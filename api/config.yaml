@@ -2,3 +2,11 @@ Server:
   Port: 8000
   WriteTimeoutInSeconds: 5s
   ReadTimeoutInSeconds: 5s
+
+Database:
+  Host: localhost
+  Port: 5432
+  User: postgres
+  Password: password
+  Name: postgres
+  TimeZone: Asia/Singapore

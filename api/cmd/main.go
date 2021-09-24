@@ -6,11 +6,17 @@ import (
 	"net/http"
 
 	"github.com/ashwinath/financials/api/config"
+	"github.com/ashwinath/financials/api/context"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	configuration, err := config.Load()
+	c, err := config.Load()
+	if err != nil {
+		log.Panic(err.Error())
+	}
+
+	_, err = context.InitContext(c)
 	if err != nil {
 		log.Panic(err.Error())
 	}
@@ -20,9 +26,9 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      r,
-		Addr:         fmt.Sprintf("0.0.0.0:%d", configuration.Server.Port),
-		WriteTimeout: configuration.Server.WriteTimeoutInSeconds,
-		ReadTimeout:  configuration.Server.ReadTimeoutInSeconds,
+		Addr:         fmt.Sprintf("0.0.0.0:%d", c.Server.Port),
+		WriteTimeout: c.Server.WriteTimeoutInSeconds,
+		ReadTimeout:  c.Server.ReadTimeoutInSeconds,
 	}
 
 	if err := srv.ListenAndServe(); err != nil {
