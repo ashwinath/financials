@@ -1,0 +1,4 @@
+Server:
+  Port: 8000
+  WriteTimeoutInSeconds: 5s
+  ReadTimeoutInSeconds: 5s
