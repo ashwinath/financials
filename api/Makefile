@@ -1,6 +1,15 @@
-test:
+setup:
+	@docker stop financial
+	@docker rm financial
+	@docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=password --name financial postgres:13-alpine
+	@sleep 10
+	@docker run \
+		--net="container:financial" \
+		--volume ${PWD}/migrations:/etc/migrations \
+		migrate/migrate:v4.15.0 \
+		-path=/etc/migrations \
+		-database='postgres://postgres:password@localhost:5432/postgres?sslmode=disable' up
+
+test: setup
 	@go test -v -race -short -cover -coverprofile cover.out ./...
 	@go tool cover -func cover.out
-
-setup:
-	@docker run -d -p 5432:5432 -e POSTGRES_PASSWORD=password --name financial postgres:13-alpine
