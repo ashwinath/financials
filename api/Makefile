@@ -1,0 +1,3 @@
+test:
+	@go test -v -race -short -cover -coverprofile cover.out ./...
+	@go tool cover -func cover.out
