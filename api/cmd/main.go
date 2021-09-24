@@ -7,7 +7,7 @@ import (
 
 	"github.com/ashwinath/financials/api/config"
 	"github.com/ashwinath/financials/api/context"
-	"github.com/gorilla/mux"
+	"github.com/ashwinath/financials/api/controller"
 )
 
 func main() {
@@ -16,21 +16,21 @@ func main() {
 		log.Panic(err.Error())
 	}
 
-	_, err = context.InitContext(c)
+	ctx, err := context.InitContext(c)
 	if err != nil {
 		log.Panic(err.Error())
 	}
 
-	r := mux.NewRouter()
-	//r.HandleFunc("/foo", foo.DoSomething).Methods("POST")
+	router := controller.MakeRouter(ctx)
 
 	srv := &http.Server{
-		Handler:      r,
+		Handler:      router,
 		Addr:         fmt.Sprintf("0.0.0.0:%d", c.Server.Port),
 		WriteTimeout: c.Server.WriteTimeoutInSeconds,
 		ReadTimeout:  c.Server.ReadTimeoutInSeconds,
 	}
 
+	log.Printf("Starting server on port: %d", c.Server.Port)
 	if err := srv.ListenAndServe(); err != nil {
 		log.Fatalf("%s", err.Error())
 	}

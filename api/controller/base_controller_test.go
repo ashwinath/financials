@@ -11,7 +11,7 @@ import (
 )
 
 type fooController struct {
-	Controller
+	controller
 }
 
 type params struct {
@@ -64,7 +64,7 @@ func TestBaseController(t *testing.T) {
 			assert.Nil(t, err)
 
 			c := fooController{
-				Controller: Controller{
+				controller: controller{
 					decoder:   schema.NewDecoder(),
 					validator: validator.New(),
 				},
