@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import LoginPage from "./components/LoginPage";
+import CreatePage from "./components/CreatePage";
 import BrandBar from "./components/BrandBar";
 
 function App() {
@@ -15,7 +16,7 @@ function App() {
       <Router>
         <Switch>
           <Route path="/create">
-            <h1>hello create</h1>
+            <CreatePage/>
           </Route>
           <Route path="/login">
             <LoginPage/>
