@@ -8,6 +8,8 @@ import (
 	"gorm.io/gorm"
 )
 
+// CreateTestDB is only used for testing db
+// Do not use this db other than testing
 func CreateTestDB() (*gorm.DB, error) {
 	host := os.Getenv("DB_HOST")
 	user := os.Getenv("DB_USER")
