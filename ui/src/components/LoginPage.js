@@ -26,7 +26,6 @@ function LoginForm() {
   const {
     username,
     password,
-    errorMessage,
   } = useSelector((state) => state.login)
   const user = {
     username,
