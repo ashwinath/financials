@@ -1,6 +1,8 @@
 package mediator
 
 import (
+	"strings"
+
 	"github.com/ashwinath/financials/api/models"
 	"github.com/ashwinath/financials/api/service"
 	"golang.org/x/crypto/bcrypt"
@@ -26,6 +28,9 @@ func NewLoginMediator(
 // CreateAccount creates an account and returns the session id
 func (m *LoginMediator) CreateAccount(user *models.User) (*models.Session, error) {
 	if err := m.userService.Save(user); err != nil {
+		if strings.Contains(err.Error(), "violates unique constraint") {
+			return nil, ErrorDuplicateUser
+		}
 		return nil, err
 	}
 
@@ -36,6 +41,9 @@ func (m *LoginMediator) CreateAccount(user *models.User) (*models.Session, error
 func (m *LoginMediator) Login(request *models.User) (*models.Session, error) {
 	user, err := m.userService.FindByUsername(request.Username)
 	if err != nil {
+		if strings.Contains(err.Error(), "record not found") {
+			return nil, ErrorNoSuchUser
+		}
 		return nil, err
 	}
 

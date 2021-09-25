@@ -3,7 +3,6 @@ package controller
 import (
 	"errors"
 	"net/http"
-	"strings"
 
 	mediator "github.com/ashwinath/financials/api/mediators"
 	"github.com/ashwinath/financials/api/models"
@@ -22,8 +21,8 @@ func (c *loginController) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	session, err := c.context.LoginMediator.CreateAccount(user)
 	if err != nil {
-		if strings.Contains(err.Error(), "violates unique constraint") {
-			badRequest(w, "username taken", "Username has been taken, please pick another username.")
+		if errors.Is(err, mediator.ErrorDuplicateUser) {
+			badRequest(w, "username taken", "Username has been taken.")
 			return
 		}
 
@@ -49,6 +48,10 @@ func (c *loginController) Login(w http.ResponseWriter, r *http.Request) {
 
 	session, err := c.context.LoginMediator.Login(user)
 	if err != nil {
+		if errors.Is(err, mediator.ErrorNoSuchUser) {
+			badRequest(w, "no such user", "User does not exist.")
+			return
+		}
 		if errors.Is(err, mediator.ErrorWrongPassword) {
 			badRequest(w, "wrong password", "Password did not match.")
 			return

@@ -23,6 +23,7 @@ func TestCreateAndLogin(t *testing.T) {
 		createUser *models.User
 		loginUser  *models.User
 		success    bool
+		errorType  error
 	}{
 		{
 			name: "success | nominal",
@@ -34,7 +35,8 @@ func TestCreateAndLogin(t *testing.T) {
 				Username: "foo-user",
 				Password: "password",
 			},
-			success: true,
+			success:   true,
+			errorType: nil,
 		},
 		{
 			name: "failure | wrong password",
@@ -46,7 +48,21 @@ func TestCreateAndLogin(t *testing.T) {
 				Username: "foo-user",
 				Password: "totally-wrong-password",
 			},
-			success: false,
+			success:   false,
+			errorType: ErrorWrongPassword,
+		},
+		{
+			name: "failure | no such user",
+			createUser: &models.User{
+				Username: "foo-user",
+				Password: "password",
+			},
+			loginUser: &models.User{
+				Username: "foo-user-hello",
+				Password: "totally-wrong-password",
+			},
+			success:   false,
+			errorType: ErrorNoSuchUser,
 		},
 	}
 	for _, tt := range tests {
@@ -65,8 +81,39 @@ func TestCreateAndLogin(t *testing.T) {
 				assert.NotNil(t, loginSession)
 				assert.NotEqual(t, "", loginSession.ID)
 			} else {
-				assert.True(t, errors.Is(err, ErrorWrongPassword))
+				assert.True(t, errors.Is(err, tt.errorType))
 			}
 		})
 	}
+}
+
+func TestDuplicateUser(t *testing.T) {
+	db, err := service.CreateTestDB()
+	assert.Nil(t, err)
+
+	sessionService := service.NewSessionService(db)
+	userService := service.NewUserService(db)
+
+	loginMediator := NewLoginMediator(userService, sessionService)
+	t.Run("failure | duplicate user", func(t *testing.T) {
+		user := &models.User{
+			Username: "duplicate",
+			Password: "helloworld",
+		}
+		session, err := loginMediator.CreateAccount(user)
+		defer userService.Delete(user)
+		defer sessionService.Delete(session)
+		assert.Nil(t, err)
+		assert.NotNil(t, session)
+		assert.NotEqual(t, "", session.ID)
+
+		// Duplicate here
+		duplicateUser := &models.User{
+			Username: "duplicate",
+			Password: "helloworld",
+		}
+		newSession, err := loginMediator.CreateAccount(duplicateUser)
+		assert.Nil(t, newSession)
+		assert.Equal(t, err, ErrorDuplicateUser)
+	})
 }
