@@ -30,6 +30,19 @@ func (s *UserService) Find(id string) (*models.User, error) {
 	return &user, nil
 }
 
+// FindByUsername finds a user by username
+func (s *UserService) FindByUsername(username string) (*models.User, error) {
+	query := s.db.Where("username = ?", username)
+
+	var user models.User
+	err := query.First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 // Save saves the session into the database
 func (s *UserService) Save(user *models.User) error {
 	return s.db.Save(user).Error

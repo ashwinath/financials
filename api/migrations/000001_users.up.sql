@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at    timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
+
 CREATE TABLE IF NOT EXISTS sessions (
     id         text        NOT NULL PRIMARY KEY,
     user_id    text        NOT NULL,

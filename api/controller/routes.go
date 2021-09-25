@@ -24,18 +24,15 @@ func makeRoutes(ctx *context.Context) []routes {
 		decoder:   decoder,
 		validator: validate,
 	}
-	health := healthController{
-		controller: base,
-	}
 
-	login := loginController{
-		controller: base,
-	}
+	health := healthController{controller: base}
+	login := loginController{controller: base}
 
 	return []routes{
 		{"/alive", http.MethodGet, health.Alive},
 		{"/ready", http.MethodGet, health.Ready},
 		{"/api/v1/users", http.MethodPost, login.CreateUser},
+		{"/api/v1/login", http.MethodPost, login.Login},
 	}
 }
 
