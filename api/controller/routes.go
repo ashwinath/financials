@@ -18,19 +18,28 @@ type routes struct {
 func makeRoutes(ctx *context.Context) []routes {
 	validate := validator.New()
 	decoder := schema.NewDecoder()
-	c := healthController{
-		controller: controller{
-			context:   ctx,
-			decoder:   decoder,
-			validator: validate,
-		},
+
+	base := controller{
+		context:   ctx,
+		decoder:   decoder,
+		validator: validate,
 	}
+	health := healthController{
+		controller: base,
+	}
+
+	login := loginController{
+		controller: base,
+	}
+
 	return []routes{
-		{"/alive", http.MethodGet, c.Alive},
-		{"/ready", http.MethodGet, c.Ready},
+		{"/alive", http.MethodGet, health.Alive},
+		{"/ready", http.MethodGet, health.Ready},
+		{"/users", http.MethodPost, login.CreateUser},
 	}
 }
 
+// MakeRouter makes a multiplexed router
 func MakeRouter(ctx *context.Context) *mux.Router {
 	r := mux.NewRouter()
 	for _, route := range makeRoutes(ctx) {

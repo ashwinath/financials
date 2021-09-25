@@ -7,20 +7,20 @@ type healthController struct {
 }
 
 func (c *healthController) Alive(w http.ResponseWriter, _ *http.Request) {
-	c.Ok(w, struct{}{})
+	ok(w, struct{}{})
 }
 
 func (c *healthController) Ready(w http.ResponseWriter, _ *http.Request) {
 	db, err := c.context.DB.DB()
 	if err != nil {
-		c.ServiceUnavailable(w, struct{}{})
+		serviceUnavailable(w, struct{}{})
 		return
 	}
 
 	if err := db.Ping(); err != nil {
-		c.ServiceUnavailable(w, struct{}{})
+		serviceUnavailable(w, struct{}{})
 		return
 	}
 
-	c.Ok(w, struct{}{})
+	ok(w, struct{}{})
 }

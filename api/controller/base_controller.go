@@ -47,15 +47,38 @@ func (c *controller) validate(dst interface{}) error {
 	return c.validator.Struct(dst)
 }
 
-func (c *controller) ServiceUnavailable(w http.ResponseWriter, body interface{}) {
-	c.WriteJSON(w, http.StatusServiceUnavailable, body)
+func serviceUnavailable(w http.ResponseWriter, body interface{}) {
+	writeJSON(w, http.StatusServiceUnavailable, body)
 }
 
-func (c *controller) Ok(w http.ResponseWriter, body interface{}) {
-	c.WriteJSON(w, http.StatusOK, body)
+func ok(w http.ResponseWriter, body interface{}) {
+	writeJSON(w, http.StatusOK, body)
 }
 
-func (c *controller) WriteJSON(w http.ResponseWriter, statusCode int, body interface{}) {
+func created(w http.ResponseWriter, body interface{}) {
+	writeJSON(w, http.StatusCreated, body)
+}
+
+type errorResponse struct {
+	Description string `json:"description"`
+	Message     string `json:"message"`
+}
+
+func badRequest(w http.ResponseWriter, description string, message string) {
+	writeJSON(w, http.StatusBadRequest, errorResponse{
+		Description: description,
+		Message:     message,
+	})
+}
+
+func internalServiceError(w http.ResponseWriter, description string, message string) {
+	writeJSON(w, http.StatusInternalServerError, errorResponse{
+		Description: description,
+		Message:     message,
+	})
+}
+
+func writeJSON(w http.ResponseWriter, statusCode int, body interface{}) {
 	w.WriteHeader(statusCode)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(body)

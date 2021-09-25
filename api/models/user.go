@@ -8,8 +8,8 @@ import (
 // User contains the user information of a user
 type User struct {
 	Model
-	Username     string `json:"username"`
-	Password     string `json:"password,omitempty" gorm:"-"`
+	Username     string `json:"username" validate:"required" gorm:"unique"`
+	Password     string `json:"password,omitempty" validate:"required,gte=8" gorm:"-"`
 	PasswordHash string `json:"-"`
 }
 

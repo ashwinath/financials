@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
     id            text        NOT NULL PRIMARY KEY,
-    username      text        NOT NULL,
+    username      text        NOT NULL UNIQUE,
     password_hash text,
     created_at    timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
