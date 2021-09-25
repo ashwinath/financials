@@ -9,7 +9,10 @@ import {
   EuiFieldPassword,
   EuiEmptyPrompt,
   EuiCallOut,
+  EuiText,
 } from '@elastic/eui';
+
+import { Link, useHistory } from "react-router-dom";
 
 import { 
   useDispatch,
@@ -26,12 +29,17 @@ function LoginForm() {
   const {
     username,
     password,
+    isLoggedIn
   } = useSelector((state) => state.login)
   const user = {
     username,
     password,
   }
   const dispatch = useDispatch()
+  const history = useHistory();
+  if (isLoggedIn) {
+    history.push("/");
+  }
 
   return (
     <EuiForm component="form">
@@ -48,6 +56,12 @@ function LoginForm() {
           onChange={(e) => dispatch(updatePassword(e.target.value))}
         />
       </EuiFormRow>
+
+      <EuiSpacer />
+
+      <Link to="/create">
+        <EuiText>Don't have one? Create here.</EuiText>
+      </Link>
 
       <EuiSpacer />
 

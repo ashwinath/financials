@@ -14,7 +14,10 @@ function App() {
       <BrandBar/>
       <Router>
         <Switch>
-          <Route path="/">
+          <Route path="/create">
+            <h1>hello create</h1>
+          </Route>
+          <Route path="/login">
             <LoginPage/>
           </Route>
         </Switch>
