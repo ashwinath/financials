@@ -8,12 +8,30 @@ import {
   EuiButton,
   EuiFieldPassword,
   EuiEmptyPrompt,
+  EuiCallOut,
 } from '@elastic/eui';
 
-import { useDispatch } from 'react-redux';
-import { updateUsername, updatePassword } from '../redux/loginSlice';
+import { 
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
+import {
+  updateUsername,
+  updatePassword,
+  loginAsync,
+} from '../redux/loginSlice';
 
 function LoginForm() {
+  const {
+    username,
+    password,
+    errorMessage,
+  } = useSelector((state) => state.login)
+  const user = {
+    username,
+    password,
+  }
   const dispatch = useDispatch()
 
   return (
@@ -34,7 +52,16 @@ function LoginForm() {
 
       <EuiSpacer />
 
-      <EuiButton type="submit" fill>
+      <EuiButton
+        type="submit"
+        fill
+        onClick={
+          (e) => {
+            e.preventDefault();
+            dispatch(loginAsync(user));
+          }
+        }
+      >
         Login
       </EuiButton>
 
@@ -43,18 +70,35 @@ function LoginForm() {
 }
 
 function LoginPage() {
+  const {
+    errorMessage,
+  } = useSelector((state) => state.login)
   return (
-    <EuiPageTemplate
-      template="centeredBody"
-      pageContentProps={{ paddingSize: 'l' }}
-      minHeight="80vh"
-    >
-      <EuiEmptyPrompt
-        title={<span>Login into Financials</span>}
-        body={<LoginForm/>}
-        titleSize="m"
-      />
-    </EuiPageTemplate>
+    <>
+      {
+        !!errorMessage
+        ? <EuiCallOut
+            title="Sorry, there was an error logging you in"
+            color="danger"
+            iconType="alert"
+          >
+            <p>{errorMessage}</p>
+          </EuiCallOut>
+        : null
+      }
+
+      <EuiPageTemplate
+        template="centeredBody"
+        pageContentProps={{ paddingSize: 'l' }}
+        minHeight="80vh"
+      >
+        <EuiEmptyPrompt
+          title={<span>Login into Financials</span>}
+          body={<LoginForm/>}
+          titleSize="m"
+        />
+      </EuiPageTemplate>
+    </>
   );
 }
 
