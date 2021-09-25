@@ -5,13 +5,12 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at    timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS session (
-    session_id text NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS sessions (
+    id         text NOT NULL PRIMARY KEY,
     user_id    text NOT NULL,
+    expiry     timestamptz NOT NULL,
     created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_user_id FOREIGN KEY(user_id) REFERENCES users(id)
+    updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_session_session_id_user_id ON session(session_id, user_id);
+CREATE INDEX IF NOT EXISTS idx_session_id_user_id ON sessions(id, user_id);
