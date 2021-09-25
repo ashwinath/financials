@@ -32,7 +32,7 @@ func (s *SessionService) Find(id string) (*models.Session, error) {
 
 // Save saves the session into the database
 func (s *SessionService) Save(session *models.Session) error {
-	return s.db.Debug().Save(session).Error
+	return s.db.Save(session).Error
 }
 
 // Delete deletes the session from the database

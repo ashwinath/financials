@@ -1,0 +1,56 @@
+openapi: 3.0.3
+info:
+  title: Login endpoints
+  version: 0.0.1
+
+.tags: &tags
+  - "Login"
+
+paths:
+  "/api/v1/users":
+    post:
+      tags: *tags
+      operationID: CreateUser
+      summary: "Creates a user and returns the session token"
+      requestBody:
+        description: An user object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        201:
+          description: Created
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session-token=somehashhere
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+components:
+  schemas:
+    User:
+      description: A user object that contains user information.
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        updated_at:
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+          writeOnly: true

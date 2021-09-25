@@ -29,3 +29,11 @@ test:
 	DB_TIMEZONE="Asia/Singapore" \
 		go test -v -race -short -cover -coverprofile cover.out ./...
 	go tool cover -func cover.out
+
+swagger:
+	docker run -p 5555:5555 \
+		-v ${PWD}/openapi:/app/openapi:ro \
+		-e PORT=5555 \
+		-e LAYOUT=BaseLayout \
+		-e SWAGGER_JSON=/app/openapi/openapi.yaml \
+		swaggerapi/swagger-ui:v3.52.0

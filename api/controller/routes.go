@@ -35,7 +35,7 @@ func makeRoutes(ctx *context.Context) []routes {
 	return []routes{
 		{"/alive", http.MethodGet, health.Alive},
 		{"/ready", http.MethodGet, health.Ready},
-		{"/users", http.MethodPost, login.CreateUser},
+		{"/api/v1/users", http.MethodPost, login.CreateUser},
 	}
 }
 

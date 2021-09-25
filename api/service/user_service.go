@@ -32,7 +32,7 @@ func (s *UserService) Find(id string) (*models.User, error) {
 
 // Save saves the session into the database
 func (s *UserService) Save(user *models.User) error {
-	return s.db.Debug().Save(user).Error
+	return s.db.Save(user).Error
 }
 
 // Delete deletes the session from the database
