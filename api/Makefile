@@ -18,7 +18,9 @@ deps:
 	go mod vendor
 	go mod tidy
 
-test: setup deps
+test-ci: setup deps test
+
+test:
 	DB_HOST="localhost" \
 	DB_PORT="5432" \
 	DB_USER="postgres" \

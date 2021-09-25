@@ -1,13 +1,14 @@
 CREATE TABLE IF NOT EXISTS users (
     id            text        NOT NULL PRIMARY KEY,
+    username      text        NOT NULL,
     password_hash text,
     created_at    timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at    timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
-    id         text NOT NULL PRIMARY KEY,
-    user_id    text NOT NULL,
+    id         text        NOT NULL PRIMARY KEY,
+    user_id    text        NOT NULL,
     expiry     timestamptz NOT NULL,
     created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP

@@ -5,16 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// SessionService is the interface to the database for the sessions tabls
 type SessionService struct {
 	db *gorm.DB
 }
 
+// NewSessionService creates a new SessionService
 func NewSessionService(db *gorm.DB) *SessionService {
 	return &SessionService{
 		db: db,
 	}
 }
 
+// Find finds a session by it's ID
 func (s *SessionService) Find(id string) (*models.Session, error) {
 	query := s.db.Where("id = ?", id)
 
@@ -27,10 +30,12 @@ func (s *SessionService) Find(id string) (*models.Session, error) {
 	return &session, nil
 }
 
+// Save saves the session into the database
 func (s *SessionService) Save(session *models.Session) error {
-	return s.db.Save(session).Error
+	return s.db.Debug().Save(session).Error
 }
 
+// Delete deletes the session from the database
 func (s *SessionService) Delete(session *models.Session) error {
 	return s.db.Delete(session).Error
 }
