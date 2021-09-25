@@ -9,3 +9,5 @@ servers:
 paths:
   "/api/v1/users":
     $ref: "specs/login.yaml#/paths/~1api~1v1~1users"
+  "/api/v1/login":
+    $ref: "specs/login.yaml#/paths/~1api~1v1~1login"

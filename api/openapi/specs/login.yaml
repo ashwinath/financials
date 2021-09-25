@@ -31,6 +31,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+  "/api/v1/login":
+    post:
+      tags: *tags
+      operationID: CreateUser
+      summary: "Creates a user and returns the session token"
+      requestBody:
+        description: An user object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        200:
+          description: Success
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session-token=somehashhere
+          content:
+            application/json:
+              schema:
+                type: object
 
 components:
   schemas:
