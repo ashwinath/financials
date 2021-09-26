@@ -33,6 +33,7 @@ func makeRoutes(ctx *context.Context) []routes {
 		{"/ready", http.MethodGet, health.Ready},
 		{"/api/v1/users", http.MethodPost, login.CreateUser},
 		{"/api/v1/login", http.MethodPost, login.Login},
+		{"/api/v1/logout", http.MethodPost, login.Logout},
 		{"/api/v1/session", http.MethodGet, login.GetUserFromSession},
 	}
 }

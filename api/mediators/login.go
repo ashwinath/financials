@@ -95,3 +95,13 @@ func (m *LoginMediator) GetUserFromSession(sessionID string) (*models.User, erro
 
 	return user, nil
 }
+
+// Logout deletes a session for a user.
+func (m *LoginMediator) Logout(sessionID string) error {
+	session, err := m.sessionService.Find(sessionID)
+	if err != nil {
+		return err
+	}
+
+	return m.sessionService.Delete(session)
+}

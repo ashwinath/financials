@@ -81,6 +81,25 @@ paths:
               schema:
                 $ref: "common.yaml#/components/schemas/Error"
 
+  "/api/v1/logout":
+    post:
+      tags: *tags
+      operationID: Logout
+      summary: "Logs the user out"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+
   "/api/v1/session":
     get:
       tags: *tags

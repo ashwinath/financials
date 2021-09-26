@@ -76,6 +76,7 @@ func (c *loginController) GetUserFromSession(w http.ResponseWriter, r *http.Requ
 		badRequest(w, "session not found", "not a valid session.")
 		return
 	}
+
 	user, err := c.context.LoginMediator.GetUserFromSession(cookie.Value)
 	if err != nil {
 		badRequest(w, "session not found", "not a valid session.")
@@ -83,4 +84,26 @@ func (c *loginController) GetUserFromSession(w http.ResponseWriter, r *http.Requ
 	}
 
 	ok(w, user)
+}
+
+func (c *loginController) Logout(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie(CookieSessionName)
+	if err != nil {
+		badRequest(w, "session not found", "not a valid session.")
+		return
+	}
+
+	err = c.context.LoginMediator.Logout(cookie.Value)
+	if err != nil {
+		badRequest(w, "could not delete session", "Session not found, can't log you out..")
+		return
+	}
+
+	// Blankco out cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:  CookieSessionName,
+		Value: "",
+	})
+
+	ok(w, struct{}{})
 }

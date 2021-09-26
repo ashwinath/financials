@@ -18,5 +18,7 @@ paths:
     $ref: "specs/login.yaml#/paths/~1api~1v1~1users"
   "/api/v1/login":
     $ref: "specs/login.yaml#/paths/~1api~1v1~1login"
+  "/api/v1/logout":
+    $ref: "specs/login.yaml#/paths/~1api~1v1~1logout"
   "/api/v1/session":
     $ref: "specs/login.yaml#/paths/~1api~1v1~1session"

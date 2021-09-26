@@ -174,3 +174,27 @@ func TestGetUserFromSession(t *testing.T) {
 		assert.Nil(t, found)
 	})
 }
+
+func TestLogUserOut(t *testing.T) {
+	db, err := service.CreateTestDB()
+	assert.Nil(t, err)
+
+	sessionService := service.NewSessionService(db)
+	userService := service.NewUserService(db)
+
+	loginMediator := NewLoginMediator(userService, sessionService)
+
+	user := &models.User{
+		Username: "duplicate",
+		Password: "helloworld",
+	}
+	session, err := loginMediator.CreateAccount(user)
+	defer userService.Delete(user)
+
+	err = loginMediator.Logout(session.ID)
+	assert.Nil(t, err)
+
+	found, err := sessionService.Find(session.ID)
+	assert.Nil(t, found)
+	assert.NotNil(t, err)
+}
