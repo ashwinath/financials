@@ -7,7 +7,7 @@ function BrandBar() {
     <EuiCollapsibleNavGroup
       title="Financials"
       iconType="logoMetrics"
-      iconSize="xxl"
+      iconSize="l"
       titleSize="s"
       isCollapsible={false}
       initialIsOpen={false}
