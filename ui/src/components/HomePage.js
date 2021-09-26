@@ -4,11 +4,17 @@ import {
   useHistory,
 } from "react-router-dom";
 
+import {
+  EuiPageTemplate,
+} from '@elastic/eui';
+
 import { 
   useDispatch,
   useSelector,
 } from 'react-redux';
+
 import { querySessionAsync } from "../redux/mainPageSlice";
+import Sidebar from "./SideBar";
 
 export default function HomePage() {
   const history = useHistory();
@@ -24,6 +30,14 @@ export default function HomePage() {
   }
 
   return (
-    <h1>Hello world</h1>
+    <EuiPageTemplate
+      pageSideBar={<Sidebar/>}
+      pageHeader={{
+        iconType: 'logoElastic',
+        pageTitle: 'Financials',
+      }}
+    >
+      <h1>hello world</h1>
+    </EuiPageTemplate>
   );
 }
