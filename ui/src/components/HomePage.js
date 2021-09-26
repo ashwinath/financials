@@ -15,6 +15,7 @@ import {
 
 import { querySessionAsync } from "../redux/mainPageSlice";
 import Sidebar from "./SideBar";
+import LoadingPage from "./LoadingPage";
 
 export default function HomePage() {
   const history = useHistory();
@@ -27,6 +28,10 @@ export default function HomePage() {
 
   if (!isLoggedIn && triedLoggingIn) {
     history.push("/login");
+  }
+
+  if (status === "loading") {
+    return <LoadingPage/>;
   }
 
   return (

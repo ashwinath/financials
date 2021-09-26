@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 
 import LoginPage from "./components/LoginPage";
-import CreatePage from "./components/CreatePage";
+import CreateAccountPage from "./components/CreateAccountPage";
 import BrandBar from "./components/BrandBar";
 import HomePage from "./components/HomePage";
 
@@ -17,7 +17,7 @@ function App() {
       <Router>
         <Switch>
           <Route path="/create">
-            <CreatePage/>
+            <CreateAccountPage/>
           </Route>
           <Route path="/login">
             <LoginPage/>

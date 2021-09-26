@@ -24,11 +24,13 @@ import {
   createAsync,
 } from '../redux/createAccountSlice';
 
-function LoginForm() {
+import LoadingPage from "./LoadingPage";
+
+function CreateAccountForm() {
   const {
     username,
     password,
-    isLoggedIn
+    isLoggedIn,
   } = useSelector((state) => state.createAccount)
   const user = {
     username,
@@ -75,10 +77,16 @@ function LoginForm() {
   );
 }
 
-function LoginPage() {
+function CreateAccountPage() {
   const {
     errorMessage,
+    status,
   } = useSelector((state) => state.login)
+
+  if (status === "loading") {
+    return <LoadingPage/>;
+  }
+
   return (
     <>
       {
@@ -99,8 +107,8 @@ function LoginPage() {
         minHeight="80vh"
       >
         <EuiEmptyPrompt
-          title={<span>Login into Financials</span>}
-          body={<LoginForm/>}
+          title={<span>Create an account</span>}
+          body={<CreateAccountForm/>}
           titleSize="m"
         />
       </EuiPageTemplate>
@@ -108,4 +116,4 @@ function LoginPage() {
   );
 }
 
-export default LoginPage;
+export default CreateAccountPage;

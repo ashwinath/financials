@@ -25,11 +25,13 @@ import {
   loginAsync,
 } from '../redux/loginSlice';
 
+import LoadingPage from "./LoadingPage";
+
 function LoginForm() {
   const {
     username,
     password,
-    isLoggedIn
+    isLoggedIn,
   } = useSelector((state) => state.login)
   const user = {
     username,
@@ -37,6 +39,7 @@ function LoginForm() {
   }
   const dispatch = useDispatch();
   const history = useHistory();
+
   if (isLoggedIn) {
     history.push("/");
   }
@@ -85,7 +88,13 @@ function LoginForm() {
 function LoginPage() {
   const {
     errorMessage,
+    status,
   } = useSelector((state) => state.login)
+
+  if (status === "loading") {
+    return <LoadingPage/>;
+  }
+
   return (
     <>
       {
