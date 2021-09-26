@@ -5,8 +5,19 @@ import {
   EuiIcon,
 } from '@elastic/eui';
 
-import { useLocation } from 'react-router-dom';
-import { useHistory } from "react-router-dom";
+import {
+  useLocation,
+  useHistory,
+} from 'react-router-dom';
+
+import { 
+  useDispatch,
+  useSelector,
+} from 'react-redux';
+
+import {
+  logoutAsync,
+} from '../redux/loginSlice';
 
 const HOME_PAGE = "Home";
 
@@ -16,7 +27,13 @@ const PATH_MAPPING = {
 
 export default function SideBar() {
   const history = useHistory();
+  const dispatch = useDispatch();
   const { pathname } = useLocation();
+  const { isLoggedIn } = useSelector((state) => state.login)
+
+  if (!isLoggedIn) {
+    history.push("/login");
+  }
 
   const sideNav = [
     {
@@ -32,6 +49,19 @@ export default function SideBar() {
         },
       ],
     },
+    {
+      name: 'Account',
+      icon: <EuiIcon type="logoElasticsearch" />,
+      id: '0',
+      items: [
+        {
+          name: "Log me out",
+          id: '0.1',
+          onClick: () => dispatch(logoutAsync()),
+          isSelected: false,
+        },
+      ],
+    }
   ];
 
   return (

@@ -16,6 +16,20 @@ export const loginAsync = createAsyncThunk(
   }
 );
 
+export const logoutAsync = createAsyncThunk(
+  'login/logoutAsync',
+  async () => {
+    try {
+      const response = await axios.post(
+        '/api/v1/logout',
+      );
+      return response;
+    } catch (error) {
+      return error.response;
+    }
+  }
+);
+
 export const loginSlice = createSlice({
   name: "login",
   initialState: {
@@ -36,6 +50,7 @@ export const loginSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    // Login
     builder
       .addCase(loginAsync.pending, (state) => {
         state.status = "loading";
@@ -53,6 +68,14 @@ export const loginSlice = createSlice({
       .addCase(loginAsync.rejected, (state) => {
         state.status = "idle";
         state.errorMessage = "Something went wrong logging you in.";
+      });
+
+    // Logout
+    builder
+      .addCase(logoutAsync.fulfilled, (state, action) => {
+        if (action.payload.status === 200) {
+          state.isLoggedIn = false;
+        }
       });
   },
 });
