@@ -1,0 +1,16 @@
+openapi: 3.0.3
+info:
+  title: Login endpoints
+  version: 0.0.1
+
+path:
+
+components:
+  schemas:
+    Error:
+      description: Standard error object.
+      properties:
+        description:
+          type: string
+        message:
+          type: string

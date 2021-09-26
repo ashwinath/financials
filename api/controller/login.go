@@ -69,3 +69,18 @@ func (c *loginController) Login(w http.ResponseWriter, r *http.Request) {
 
 	ok(w, struct{}{})
 }
+
+func (c *loginController) GetUserFromSession(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie(CookieSessionName)
+	if err != nil {
+		badRequest(w, "session not found", "not a valid session.")
+		return
+	}
+	user, err := c.context.LoginMediator.GetUserFromSession(cookie.Value)
+	if err != nil {
+		badRequest(w, "session not found", "not a valid session.")
+		return
+	}
+
+	ok(w, user)
+}

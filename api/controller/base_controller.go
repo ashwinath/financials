@@ -64,6 +64,13 @@ type errorResponse struct {
 	Message     string `json:"message"`
 }
 
+func notFound(w http.ResponseWriter, description string, message string) {
+	writeJSON(w, http.StatusNotFound, errorResponse{
+		Description: description,
+		Message:     message,
+	})
+}
+
 func badRequest(w http.ResponseWriter, description string, message string) {
 	writeJSON(w, http.StatusBadRequest, errorResponse{
 		Description: description,

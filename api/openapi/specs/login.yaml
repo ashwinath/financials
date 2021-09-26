@@ -31,6 +31,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+        500:
+          description: Internal Service Error
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+
   "/api/v1/login":
     post:
       tags: *tags
@@ -55,6 +68,37 @@ paths:
             application/json:
               schema:
                 type: object
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+        500:
+          description: Internal Service Error
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+
+  "/api/v1/session":
+    get:
+      tags: *tags
+      operationID: CreateUser
+      summary: "Creates a user and returns the session token"
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
 
 components:
   schemas:

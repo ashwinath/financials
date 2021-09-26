@@ -2,6 +2,7 @@ package mediator
 
 import (
 	"strings"
+	"time"
 
 	"github.com/ashwinath/financials/api/models"
 	"github.com/ashwinath/financials/api/service"
@@ -68,4 +69,29 @@ func (m *LoginMediator) createSession(user *models.User) (*models.Session, error
 	}
 
 	return session, nil
+}
+
+// GetUserFromSession checks if the session has expired and returns the user.
+func (m *LoginMediator) GetUserFromSession(sessionID string) (*models.User, error) {
+	session, err := m.sessionService.Find(sessionID)
+	if err != nil {
+		return nil, err
+	}
+
+	loc, err := time.LoadLocation("Asia/Singapore")
+	if err != nil {
+		return nil, err
+	}
+
+	currentTime := time.Now().In(loc)
+	if session.Expiry.Before(currentTime) {
+		return nil, ErrorExpiredSession
+	}
+
+	user, err := m.userService.Find(session.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }

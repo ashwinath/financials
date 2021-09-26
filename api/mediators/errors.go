@@ -9,4 +9,6 @@ var (
 	ErrorDuplicateUser = fmt.Errorf("duplicate user")
 	// ErrorNoSuchUser is when the username has been taken
 	ErrorNoSuchUser = fmt.Errorf("unknown user")
+	// ErrorExpiredSession is an expired session
+	ErrorExpiredSession = fmt.Errorf("expired session")
 )

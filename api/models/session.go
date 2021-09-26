@@ -23,7 +23,7 @@ func (m *Session) BeforeCreate(tx *gorm.DB) error {
 		return err
 	}
 
-	loc, err := time.LoadLocation("Asia/Shanghai")
+	loc, err := time.LoadLocation("Asia/Singapore")
 	if err != nil {
 		return err
 	}
