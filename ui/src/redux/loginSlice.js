@@ -51,6 +51,7 @@ export const loginSlice = createSlice({
         }
       })
       .addCase(loginAsync.rejected, (state) => {
+        state.status = "idle";
         state.errorMessage = "Something went wrong logging you in.";
       });
   },

@@ -1,13 +1,14 @@
 import React from 'react';
 import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
+  BrowserRouter as Router,
+  Switch,
+  Route,
 } from "react-router-dom";
 
 import LoginPage from "./components/LoginPage";
 import CreatePage from "./components/CreatePage";
 import BrandBar from "./components/BrandBar";
+import HomePage from "./components/HomePage";
 
 function App() {
   return (
@@ -20,6 +21,9 @@ function App() {
           </Route>
           <Route path="/login">
             <LoginPage/>
+          </Route>
+          <Route path="/">
+            <HomePage/>
           </Route>
         </Switch>
       </Router>

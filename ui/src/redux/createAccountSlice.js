@@ -51,6 +51,7 @@ export const createAccountSlice = createSlice({
         }
       })
       .addCase(createAsync.rejected, (state) => {
+        state.status = "idle";
         state.errorMessage = "Had some trouble creating an account";
       });
   },

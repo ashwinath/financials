@@ -35,7 +35,7 @@ function LoginForm() {
     username,
     password,
   }
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const history = useHistory();
   if (isLoggedIn) {
     history.push("/");
