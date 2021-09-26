@@ -4,13 +4,15 @@ import axios from 'axios';
 export const createAsync = createAsyncThunk(
   'createAccount/createAsync',
   async (user) => {
-    // TODO: can we get the error message back?
-    // try catch?
-    const response = await axios.post(
-      '/api/v1/users',
-      user,
-    );
-    return response;
+    try {
+      const response = await axios.post(
+        '/api/v1/users',
+        user,
+      );
+      return response;
+    } catch (error) {
+      return error.response;
+    }
   }
 );
 
@@ -41,8 +43,12 @@ export const createAccountSlice = createSlice({
       })
       .addCase(createAsync.fulfilled, (state, action) => {
         state.status = "idle";
+        if (action.payload.status === 201) {
           state.isLoggedIn = true;
           state.errorMessage = "";
+        } else {
+          state.errorMessage = action.payload.data.message;
+        }
       })
       .addCase(createAsync.rejected, (state) => {
         state.errorMessage = "Had some trouble creating an account";
