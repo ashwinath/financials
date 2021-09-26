@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info:
+  title: Health endpoints
+  version: 0.0.1
+
+.tags: &tags
+  - "Health"
+
+paths:
+  "/alive":
+    get:
+      tags: *tags
+      operationID: Alive
+      summary: "Checks if the server is alive."
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+        503:
+          description: Service unavailable.
+          content:
+            application/json:
+              schema:
+                type: object
+  "/ready":
+    get:
+      tags: *tags
+      operationID: Alive
+      summary: "Checks if the server is ready to serve."
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+        503:
+          description: Service unavailable.
+          content:
+            application/json:
+              schema:
+                type: object

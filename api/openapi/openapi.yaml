@@ -7,6 +7,13 @@ servers:
   - url: http://localhost:8000
 
 paths:
+  # Health
+  "/alive":
+    $ref: "specs/health.yaml#/paths/~1alive"
+  "/ready":
+    $ref: "specs/health.yaml#/paths/~1ready"
+
+  # Login
   "/api/v1/users":
     $ref: "specs/login.yaml#/paths/~1api~1v1~1users"
   "/api/v1/login":
