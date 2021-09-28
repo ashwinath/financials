@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ashwinath/financials/api/context"
+	"github.com/ashwinath/financials/api/models"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/schema"
 )
@@ -13,6 +14,15 @@ type controller struct {
 	context   *context.Context
 	decoder   *schema.Decoder
 	validator *validator.Validate
+}
+
+func (c *controller) getSessionFromCookie(r *http.Request) (*models.Session, error) {
+	cookie, err := r.Cookie(CookieSessionName)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.context.LoginMediator.GetSession(cookie.Value)
 }
 
 // getBody unmarshals the body into a Go struct

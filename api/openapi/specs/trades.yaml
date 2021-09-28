@@ -1,0 +1,73 @@
+openapi: 3.0.3
+info:
+  title: Trade endpoints
+  version: 0.0.1
+
+.tags: &tags
+  - "Trades"
+
+paths:
+  "/api/v1/trades":
+    post:
+      tags: *tags
+      operationID: CreateTransactionInBulk
+      summary: "Create trade transactions in bulk"
+      requestBody:
+        description: A list of trade transactions.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BulkTradeTransaction"
+      responses:
+        201:
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+        500:
+          description: Internal Service Error
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+
+components:
+  schemas:
+    BulkTradeTransaction:
+      description: Contains multiple trade transactions.
+      properties:
+        transactions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Trade"
+    Trade:
+      description: A user object that contains user information.
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        date_purchased:
+          type: string
+          format: date-time
+        symbol:
+          type: string
+        price_each:
+          type: number
+        quantity:
+          type: number

@@ -14,10 +14,11 @@ type Server struct {
 }
 
 type Database struct {
-	Host     string `validate:"required"`
-	Port     int    `validate:"required"`
-	User     string `validate:"required"`
-	Password string `validate:"required"`
-	Name     string `validate:"required"`
-	TimeZone string `validate:"required"`
+	Host            string `validate:"required"`
+	Port            int    `validate:"required"`
+	User            string `validate:"required"`
+	Password        string `validate:"required"`
+	Name            string `validate:"required"`
+	TimeZone        string `validate:"required"`
+	BatchInsertSize int    `validate:"required"`
 }

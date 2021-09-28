@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// UserService is the interface to the database for the sessions tabls
+// UserService is the interface to the database for the sessions tables
 type UserService struct {
 	db *gorm.DB
 }

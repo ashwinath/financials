@@ -71,8 +71,8 @@ func (m *LoginMediator) createSession(user *models.User) (*models.Session, error
 	return session, nil
 }
 
-// GetUserFromSession checks if the session has expired and returns the user.
-func (m *LoginMediator) GetUserFromSession(sessionID string) (*models.User, error) {
+// GetSession gets the userID from the sessionID
+func (m *LoginMediator) GetSession(sessionID string) (*models.Session, error) {
 	session, err := m.sessionService.Find(sessionID)
 	if err != nil {
 		return nil, err
@@ -86,6 +86,16 @@ func (m *LoginMediator) GetUserFromSession(sessionID string) (*models.User, erro
 	currentTime := time.Now().In(loc)
 	if session.Expiry.Before(currentTime) {
 		return nil, ErrorExpiredSession
+	}
+
+	return session, nil
+}
+
+// GetUserFromSession checks if the session has expired and returns the user.
+func (m *LoginMediator) GetUserFromSession(sessionID string) (*models.User, error) {
+	session, err := m.GetSession(sessionID)
+	if err != nil {
+		return nil, err
 	}
 
 	user, err := m.userService.Find(session.UserID)

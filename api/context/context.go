@@ -12,10 +12,17 @@ import (
 
 // Context contains all the dependencies as part of DI
 type Context struct {
-	DB             *gorm.DB
-	UserService    *service.UserService
-	SessionService *service.SessionService
-	LoginMediator  *mediator.LoginMediator
+	// Database
+	DB *gorm.DB
+
+	// Services
+	UserService             *service.UserService
+	SessionService          *service.SessionService
+	TradeTransactionService *service.TradeService
+
+	// Mediators
+	LoginMediator *mediator.LoginMediator
+	TradeMediator *mediator.TradeMediator
 }
 
 // InitContext inits all dependencies required by API server
@@ -27,11 +34,18 @@ func InitContext(c *config.Config) (*Context, error) {
 	}
 	context.DB = db
 
+	// Services
 	context.SessionService = service.NewSessionService(db)
 	context.UserService = service.NewUserService(db)
+	context.TradeTransactionService = service.NewTradeService(db, c.Database.BatchInsertSize)
+
+	// Mediators
 	context.LoginMediator = mediator.NewLoginMediator(
 		context.UserService,
 		context.SessionService,
+	)
+	context.TradeMediator = mediator.NewTradeMediator(
+		context.TradeTransactionService,
 	)
 
 	return &context, nil

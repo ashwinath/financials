@@ -10,3 +10,4 @@ Database:
   Password: password
   Name: postgres
   TimeZone: Asia/Singapore
+  BatchInsertSize: 100

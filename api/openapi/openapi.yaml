@@ -22,3 +22,7 @@ paths:
     $ref: "specs/login.yaml#/paths/~1api~1v1~1logout"
   "/api/v1/session":
     $ref: "specs/login.yaml#/paths/~1api~1v1~1session"
+
+  # Trades
+  "/api/v1/trades":
+    $ref: "specs/trades.yaml#/paths/~1api~1v1~1trades"
