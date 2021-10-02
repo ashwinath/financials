@@ -14,3 +14,15 @@ components:
           type: string
         message:
           type: string
+    Paging:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: "Total number of results."
+        page:
+          type: integer
+          description: "Current page number."
+        pages:
+          type: integer
+          description: "Total number of pages."

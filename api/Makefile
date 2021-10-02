@@ -27,11 +27,12 @@ test:
 	DB_NAME="postgres" \
 	DB_PASSWORD="password" \
 	DB_TIMEZONE="Asia/Singapore" \
-		go test -v -race -short -cover -coverprofile cover.out ./...
+		go test -race -v -short -cover -coverprofile cover.out ./...
 	go tool cover -func cover.out
 
 swagger:
-	docker run -p 5555:5555 \
+	docker run -d \
+		-p 5555:5555 \
 		-v ${PWD}/openapi:/app/openapi:ro \
 		-e PORT=5555 \
 		-e LAYOUT=BaseLayout \

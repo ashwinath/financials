@@ -27,6 +27,7 @@ func makeRoutes(ctx *context.Context) []routes {
 
 	health := healthController{controller: base}
 	login := loginController{controller: base}
+	trades := tradeTransactionController{controller: base}
 
 	return []routes{
 		{"/alive", http.MethodGet, health.Alive},
@@ -34,7 +35,8 @@ func makeRoutes(ctx *context.Context) []routes {
 		{"/api/v1/users", http.MethodPost, login.CreateUser},
 		{"/api/v1/login", http.MethodPost, login.Login},
 		{"/api/v1/logout", http.MethodPost, login.Logout},
-		{"/api/v1/session", http.MethodGet, login.GetUserFromSession},
+		{"/api/v1/trades", http.MethodGet, trades.List},
+		{"/api/v1/trades", http.MethodPost, trades.CreateTransactionInBulk},
 	}
 }
 

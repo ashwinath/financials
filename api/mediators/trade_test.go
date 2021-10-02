@@ -6,31 +6,29 @@ import (
 	"github.com/ashwinath/financials/api/models"
 	"github.com/ashwinath/financials/api/service"
 	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 )
 
 func TestCreateTransactionInBulk(t *testing.T) {
-	db, err := service.CreateTestDB()
-	assert.Nil(t, err)
+	service.WithTestDatabase(t, func(t *testing.T, db *gorm.DB) {
+		svc := service.NewTradeService(db, 20)
 
-	svc := service.NewTradeService(db, 20)
+		session := &models.Session{
+			UserID: "hello",
+		}
 
-	session := &models.Session{
-		UserID: "hello",
-	}
+		m := NewTradeMediator(svc)
 
-	m := NewTradeMediator(svc)
-
-	trades := models.CreateTradeTransactions(5)
-	err = m.CreateTransactionInBulk(session, trades)
-	for _, trade := range trades {
-		defer svc.Delete(&trade)
-	}
-
-	for _, trade := range trades {
-		tr, err := svc.Find(trade.ID)
+		trades := models.CreateTradeTransactions(5)
+		err := m.CreateTransactionInBulk(session, trades)
 		assert.Nil(t, err)
-		assert.NotNil(t, tr)
 
-		assert.NotEqual(t, "", tr.UserID)
-	}
+		for _, trade := range trades {
+			tr, err := svc.Find(trade.ID)
+			assert.Nil(t, err)
+			assert.NotNil(t, tr)
+
+			assert.NotEqual(t, "", tr.UserID)
+		}
+	})
 }

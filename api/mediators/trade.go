@@ -5,28 +5,51 @@ import (
 	"github.com/ashwinath/financials/api/service"
 )
 
+var (
+	orderByDatePurchased = "date_purchased"
+	orderDirection       = "desc"
+)
+
 // TradeMediator handles everything regarding trades
 type TradeMediator struct {
-	tradeTransactionService *service.TradeService
+	tradeService *service.TradeService
 }
 
 // NewTradeMediator creates a new NewTradeMediator
 func NewTradeMediator(
-	tradeTransactionService *service.TradeService,
+	tradeService *service.TradeService,
 ) *TradeMediator {
 	return &TradeMediator{
-		tradeTransactionService: tradeTransactionService,
+		tradeService: tradeService,
 	}
 }
 
 // CreateTransactionInBulk creates multiple trade transactions at once
 func (m *TradeMediator) CreateTransactionInBulk(
 	session *models.Session,
-	transactions []models.Trade,
+	transactions []*models.Trade,
 ) error {
 	for _, tx := range transactions {
 		tx.UserID = session.UserID
 	}
 
-	return m.tradeTransactionService.BulkAdd(transactions)
+	return m.tradeService.BulkAdd(transactions)
+}
+
+// ListTrades lists all the trades
+func (m *TradeMediator) ListTrades(
+	session *models.Session,
+	options service.TradeListOptions,
+) (*service.PaginatedResults, error) {
+	if options.OrderBy == nil {
+		options.OrderBy = &orderByDatePurchased
+	}
+
+	if options.Order == nil {
+		options.Order = &orderDirection
+	}
+
+	options.UserID = &session.UserID
+
+	return m.tradeService.List(options)
 }

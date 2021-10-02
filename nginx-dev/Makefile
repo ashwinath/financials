@@ -2,6 +2,7 @@ build:
 	docker build -t financial-nginx-dev .
 
 run: build
-	docker run --rm \
+	docker run -d \
+		--rm \
 		--net host \
 		financial-nginx-dev
