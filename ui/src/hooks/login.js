@@ -1,11 +1,6 @@
-import { 
-  useDispatch,
-  useSelector,
-} from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import {
-  useHistory,
-} from "react-router-dom";
+import { useHistory } from "react-router-dom";
 
 import { querySessionAsync } from "../redux/loginSlice";
 

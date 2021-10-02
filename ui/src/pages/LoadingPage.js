@@ -6,7 +6,7 @@ import {
   EuiLoadingChart,
 } from '@elastic/eui';
 
-export default function Loading() {
+export function LoadingPage() {
   return (
     <EuiPageTemplate
       template="centeredBody"

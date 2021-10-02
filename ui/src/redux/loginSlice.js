@@ -90,6 +90,7 @@ export const loginSlice = createSlice({
       .addCase(logoutAsync.fulfilled, (state, action) => {
         if (action.payload.status === 200) {
           state.isLoggedIn = false;
+          state.triedLoggingIn = false;
         }
       });
 

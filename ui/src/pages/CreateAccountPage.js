@@ -12,19 +12,9 @@ import {
 } from '@elastic/eui';
 
 import { useHistory } from "react-router-dom";
-
-import { 
-  useDispatch,
-  useSelector,
-} from 'react-redux';
-
-import {
-  updateUsername,
-  updatePassword,
-  createAsync,
-} from '../redux/createAccountSlice';
-
-import LoadingPage from "./LoadingPage";
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUsername, updatePassword, createAsync } from '../redux/createAccountSlice';
+import { LoadingPage } from ".";
 
 function CreateAccountForm() {
   const {
@@ -77,11 +67,11 @@ function CreateAccountForm() {
   );
 }
 
-function CreateAccountPage() {
+export function CreateAccountPage() {
   const {
     errorMessage,
     status,
-  } = useSelector((state) => state.login)
+  } = useSelector((state) => state.createAccount)
 
   if (status === "loading") {
     return <LoadingPage/>;
@@ -115,5 +105,3 @@ function CreateAccountPage() {
     </>
   );
 }
-
-export default CreateAccountPage;

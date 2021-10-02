@@ -1,8 +1,6 @@
-import {
-  EuiCollapsibleNavGroup,
-} from '@elastic/eui';
+import { EuiCollapsibleNavGroup } from '@elastic/eui';
 
-function BrandBar() {
+export function BrandBar() {
   return (
     <EuiCollapsibleNavGroup
       title="Financials"
@@ -15,5 +13,3 @@ function BrandBar() {
     />
   );
 }
-
-export default BrandBar;

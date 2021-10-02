@@ -4,11 +4,11 @@ import {
   EuiPageTemplate,
 } from '@elastic/eui';
 
-import Sidebar from "./SideBar";
-import LoadingPage from "./LoadingPage";
+import { SideBar } from "../components";
+import { LoadingPage } from ".";
 import { useLoginHook } from "../hooks/login";
 
-export default function HomePage() {
+export function HomePage() {
   const status = useLoginHook();
 
   if (status === "loading") {
@@ -17,7 +17,7 @@ export default function HomePage() {
 
   return (
     <EuiPageTemplate
-      pageSideBar={<Sidebar/>}
+      pageSideBar={<SideBar/>}
       pageHeader={{
         iconType: 'logoElastic',
         pageTitle: 'Financials',

@@ -13,19 +13,10 @@ import {
 } from '@elastic/eui';
 
 import { Link, useHistory } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { updateUsername, updatePassword, loginAsync } from '../redux/loginSlice';
 
-import { 
-  useDispatch,
-  useSelector,
-} from 'react-redux';
-
-import {
-  updateUsername,
-  updatePassword,
-  loginAsync,
-} from '../redux/loginSlice';
-
-import LoadingPage from "./LoadingPage";
+import { LoadingPage } from ".";
 
 function LoginForm() {
   const {
@@ -85,7 +76,7 @@ function LoginForm() {
   );
 }
 
-function LoginPage() {
+export function LoginPage() {
   const {
     errorMessage,
     status,
@@ -123,5 +114,3 @@ function LoginPage() {
     </>
   );
 }
-
-export default LoginPage;

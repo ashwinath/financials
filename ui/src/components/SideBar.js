@@ -1,23 +1,9 @@
 import React from 'react';
 
-import {
-  EuiSideNav,
-  EuiIcon,
-} from '@elastic/eui';
-
-import {
-  useLocation,
-  useHistory,
-} from 'react-router-dom';
-
-import { 
-  useDispatch,
-  useSelector,
-} from 'react-redux';
-
-import {
-  logoutAsync,
-} from '../redux/loginSlice';
+import { EuiSideNav, EuiIcon } from '@elastic/eui';
+import { useLocation, useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutAsync } from '../redux/loginSlice';
 
 const HOME_PAGE = "Home";
 
@@ -25,7 +11,7 @@ const PATH_MAPPING = {
   [HOME_PAGE]: "/",
 }
 
-export default function SideBar() {
+export function SideBar() {
   const history = useHistory();
   const dispatch = useDispatch();
   const { pathname } = useLocation();

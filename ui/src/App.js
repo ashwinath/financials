@@ -5,10 +5,8 @@ import {
   Route,
 } from "react-router-dom";
 
-import LoginPage from "./components/LoginPage";
-import CreateAccountPage from "./components/CreateAccountPage";
-import BrandBar from "./components/BrandBar";
-import HomePage from "./components/HomePage";
+import { BrandBar } from "./components/BrandBar";
+import { HomePage, LoginPage, CreateAccountPage } from "./pages";
 
 function App() {
   return (
