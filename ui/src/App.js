@@ -7,6 +7,7 @@ import {
 
 import { BrandBar } from "./components/BrandBar";
 import { HomePage, LoginPage, CreateAccountPage } from "./pages";
+import { InvestmentsTradesPage, InvestmentsMainPage } from "./pages/investments";
 
 function App() {
   return (
@@ -19,6 +20,12 @@ function App() {
           </Route>
           <Route path="/login">
             <LoginPage/>
+          </Route>
+          <Route path="/investments/trades">
+            <InvestmentsTradesPage/>
+          </Route>
+          <Route path="/investments">
+            <InvestmentsMainPage/>
           </Route>
           <Route path="/">
             <HomePage/>

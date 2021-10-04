@@ -6,9 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logoutAsync } from '../redux/loginSlice';
 
 const HOME_PAGE = "Home";
+const INVESTMENTS_MAIN = "Investments"
+const INVESTMENTS_TRADES = "Trades"
 
 const PATH_MAPPING = {
   [HOME_PAGE]: "/",
+  [INVESTMENTS_MAIN]: "/investments",
+  [INVESTMENTS_TRADES]: "/investments/trades",
 }
 
 export function SideBar() {
@@ -26,19 +30,28 @@ export function SideBar() {
       name: 'Financials',
       icon: <EuiIcon type="logoElasticsearch" />,
       id: '0',
+      onClick: () => history.push(PATH_MAPPING[HOME_PAGE]),
+      isSelected: pathname === PATH_MAPPING[HOME_PAGE],
+    },
+    {
+      name: 'Investments',
+      icon: <EuiIcon type="logoElasticsearch" />,
+      id: '1',
+      onClick: () => history.push(PATH_MAPPING[INVESTMENTS_MAIN]),
+      isSelected: pathname === PATH_MAPPING[INVESTMENTS_MAIN],
       items: [
         {
-          name: HOME_PAGE,
-          id: '0.1',
-          onClick: () => history.push(PATH_MAPPING[HOME_PAGE]),
-          isSelected: pathname === PATH_MAPPING[HOME_PAGE],
+          name: INVESTMENTS_TRADES,
+          id: INVESTMENTS_TRADES,
+          onClick: () => history.push(PATH_MAPPING[INVESTMENTS_TRADES]),
+          isSelected: pathname === PATH_MAPPING[INVESTMENTS_TRADES],
         },
       ],
     },
     {
       name: 'Account',
       icon: <EuiIcon type="logoElasticsearch" />,
-      id: '0',
+      id: '2',
       items: [
         {
           name: "Log me out",

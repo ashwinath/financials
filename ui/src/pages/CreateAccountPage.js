@@ -8,13 +8,13 @@ import {
   EuiButton,
   EuiFieldPassword,
   EuiEmptyPrompt,
-  EuiCallOut,
 } from '@elastic/eui';
 
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUsername, updatePassword, createAsync } from '../redux/createAccountSlice';
 import { LoadingPage } from ".";
+import { ErrorBar } from "../components"
 
 function CreateAccountForm() {
   const {
@@ -71,7 +71,7 @@ export function CreateAccountPage() {
   const {
     errorMessage,
     status,
-  } = useSelector((state) => state.createAccount)
+  } = useSelector((state) => state.createAccount);
 
   if (status === "loading") {
     return <LoadingPage/>;
@@ -79,17 +79,10 @@ export function CreateAccountPage() {
 
   return (
     <>
-      {
-        !!errorMessage
-        ? <EuiCallOut
-            title="Sorry, there was an error creating an account for you."
-            color="danger"
-            iconType="alert"
-          >
-            <p>{errorMessage}</p>
-          </EuiCallOut>
-        : null
-      }
+      <ErrorBar 
+        title="Sorry, there was an error creating an account for you."
+        errorMessage={errorMessage}
+      />
 
       <EuiPageTemplate
         template="centeredBody"
