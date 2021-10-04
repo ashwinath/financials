@@ -12,6 +12,7 @@ func CreateTradeTransactions(count int) []*Trade {
 			Symbol:        "VWRA.LON",
 			PriceEach:     100.25,
 			Quantity:      100,
+			TradeType:     "buy",
 		})
 	}
 	return trades

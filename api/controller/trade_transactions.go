@@ -12,7 +12,7 @@ type tradeTransactionController struct {
 }
 
 type bulkTransactionsRequest struct {
-	Transactions []*models.Trade `json:"transactions" validate:"required"`
+	Transactions []*models.Trade `json:"transactions" validate:"required,dive"`
 }
 
 func (c *tradeTransactionController) List(w http.ResponseWriter, r *http.Request) {

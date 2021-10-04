@@ -8,6 +8,7 @@ type Trade struct {
 	UserID        string    `json:"-"`
 	DatePurchased time.Time `json:"date_purchased" validate:"required"`
 	Symbol        string    `json:"symbol" validate:"required"`
+	TradeType     string    `json:"trade_type" validate:"required,oneof=buy sell"`
 	PriceEach     float64   `json:"price_each" validate:"required"`
 	Quantity      float64   `json:"quantity" validate:"required"`
 }
