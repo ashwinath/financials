@@ -4,6 +4,7 @@ import {
   formatDate,
   EuiPageTemplate,
   EuiBasicTable,
+  EuiTextColor,
 } from '@elastic/eui';
 
 import { SideBar } from "../../components";
@@ -64,6 +65,11 @@ export function InvestmentsTradesPage() {
     });
   }
 
+  const renderTradeType = (type) => {
+    const color = type === "buy" ? 'success' : 'danger';
+    return <EuiTextColor color={color}>{capitaliseFirstLetter(type)}</EuiTextColor>;
+  }
+
   const columns = [
     {
       field: 'date_purchased',
@@ -82,7 +88,7 @@ export function InvestmentsTradesPage() {
       field: 'trade_type',
       name: 'Trade Type',
       truncateText: true,
-      render: (field) => capitaliseFirstLetter(field),
+      render: (field) => renderTradeType(field),
     },
     {
       field: 'price_each',
@@ -107,7 +113,7 @@ export function InvestmentsTradesPage() {
     pageIndex: payload && payload.data ? payload.data.paging.page - 1 : 0,
     pageSize: pageSize,
     totalItemCount: payload && payload.data ? payload.data.paging.total : 0,
-    pageSizeOptions: [10, 20],
+    pageSizeOptions: [20, 40],
     hidePerPageOptions: false,
   };
 
