@@ -4,7 +4,6 @@ import {
 } from '@elastic/eui';
 
 export function ErrorBar({ title, errorMessage }) {
-  console.log(!errorMessage)
   if (!errorMessage) {
     return null;
   }

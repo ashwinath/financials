@@ -27,8 +27,18 @@ export const investmentsSlice = createSlice({
     status: "idle",
     payload: null,
     errorMessage: "",
+    shouldReload: false,
   },
-  reducers: {},
+  reducers: {
+    updateTableInfo: (state, action) => {
+      state.page = action.payload.page.index + 1;
+      state.pageSize = action.payload.page.size;
+      state.shouldReload = true;
+    },
+    resetShouldReload: (state) => {
+      state.shouldReload = false;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(queryTrades.pending, (state) => {
@@ -52,6 +62,6 @@ export const investmentsSlice = createSlice({
   },
 });
 
-//export const { updateUsername, updatePassword } = createAccountSlice.actions;
+export const { updateTableInfo, resetShouldReload } = investmentsSlice.actions;
 
 export default investmentsSlice.reducer;
