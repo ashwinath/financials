@@ -7,5 +7,6 @@ export function capitaliseAll(string) {
 }
 
 export function formatMoney(number) {
-  return `$${number.toFixed(2)}`;
+	const numberString = number.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return `$${numberString}`;
 }
