@@ -50,7 +50,7 @@ export function InvestmentsTradesPage() {
     dispatch(resetShouldReload());
     history.push({
       pathname: "/investments/trades",
-      search: `?page=${page}&page_size=${pageSize}&order=${order}&order_by=${orderBy}`,
+      search: `?page=${page}&page_size=${pageSize}&order_by=${orderBy}&order=${order}`,
     });
   }
 
@@ -113,8 +113,8 @@ export function InvestmentsTradesPage() {
 
   const sorting = {
     sort: {
-      field: order,
-      direction: orderBy,
+      field: orderBy,
+      direction: order,
     },
   };
 

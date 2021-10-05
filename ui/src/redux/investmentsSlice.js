@@ -32,21 +32,28 @@ export const investmentsSlice = createSlice({
   },
   reducers: {
     updateTableInfo: (state, action) => {
-      console.log(action.payload.sort)
       state.page = action.payload.page.index + 1;
       state.pageSize = action.payload.page.size;
       state.orderBy = action.payload.sort.field;
-      state.order = state.order === "desc" ? "asc" : "desc";
+      state.order = action.payload.sort.direction;
       state.shouldReload = true;
     },
     resetShouldReload: (state) => {
       state.shouldReload = false;
     },
     setInitialState: (state, action) => {
-      state.page = action.payload.get("page")
-      state.pageSize = action.payload.get("page_size")
-      state.orderBy = action.payload.get("order_by")
-      state.order = action.payload.get("order")
+      const page = action.payload.get("page");
+      state.page = page ? page : state.page;
+
+      const pageSize = action.payload.get("page_size");
+      state.pageSize = pageSize ? pageSize : state.pageSize;
+
+      const orderBy = action.payload.get("order_by");
+      state.orderBy = orderBy ? orderBy : state.orderBy;
+
+      const order = action.payload.get("order");
+      state.order = order ? order : state.order;
+
       state.init = true;
       state.shouldReload = true;
     },
