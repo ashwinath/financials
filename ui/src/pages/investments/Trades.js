@@ -9,17 +9,19 @@ import {
 import { SideBar } from "../../components";
 import { LoadingPage } from "../";
 import { useLoginHook } from "../../hooks/login";
-import { queryTrades, updateTableInfo, resetShouldReload } from '../../redux/investmentsSlice';
+import { queryTrades, updateTableInfo, resetShouldReload, setInitialState } from '../../redux/investmentsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { ErrorBar } from "../../components";
 import { capitaliseFirstLetter, capitaliseAll, formatMoney } from "../../utils";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 export function InvestmentsTradesPage() {
   const loginStatus = useLoginHook();
   const history = useHistory();
   const dispatch = useDispatch();
+  const location = useLocation();
   const investmentsState = useSelector((state) => state.investments);
+
   const {
     page,
     pageSize,
@@ -29,9 +31,14 @@ export function InvestmentsTradesPage() {
     payload,
     errorMessage,
     shouldReload,
+    init,
   } = investmentsState;
 
-  if (status === "idle" && (payload === null || shouldReload)) {
+  if (!init) {
+    dispatch(setInitialState(new URLSearchParams(location.search)));
+  }
+
+  if (init && status === "idle" && (payload === null || shouldReload)) {
     dispatch(queryTrades({page, pageSize, orderBy, order}));
   }
 
@@ -43,7 +50,7 @@ export function InvestmentsTradesPage() {
     dispatch(resetShouldReload());
     history.push({
       pathname: "/investments/trades",
-      search: `?page=${page}&pageSize=${pageSize}&order=${order}&orderBy=${orderBy}`,
+      search: `?page=${page}&page_size=${pageSize}&order=${order}&order_by=${orderBy}`,
     });
   }
 
@@ -63,6 +70,7 @@ export function InvestmentsTradesPage() {
       name: 'Date',
       dataType: 'date',
       render: (date) => formatDate(date, 'dobLong'),
+      sortable: true,
     },
     {
       field: 'symbol',
@@ -96,11 +104,18 @@ export function InvestmentsTradesPage() {
   ];
 
   const pagination = {
-    pageIndex: payload ? payload.data.paging.page - 1 : 0,
+    pageIndex: payload && payload.data ? payload.data.paging.page - 1 : 0,
     pageSize: pageSize,
-    totalItemCount: payload ? payload.data.paging.total : 0,
+    totalItemCount: payload && payload.data ? payload.data.paging.total : 0,
     pageSizeOptions: [10, 20],
     hidePerPageOptions: false,
+  };
+
+  const sorting = {
+    sort: {
+      field: order,
+      direction: orderBy,
+    },
   };
 
   return (
@@ -123,6 +138,7 @@ export function InvestmentsTradesPage() {
           pagination={pagination}
           onChange={(value) => dispatch(updateTableInfo(value))}
           loading={(loginStatus === "loading" || status === "loading")}
+          sorting={sorting}
         />
       </EuiPageTemplate>
     </>

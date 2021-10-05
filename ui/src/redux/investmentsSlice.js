@@ -28,15 +28,27 @@ export const investmentsSlice = createSlice({
     payload: null,
     errorMessage: "",
     shouldReload: false,
+    init: false,
   },
   reducers: {
     updateTableInfo: (state, action) => {
+      console.log(action.payload.sort)
       state.page = action.payload.page.index + 1;
       state.pageSize = action.payload.page.size;
+      state.orderBy = action.payload.sort.field;
+      state.order = state.order === "desc" ? "asc" : "desc";
       state.shouldReload = true;
     },
     resetShouldReload: (state) => {
       state.shouldReload = false;
+    },
+    setInitialState: (state, action) => {
+      state.page = action.payload.get("page")
+      state.pageSize = action.payload.get("page_size")
+      state.orderBy = action.payload.get("order_by")
+      state.order = action.payload.get("order")
+      state.init = true;
+      state.shouldReload = true;
     },
   },
   extraReducers: (builder) => {
@@ -62,6 +74,6 @@ export const investmentsSlice = createSlice({
   },
 });
 
-export const { updateTableInfo, resetShouldReload } = investmentsSlice.actions;
+export const { updateTableInfo, resetShouldReload, setInitialState } = investmentsSlice.actions;
 
 export default investmentsSlice.reducer;
