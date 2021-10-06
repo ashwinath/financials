@@ -1,6 +1,8 @@
 package mediator
 
 import (
+	"strings"
+
 	"github.com/ashwinath/financials/api/models"
 	"github.com/ashwinath/financials/api/service"
 )
@@ -31,6 +33,7 @@ func (m *TradeMediator) CreateTransactionInBulk(
 ) error {
 	for _, tx := range transactions {
 		tx.UserID = session.UserID
+		tx.Symbol = strings.ToUpper(tx.Symbol)
 	}
 
 	return m.tradeService.BulkAdd(transactions)

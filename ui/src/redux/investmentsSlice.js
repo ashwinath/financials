@@ -1,5 +1,9 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
+import moment from "moment";
+import {
+  convertDateToString,
+} from "../utils";
 
 const DEFAULT_PAGE_SIZE = 20;
 
@@ -17,6 +21,29 @@ export const queryTrades = createAsyncThunk(
   }
 );
 
+export const submitTrade = createAsyncThunk(
+  'investments/submitTrade',
+  async (singleTrade) => {
+    try {
+      const url = "/api/v1/trades";
+      const response = await axios.post(url, {
+        transactions: [singleTrade],
+      });
+      return response;
+    } catch (error) {
+      return error.response;
+    }
+  }
+);
+
+const addTradeFormInitState = {
+  date_purchased: convertDateToString(moment()),
+  symbol: "",
+  price_each: 0,
+  quantity: 0,
+  trade_type: "buy",
+}
+
 export const investmentsSlice = createSlice({
   name: "investments",
   initialState: {
@@ -29,6 +56,10 @@ export const investmentsSlice = createSlice({
     errorMessage: "",
     shouldReload: false,
     init: false,
+    isAddTradeModalOpen: false,
+    addTradeForm: addTradeFormInitState,
+    isTradeFormSubmitting: false,
+    submitSuccess: "none", // can be none/success/failure
   },
   reducers: {
     updateTableInfo: (state, action) => {
@@ -42,6 +73,7 @@ export const investmentsSlice = createSlice({
       state.shouldReload = false;
     },
     setInitialState: (state, action) => {
+      // This function gets the query params and sets the intial state so it renders right
       const page = action.payload.get("page");
       state.page = page ? page : state.page;
 
@@ -57,8 +89,17 @@ export const investmentsSlice = createSlice({
       state.init = true;
       state.shouldReload = true;
     },
+    toggleIsAddTradeModalOpen: (state) => {
+      state.submitSuccess = "none";
+      state.isAddTradeModalOpen = !state.isAddTradeModalOpen;
+    },
+    updateAddTradeForm: (state, action) => {
+      const payload = action.payload;
+      state.addTradeForm[payload.name] = payload.value;
+    },
   },
   extraReducers: (builder) => {
+    // Get trades
     builder
       .addCase(queryTrades.pending, (state) => {
         state.status = "loading";
@@ -67,7 +108,7 @@ export const investmentsSlice = createSlice({
       .addCase(queryTrades.fulfilled, (state, action) => {
         state.status = "idle";
         if (action.payload.status === 200) {
-          state.payload = action.payload;
+          state.payload = action.payload.data;
           state.errorMessage = "";
         } else {
           state.payload = {};
@@ -78,9 +119,42 @@ export const investmentsSlice = createSlice({
         state.status = "idle";
         state.errorMessage = "Had some trouble fetching transactions.";
       });
+
+    // Submit trades
+    builder
+      .addCase(submitTrade.pending, (state) => {
+        state.isTradeFormSubmitting = true;
+        state.errorMessage = "";
+      })
+      .addCase(submitTrade.fulfilled, (state, action) => {
+        state.isTradeFormSubmitting = false;
+        if (action.payload.status === 201) {
+          state.submitSuccess = "success";
+          state.isAddTradeModalOpen = false;
+          state.errorMessage = "";
+          state.shouldReload = true;
+          state.addTradeForm = addTradeFormInitState
+        } else {
+          state.submitSuccess = "failure";
+          state.isAddTradeModalOpen = false;
+          state.errorMessage = action.payload.data.message;
+        }
+      })
+      .addCase(submitTrade.rejected, (state) => {
+        state.isTradeFormSubmitting = false;
+        state.submitSuccess = "failure";
+        state.isAddTradeModalOpen = false;
+        state.errorMessage = "Had some trouble submitting your trades.";
+      });
   },
 });
 
-export const { updateTableInfo, resetShouldReload, setInitialState } = investmentsSlice.actions;
+export const { 
+  updateTableInfo,
+  resetShouldReload,
+  setInitialState,
+  toggleIsAddTradeModalOpen,
+  updateAddTradeForm,
+} = investmentsSlice.actions;
 
 export default investmentsSlice.reducer;

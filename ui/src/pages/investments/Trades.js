@@ -5,14 +5,22 @@ import {
   EuiPageTemplate,
   EuiBasicTable,
   EuiTextColor,
+  EuiButton,
+  EuiSpacer,
 } from '@elastic/eui';
 
-import { SideBar } from "../../components";
+import { SideBar, AddTradeModal } from "../../components";
 import { LoadingPage } from "../";
 import { useLoginHook } from "../../hooks/login";
-import { queryTrades, updateTableInfo, resetShouldReload, setInitialState } from '../../redux/investmentsSlice';
+import {
+  queryTrades,
+  updateTableInfo,
+  resetShouldReload,
+  setInitialState,
+  toggleIsAddTradeModalOpen,
+} from '../../redux/investmentsSlice';
 import { useDispatch, useSelector } from 'react-redux';
-import { ErrorBar } from "../../components";
+import { ErrorBar, SuccessBar } from "../../components";
 import { capitaliseFirstLetter, capitaliseAll, formatMoney } from "../../utils";
 import { useHistory, useLocation } from "react-router-dom";
 
@@ -33,6 +41,8 @@ export function InvestmentsTradesPage() {
     errorMessage,
     shouldReload,
     init,
+    isAddTradeModalOpen,
+    submitSuccess,
   } = investmentsState;
 
   if (!init) {
@@ -56,8 +66,8 @@ export function InvestmentsTradesPage() {
   }
 
   let results = [];
-  if (payload && payload.data) {
-    results = payload.data.results.map((data) => {
+  if (payload && payload.results) {
+    results = payload.results.map((data) => {
       return {
         ...data,
         total: data.price_each * data.quantity,
@@ -110,9 +120,9 @@ export function InvestmentsTradesPage() {
   ];
 
   const pagination = {
-    pageIndex: payload && payload.data ? payload.data.paging.page - 1 : 0,
+    pageIndex: payload && payload.paging ? payload.paging.page - 1 : 0,
     pageSize: pageSize,
-    totalItemCount: payload && payload.data ? payload.data.paging.total : 0,
+    totalItemCount: payload && payload.paging ? payload.paging.total : 0,
     pageSizeOptions: [20, 40],
     hidePerPageOptions: false,
   };
@@ -130,6 +140,10 @@ export function InvestmentsTradesPage() {
         title="Sorry, there was an error retrieving your trades."
         errorMessage={errorMessage}
       />
+      <SuccessBar 
+        title="Your trade has been successfully submitted!"
+        message={submitSuccess === "success" ? "We did it!" : null}
+      />
 
       <EuiPageTemplate
         pageSideBar={<SideBar/>}
@@ -138,6 +152,13 @@ export function InvestmentsTradesPage() {
           pageTitle: 'Trades',
         }}
       >
+        <EuiButton
+          size="s"
+          onClick={() => dispatch(toggleIsAddTradeModalOpen())}
+        >
+          Add trade
+        </EuiButton>
+        <EuiSpacer size="s" />
         <EuiBasicTable
           items={results}
           columns={columns}
@@ -147,6 +168,7 @@ export function InvestmentsTradesPage() {
           sorting={sorting}
         />
       </EuiPageTemplate>
+      {isAddTradeModalOpen ? <AddTradeModal/> : null}
     </>
   );
 }
