@@ -36,6 +36,21 @@ export const submitTrade = createAsyncThunk(
   }
 );
 
+export const submitTrades = createAsyncThunk(
+  'investments/submitTrades',
+  async (trades) => {
+    try {
+      const url = "/api/v1/trades";
+      const response = await axios.post(url, {
+        transactions: trades,
+      });
+      return response;
+    } catch (error) {
+      return error.response;
+    }
+  }
+);
+
 const addTradeFormInitState = {
   date_purchased: convertDateToString(moment()),
   symbol: "",
@@ -57,9 +72,11 @@ export const investmentsSlice = createSlice({
     shouldReload: false,
     init: false,
     isAddTradeModalOpen: false,
+    isAddBulkTradeModalOpen: false,
     addTradeForm: addTradeFormInitState,
     isTradeFormSubmitting: false,
     submitSuccess: "none", // can be none/success/failure
+    tradeCSVRaw: "",
   },
   reducers: {
     updateTableInfo: (state, action) => {
@@ -93,9 +110,16 @@ export const investmentsSlice = createSlice({
       state.submitSuccess = "none";
       state.isAddTradeModalOpen = !state.isAddTradeModalOpen;
     },
+    toggleIsAddBulkTradeModalOpen: (state) => {
+      state.submitSuccess = "none";
+      state.isAddBulkTradeModalOpen = !state.isAddBulkTradeModalOpen;
+    },
     updateAddTradeForm: (state, action) => {
       const payload = action.payload;
       state.addTradeForm[payload.name] = payload.value;
+    },
+    updateCSVTrades: (state, action) => {
+      state.tradeCSVRaw = action.payload
     },
   },
   extraReducers: (builder) => {
@@ -120,7 +144,7 @@ export const investmentsSlice = createSlice({
         state.errorMessage = "Had some trouble fetching transactions.";
       });
 
-    // Submit trades
+    // Submit single trade
     builder
       .addCase(submitTrade.pending, (state) => {
         state.isTradeFormSubmitting = true;
@@ -134,6 +158,7 @@ export const investmentsSlice = createSlice({
           state.errorMessage = "";
           state.shouldReload = true;
           state.addTradeForm = addTradeFormInitState
+          state.tradeCSVRaw = ""
         } else {
           state.submitSuccess = "failure";
           state.isAddTradeModalOpen = false;
@@ -141,6 +166,33 @@ export const investmentsSlice = createSlice({
         }
       })
       .addCase(submitTrade.rejected, (state) => {
+        state.isTradeFormSubmitting = false;
+        state.submitSuccess = "failure";
+        state.isAddTradeModalOpen = false;
+        state.errorMessage = "Had some trouble submitting your trades.";
+      });
+
+    // Submit trades
+    builder
+      .addCase(submitTrades.pending, (state) => {
+        state.isTradeFormSubmitting = true;
+        state.errorMessage = "";
+      })
+      .addCase(submitTrades.fulfilled, (state, action) => {
+        state.isTradeFormSubmitting = false;
+        state.isAddBulkTradeModalOpen = false;
+        if (action.payload.status === 201) {
+          state.submitSuccess = "success";
+          state.errorMessage = "";
+          state.shouldReload = true;
+          state.addTradeForm = addTradeFormInitState
+          state.tradeCSVRaw = ""
+        } else {
+          state.submitSuccess = "failure";
+          state.errorMessage = action.payload.data.message;
+        }
+      })
+      .addCase(submitTrades.rejected, (state) => {
         state.isTradeFormSubmitting = false;
         state.submitSuccess = "failure";
         state.isAddTradeModalOpen = false;
@@ -155,6 +207,8 @@ export const {
   setInitialState,
   toggleIsAddTradeModalOpen,
   updateAddTradeForm,
+  toggleIsAddBulkTradeModalOpen,
+  updateCSVTrades,
 } = investmentsSlice.actions;
 
 export default investmentsSlice.reducer;

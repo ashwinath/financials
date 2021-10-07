@@ -7,9 +7,11 @@ import {
   EuiTextColor,
   EuiButton,
   EuiSpacer,
+  EuiFlexItem,
+  EuiFlexGroup,
 } from '@elastic/eui';
 
-import { SideBar, AddTradeModal } from "../../components";
+import { SideBar, AddTradeModal, AddBulkTradeModal } from "../../components";
 import { LoadingPage } from "../";
 import { useLoginHook } from "../../hooks/login";
 import {
@@ -18,6 +20,7 @@ import {
   resetShouldReload,
   setInitialState,
   toggleIsAddTradeModalOpen,
+  toggleIsAddBulkTradeModalOpen,
 } from '../../redux/investmentsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { ErrorBar, SuccessBar } from "../../components";
@@ -42,6 +45,7 @@ export function InvestmentsTradesPage() {
     shouldReload,
     init,
     isAddTradeModalOpen,
+    isAddBulkTradeModalOpen,
     submitSuccess,
   } = investmentsState;
 
@@ -137,7 +141,7 @@ export function InvestmentsTradesPage() {
   return (
     <>
       <ErrorBar 
-        title="Sorry, there was an error retrieving your trades."
+        title="Sorry, there was an error."
         errorMessage={errorMessage}
       />
       <SuccessBar 
@@ -152,12 +156,24 @@ export function InvestmentsTradesPage() {
           pageTitle: 'Trades',
         }}
       >
-        <EuiButton
-          size="s"
-          onClick={() => dispatch(toggleIsAddTradeModalOpen())}
-        >
-          Add trade
-        </EuiButton>
+        <EuiFlexGroup responsive={false} wrap gutterSize="s" alignItems="center">
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              size="s"
+              onClick={() => dispatch(toggleIsAddTradeModalOpen())}
+            >
+              Add trade
+            </EuiButton>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButton
+              size="s"
+              onClick={() => dispatch(toggleIsAddBulkTradeModalOpen())}
+            >
+              Add bulk trade
+            </EuiButton>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiSpacer size="s" />
         <EuiBasicTable
           items={results}
@@ -169,6 +185,7 @@ export function InvestmentsTradesPage() {
         />
       </EuiPageTemplate>
       {isAddTradeModalOpen ? <AddTradeModal/> : null}
+      {isAddBulkTradeModalOpen ? <AddBulkTradeModal/> : null}
     </>
   );
 }

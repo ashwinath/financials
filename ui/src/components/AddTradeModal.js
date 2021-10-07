@@ -12,19 +12,28 @@ import {
   EuiFieldText,
   EuiDatePicker,
   EuiRadioGroup,
+  EuiText,
+  EuiTextArea,
+  EuiSpacer,
+  EuiCode,
 } from '@elastic/eui';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
   toggleIsAddTradeModalOpen,
+  toggleIsAddBulkTradeModalOpen,
   updateAddTradeForm,
   submitTrade,
+  submitTrades,
+  updateCSVTrades,
 } from '../redux/investmentsSlice';
 
 import {
   convertDateToString,
   convertStringToDate,
   formatMoney,
+  marshalCSV,
+  validateTradeCSV,
 } from "../utils";
 
 export function AddTradeModal() {
@@ -38,11 +47,13 @@ export function AddTradeModal() {
     trade_type,
   } = addTradeForm;
 
+  const isReadyToSubmit = symbol !== "" && !!date_purchased && quantity > 0 && price_each > 0 && trade_type !== "";
   let saveButton = (
     <EuiButton
       type="submit"
       form="modalFormId"
       onClick={() => dispatch(submitTrade(addTradeForm))}
+      isDisabled={!isReadyToSubmit}
       fill
     >
       Save
@@ -147,6 +158,81 @@ export function AddTradeModal() {
       <EuiModalFooter>
         <EuiButtonEmpty
           onClick={() => dispatch(toggleIsAddTradeModalOpen())}
+        >
+          Cancel
+        </EuiButtonEmpty>
+        {saveButton}
+      </EuiModalFooter>
+    </EuiModal>
+  );
+}
+
+export function AddBulkTradeModal() {
+  const dispatch = useDispatch();
+  const { isTradeFormSubmitting, tradeCSVRaw } = useSelector((state) => state.investments);
+
+  const isValidCSV = validateTradeCSV(tradeCSVRaw);
+  let saveButton = (
+    <EuiButton
+      type="submit"
+      form="modalFormId"
+      onClick={() => dispatch(submitTrades(marshalCSV(tradeCSVRaw)))}
+      isDisabled={!isValidCSV}
+      fill
+    >
+      Save
+    </EuiButton>
+  );
+
+  if (isTradeFormSubmitting) {
+    saveButton = (
+      <EuiButton isLoading={true}>Loading</EuiButton>
+    );
+  }
+
+  return (
+    <EuiModal
+      onClose={() => dispatch(toggleIsAddBulkTradeModalOpen())}
+      initialFocus="[name=popswitch]"
+    >
+
+      <EuiModalHeader>
+        <EuiModalHeaderTitle>
+          <h1>Add bulk trade</h1>
+        </EuiModalHeaderTitle>
+      </EuiModalHeader>
+
+      <EuiModalBody>
+        <EuiText>
+          Input your data in <EuiCode>csv</EuiCode> format, with the following headers:
+        </EuiText>
+        <EuiSpacer size="s" />
+        <EuiText>
+          <EuiCode>date_purchased</EuiCode>: Format in <EuiCode>yyyy-mm-dd</EuiCode>.
+        </EuiText>
+        <EuiText>
+          <EuiCode>symbol</EuiCode>: Using Alpha Vantage symbols.
+        </EuiText>
+        <EuiText>
+          <EuiCode>trade_type</EuiCode>: <EuiCode>buy</EuiCode> or <EuiCode>sell</EuiCode>.
+        </EuiText>
+        <EuiText>
+          <EuiCode>price_each</EuiCode>: number
+        </EuiText>
+        <EuiText>
+          <EuiCode>quantity</EuiCode>: number
+        </EuiText>
+        <EuiSpacer size="s" />
+        <EuiTextArea
+          placeholder=""
+          fullWidth={true}
+          value={tradeCSVRaw}
+          onChange={(e) => dispatch(updateCSVTrades(e.target.value))}
+        />
+      </EuiModalBody>
+      <EuiModalFooter>
+        <EuiButtonEmpty
+          onClick={() => dispatch(toggleIsAddBulkTradeModalOpen())}
         >
           Cancel
         </EuiButtonEmpty>
