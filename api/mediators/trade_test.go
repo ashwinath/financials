@@ -12,13 +12,12 @@ import (
 func TestCreateTransactionInBulk(t *testing.T) {
 	service.WithTestDatabase(t, func(t *testing.T, db *gorm.DB) {
 		svc := service.NewTradeService(db, 20)
+		symbolSvc := service.NewSymbolService(db)
+		m := NewTradeMediator(svc, symbolSvc)
 
 		session := &models.Session{
 			UserID: "hello",
 		}
-
-		m := NewTradeMediator(svc)
-
 		trades := models.CreateTradeTransactions(5)
 		err := m.CreateTransactionInBulk(session, trades)
 		assert.Nil(t, err)

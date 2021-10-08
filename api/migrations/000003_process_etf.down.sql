@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS symbols;
+DROP TABLE IF EXISTS stocks;
+DROP TABLE IF EXISTS exchange_rates;

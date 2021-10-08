@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// SessionService is the interface to the database for the sessions tabls
+// SessionService is the interface to the database for the sessions table
 type SessionService struct {
 	db *gorm.DB
 }
