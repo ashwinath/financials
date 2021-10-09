@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS stocks (
     updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE UNIQUE INDEX uidx_stocks ON stocks(trade_date, symbol);
+
 CREATE TABLE IF NOT EXISTS exchange_rates (
     id         text NOT NULL PRIMARY KEY,
     trade_date timestamptz NOT NULL,

@@ -20,6 +20,8 @@ type Context struct {
 	SessionService          *service.SessionService
 	TradeTransactionService *service.TradeService
 	SymbolService           *service.SymbolService
+	AlphaVantageService     *service.AlphaVantageService
+	ExchangeRateService     *service.ExchangeRateService
 
 	// Mediators
 	LoginMediator *mediator.LoginMediator
@@ -40,6 +42,8 @@ func InitContext(c *config.Config) (*Context, error) {
 	context.UserService = service.NewUserService(db)
 	context.TradeTransactionService = service.NewTradeService(db, c.Database.BatchInsertSize)
 	context.SymbolService = service.NewSymbolService(db)
+	context.AlphaVantageService = service.NewAlphaVantageService(c.AlphaVantage.APIKey)
+	context.ExchangeRateService = service.NewExchangeRateService(db, c.Database.BatchInsertSize)
 
 	// Mediators
 	context.LoginMediator = mediator.NewLoginMediator(
@@ -49,6 +53,8 @@ func InitContext(c *config.Config) (*Context, error) {
 	context.TradeMediator = mediator.NewTradeMediator(
 		context.TradeTransactionService,
 		context.SymbolService,
+		context.AlphaVantageService,
+		context.ExchangeRateService,
 	)
 
 	return &context, nil

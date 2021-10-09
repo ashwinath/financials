@@ -11,3 +11,6 @@ Database:
   Name: postgres
   TimeZone: Asia/Singapore
   BatchInsertSize: 100
+
+AlphaVantage:
+  APIKey: secret

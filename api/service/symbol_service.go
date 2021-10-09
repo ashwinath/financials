@@ -30,6 +30,40 @@ func (s *SymbolService) Find(symbolString string) (*models.Symbol, error) {
 	return &symbol, nil
 }
 
+// SymbolListOptions lists the symbols.
+type SymbolListOptions struct {
+	PaginationOptions
+	SymbolType models.SymbolType
+}
+
+func (s *SymbolService) parsesSymbolListOptions(options SymbolListOptions) *gorm.DB {
+	return s.db.Where("symbol_type = ?", options.SymbolType)
+}
+
+// List lists all trades
+func (s *SymbolService) List(options SymbolListOptions) (*PaginatedResults, error) {
+	done := make(chan struct{}, 1)
+
+	var count int64
+	go func() {
+		s.parsesSymbolListOptions(options).Model(&models.Symbol{}).Count(&count)
+		done <- struct{}{}
+	}()
+
+	var results []models.Symbol
+	queryResult := s.parsesSymbolListOptions(options).
+		Scopes(PaginationScope(options.PaginationOptions)).
+		Find(&results)
+	<-done
+
+	if queryResult.Error != nil {
+		return nil, queryResult.Error
+	}
+
+	paginatedResults := createPaginatedResults(options.PaginationOptions, count, results)
+	return paginatedResults, nil
+}
+
 // Save saves the session into the database
 func (s *SymbolService) Save(symbol *models.Symbol) error {
 	return s.db.Save(symbol).Error
