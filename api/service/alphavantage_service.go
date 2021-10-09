@@ -9,6 +9,7 @@ import (
 const (
 	searchURLFormat = "https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=%s&apikey=%s"
 	fxURLFormat     = "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=SGD&apikey=%s&outputsize=%s"
+	stockURLFormat  = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s&apikey=%s&output=%s"
 )
 
 // AlphaVantageService is an external service that queries stock info
@@ -50,6 +51,23 @@ func (s *AlphaVantageService) GetCurrencyHistory(symbol string, isCompact bool) 
 	}
 	err := query(
 		fmt.Sprintf(fxURLFormat, symbol, s.apiKey, outputSize),
+		&result,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+
+// GetStockHistory gets the stock history
+func (s *AlphaVantageService) GetStockHistory(symbol string, isCompact bool) (*models.AlphaVantageStockResult, error) {
+	var result models.AlphaVantageStockResult
+	outputSize := "full"
+	if isCompact {
+		outputSize = "compact"
+	}
+	err := query(
+		fmt.Sprintf(stockURLFormat, symbol, s.apiKey, outputSize),
 		&result,
 	)
 	if err != nil {

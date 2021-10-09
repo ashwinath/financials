@@ -21,3 +21,13 @@ type AlphaVantageCurrencyResult struct {
 type AlphaVantageCurrencyDailyResult struct {
 	Close string `json:"4. close"`
 }
+
+// AlphaVantageStockResult contains a map of daily stock values
+type AlphaVantageStockResult struct {
+	Results map[string]AlphaVantageStockDailyResult `json:"Time Series (Daily)"`
+}
+
+// AlphaVantageStockDailyResult contains the single value of a daily stock result
+type AlphaVantageStockDailyResult struct {
+	AdjustedClose string `json:"5. adjusted close"`
+}

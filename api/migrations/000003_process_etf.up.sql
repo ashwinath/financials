@@ -29,3 +29,5 @@ CREATE TABLE IF NOT EXISTS exchange_rates (
     created_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE UNIQUE INDEX uidx_exchange_rates ON exchange_rates(trade_date, symbol);

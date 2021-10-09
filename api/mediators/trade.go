@@ -27,6 +27,7 @@ type TradeMediator struct {
 	symbolService       *service.SymbolService
 	alphaVantageService *service.AlphaVantageService
 	exchangeRateService *service.ExchangeRateService
+	stockService        *service.StockService
 }
 
 // NewTradeMediator creates a new NewTradeMediator
@@ -35,12 +36,14 @@ func NewTradeMediator(
 	symbolService *service.SymbolService,
 	alphaVantageService *service.AlphaVantageService,
 	exchangeRateService *service.ExchangeRateService,
+	stockService *service.StockService,
 ) *TradeMediator {
 	return &TradeMediator{
 		tradeService:        tradeService,
 		symbolService:       symbolService,
 		alphaVantageService: alphaVantageService,
 		exchangeRateService: exchangeRateService,
+		stockService:        stockService,
 	}
 }
 
@@ -164,6 +167,7 @@ func (m *TradeMediator) processCurrency() error {
 	if err != nil {
 		log.Printf("Error querying symbol table: %s", err.Error())
 	}
+
 	symbols := currencyPaginated.Results.([]models.Symbol)
 	for _, symbol := range symbols {
 		isCompact := true
@@ -172,11 +176,10 @@ func (m *TradeMediator) processCurrency() error {
 		}
 		result, err := m.alphaVantageService.GetCurrencyHistory(symbol.Symbol, isCompact)
 		if err != nil {
-			// Some fix required on this as this might stall.
 			return err
 		}
 
-		var allSymbols []*models.ExchangeRate
+		var allExchangeRates []*models.ExchangeRate
 		var maxDate *time.Time
 		for key, value := range result.Results {
 			t, err := time.Parse(time.RFC3339, fmt.Sprintf("%sT08:00:00.000Z", key))
@@ -185,30 +188,94 @@ func (m *TradeMediator) processCurrency() error {
 			}
 
 			if err != nil {
-				// Some fix required on this as this might stall.
 				return err
 			}
 
 			price, err := strconv.ParseFloat(value.Close, 64)
 			if err != nil {
-				// Some fix required on this as this might stall.
 				return err
 			}
 
-			allSymbols = append(allSymbols, &models.ExchangeRate{
+			allExchangeRates = append(allExchangeRates, &models.ExchangeRate{
 				TradeDate: &t,
 				Symbol:    symbol.Symbol,
 				Price:     price,
 			})
 		}
 
-		err = m.exchangeRateService.BulkAdd(allSymbols)
+		err = m.exchangeRateService.BulkAdd(allExchangeRates)
 		if err != nil {
-			// Some fix required on this as this might stall.
+			return err
+		}
+
+		symbol.LastProcessedDate = maxDate
+		err = m.symbolService.Save(&symbol)
+		if err != nil {
 			return err
 		}
 	}
 
+	return nil
+}
+
+func (m *TradeMediator) processStocks() error {
+	currencyPaginated, err := m.symbolService.List(service.SymbolListOptions{
+		PaginationOptions: service.PaginationOptions{
+			PageSize: &symbolQueryPageSize,
+		},
+		SymbolType: models.SymbolStock,
+	})
+	if err != nil {
+		log.Printf("Error querying symbol table: %s", err.Error())
+	}
+
+	symbols := currencyPaginated.Results.([]models.Symbol)
+	for _, symbol := range symbols {
+		isCompact := true
+		if symbol.LastProcessedDate == nil {
+			isCompact = false
+		}
+		result, err := m.alphaVantageService.GetStockHistory(symbol.Symbol, isCompact)
+		if err != nil {
+			// Some fix required on this as this might stall.
+			return err
+		}
+
+		var allStocks []*models.Stock
+		var maxDate *time.Time
+		for key, value := range result.Results {
+			t, err := time.Parse(time.RFC3339, fmt.Sprintf("%sT08:00:00.000Z", key))
+			if maxDate == nil || maxDate.Before(t) {
+				maxDate = &t
+			}
+
+			if err != nil {
+				return err
+			}
+
+			price, err := strconv.ParseFloat(value.AdjustedClose, 64)
+			if err != nil {
+				return err
+			}
+
+			allStocks = append(allStocks, &models.Stock{
+				TradeDate: &t,
+				Symbol:    symbol.Symbol,
+				Price:     price,
+			})
+		}
+
+		err = m.stockService.BulkAdd(allStocks)
+		if err != nil {
+			return err
+		}
+
+		symbol.LastProcessedDate = maxDate
+		err = m.symbolService.Save(&symbol)
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -226,5 +293,10 @@ func (m *TradeMediator) ProcessTrades() {
 	}
 
 	// Query stock rates and put into table
+	err = m.processStocks()
+	if err != nil {
+		log.Printf("error downloading stocks information: %s", err)
+		return
+	}
 	// Update portfolio for each user id
 }
