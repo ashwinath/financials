@@ -44,7 +44,7 @@ func InitContext(c *config.Config) (*Context, error) {
 	context.UserService = service.NewUserService(db)
 	context.TradeTransactionService = service.NewTradeService(db, c.Database.BatchInsertSize)
 	context.SymbolService = service.NewSymbolService(db)
-	context.AlphaVantageService = service.NewAlphaVantageService(c.AlphaVantage.APIKey)
+	context.AlphaVantageService = service.NewAlphaVantageService(c.AlphaVantageAPIKey)
 	context.ExchangeRateService = service.NewExchangeRateService(db, c.Database.BatchInsertSize)
 	context.StockService = service.NewStockService(db, c.Database.BatchInsertSize)
 	context.PortfolioService = service.NewPortfolioService(db, c.Database.BatchInsertSize)
@@ -55,6 +55,7 @@ func InitContext(c *config.Config) (*Context, error) {
 		context.SessionService,
 	)
 	context.TradeMediator = mediator.NewTradeMediator(
+		c.PortfolioCalculationInterval,
 		context.TradeTransactionService,
 		context.SymbolService,
 		context.AlphaVantageService,

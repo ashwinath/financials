@@ -12,5 +12,5 @@ Database:
   TimeZone: Asia/Singapore
   BatchInsertSize: 100
 
-AlphaVantage:
-  APIKey: secret
+AlphaVantageAPIKey: test
+PortfolioCalculationInterval: 1h

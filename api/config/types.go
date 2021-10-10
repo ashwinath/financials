@@ -4,9 +4,10 @@ import "time"
 
 // Config is the base config entrypoint
 type Config struct {
-	Server       Server
-	Database     Database
-	AlphaVantage AlphaVantage
+	Server                       Server        `validate:"required,dive"`
+	Database                     Database      `validate:"required,dive"`
+	AlphaVantageAPIKey           string        `validate:"required"`
+	PortfolioCalculationInterval time.Duration `validate:"required"`
 }
 
 // Server contains the server related configurations
@@ -25,9 +26,4 @@ type Database struct {
 	Name            string `validate:"required"`
 	TimeZone        string `validate:"required"`
 	BatchInsertSize int    `validate:"required"`
-}
-
-// AlphaVantage contains the AlphaVantage related configuration
-type AlphaVantage struct {
-	APIKey string `validate:"required"`
 }

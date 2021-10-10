@@ -27,17 +27,19 @@ const (
 
 // TradeMediator handles everything regarding trades
 type TradeMediator struct {
-	tradeService        *service.TradeService
-	symbolService       *service.SymbolService
-	alphaVantageService *service.AlphaVantageService
-	exchangeRateService *service.ExchangeRateService
-	stockService        *service.StockService
-	userService         *service.UserService
-	portfolioService    *service.PortfolioService
+	portfolioCalculationInterval time.Duration
+	tradeService                 *service.TradeService
+	symbolService                *service.SymbolService
+	alphaVantageService          *service.AlphaVantageService
+	exchangeRateService          *service.ExchangeRateService
+	stockService                 *service.StockService
+	userService                  *service.UserService
+	portfolioService             *service.PortfolioService
 }
 
 // NewTradeMediator creates a new NewTradeMediator
 func NewTradeMediator(
+	portfolioCalculationInterval time.Duration,
 	tradeService *service.TradeService,
 	symbolService *service.SymbolService,
 	alphaVantageService *service.AlphaVantageService,
@@ -47,13 +49,14 @@ func NewTradeMediator(
 	portfolioService *service.PortfolioService,
 ) *TradeMediator {
 	return &TradeMediator{
-		tradeService:        tradeService,
-		symbolService:       symbolService,
-		alphaVantageService: alphaVantageService,
-		exchangeRateService: exchangeRateService,
-		stockService:        stockService,
-		userService:         userService,
-		portfolioService:    portfolioService,
+		portfolioCalculationInterval: portfolioCalculationInterval,
+		tradeService:                 tradeService,
+		symbolService:                symbolService,
+		alphaVantageService:          alphaVantageService,
+		exchangeRateService:          exchangeRateService,
+		stockService:                 stockService,
+		userService:                  userService,
+		portfolioService:             portfolioService,
 	}
 }
 
@@ -453,27 +456,36 @@ func (m *TradeMediator) calculatePortfolio() error {
 // ProcessTrades processes all the trades for all users.
 // Since I'm the only user it's not going to be optimised to calculate parallely
 func (m *TradeMediator) ProcessTrades() {
-	// Gets currencies involved and synchronises the tables
-	m.syncSymbolTable()
+	for {
+		start := time.Now()
+		log.Printf("Running one round of process trades")
+		// Gets currencies involved and synchronises the tables
+		m.syncSymbolTable()
 
-	// Gets the exchange rates for all currencies to SGD
-	err := m.processCurrency()
-	if err != nil {
-		log.Printf("error downloading currency information: %s", err)
-		return
-	}
+		// Gets the exchange rates for all currencies to SGD
+		err := m.processCurrency()
+		if err != nil {
+			log.Printf("error downloading currency information: %s", err)
+			goto endloop
+		}
 
-	// Query stock rates and put into table
-	err = m.processStocks()
-	if err != nil {
-		log.Printf("error downloading stocks information: %s", err)
-		return
-	}
+		// Query stock rates and put into table
+		err = m.processStocks()
+		if err != nil {
+			log.Printf("error downloading stocks information: %s", err)
+			goto endloop
+		}
 
-	// Update portfolio for each user id
-	err = m.calculatePortfolio()
-	if err != nil {
-		log.Printf("error calculating portfolio information: %s", err)
-		return
+		// Update portfolio for each user id
+		err = m.calculatePortfolio()
+		if err != nil {
+			log.Printf("error calculating portfolio information: %s", err)
+			goto endloop
+		}
+		log.Printf("Finished one round of process trades, time taken: %s", time.Since(start))
+
+	endloop:
+		log.Printf("ProcessTrades Sleeping for: %s", m.portfolioCalculationInterval)
+		time.Sleep(m.portfolioCalculationInterval)
 	}
 }

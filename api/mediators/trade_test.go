@@ -11,9 +11,12 @@ import (
 
 func TestCreateTransactionInBulk(t *testing.T) {
 	service.WithTestDatabase(t, func(t *testing.T, db *gorm.DB) {
-		svc := service.NewTradeService(db, 20)
+		tradeSvc := service.NewTradeService(db, 20)
 		symbolSvc := service.NewSymbolService(db)
-		m := NewTradeMediator(svc, symbolSvc)
+		m := TradeMediator{
+			tradeService:  tradeSvc,
+			symbolService: symbolSvc,
+		}
 
 		session := &models.Session{
 			UserID: "hello",
@@ -23,7 +26,7 @@ func TestCreateTransactionInBulk(t *testing.T) {
 		assert.Nil(t, err)
 
 		for _, trade := range trades {
-			tr, err := svc.Find(trade.ID)
+			tr, err := tradeSvc.Find(trade.ID)
 			assert.Nil(t, err)
 			assert.NotNil(t, tr)
 

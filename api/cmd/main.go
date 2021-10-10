@@ -20,7 +20,8 @@ func main() {
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	ctx.TradeMediator.ProcessTrades()
+
+	go ctx.TradeMediator.ProcessTrades()
 
 	router := controller.MakeRouter(ctx)
 
