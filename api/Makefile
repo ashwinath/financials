@@ -6,7 +6,7 @@ setup:
 		-e POSTGRES_PASSWORD=password \
 		--name financial \
 		postgres:13-alpine
-	@sleep 10
+	@sleep 30
 	@docker run \
 		--net="container:financial" \
 		--volume ${PWD}/migrations:/etc/migrations \

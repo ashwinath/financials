@@ -15,10 +15,14 @@ var (
 	orderByDatePurchased = "date_purchased"
 	orderDirection       = "desc"
 	symbolQueryPageSize  = 100
+	tradeQueryPageSize   = 1000
+	tradeOrderBy         = "date_purchased"
+	tradeOrder           = "asc"
 )
 
 const (
-	baseCurrency = "SGD"
+	baseCurrency  = "SGD"
+	secondsInADay = 60 * 60 * 24
 )
 
 // TradeMediator handles everything regarding trades
@@ -28,6 +32,8 @@ type TradeMediator struct {
 	alphaVantageService *service.AlphaVantageService
 	exchangeRateService *service.ExchangeRateService
 	stockService        *service.StockService
+	userService         *service.UserService
+	portfolioService    *service.PortfolioService
 }
 
 // NewTradeMediator creates a new NewTradeMediator
@@ -37,6 +43,8 @@ func NewTradeMediator(
 	alphaVantageService *service.AlphaVantageService,
 	exchangeRateService *service.ExchangeRateService,
 	stockService *service.StockService,
+	userService *service.UserService,
+	portfolioService *service.PortfolioService,
 ) *TradeMediator {
 	return &TradeMediator{
 		tradeService:        tradeService,
@@ -44,6 +52,8 @@ func NewTradeMediator(
 		alphaVantageService: alphaVantageService,
 		exchangeRateService: exchangeRateService,
 		stockService:        stockService,
+		userService:         userService,
+		portfolioService:    portfolioService,
 	}
 }
 
@@ -245,14 +255,19 @@ func (m *TradeMediator) processStocks() error {
 		var maxDate *time.Time
 		for key, value := range result.Results {
 			t, err := time.Parse(time.RFC3339, fmt.Sprintf("%sT08:00:00.000Z", key))
-			if maxDate == nil || maxDate.Before(t) {
-				maxDate = &t
-			}
 
 			if err != nil {
 				return err
 			}
 
+			// Due to time zone differences, we just add one extra day, assume stocks are us time based
+			t = t.Add(secondsInADay * time.Second)
+
+			if maxDate == nil || maxDate.Before(t) {
+				maxDate = &t
+			}
+
+			// TODO: Handle split coefficient.
 			price, err := strconv.ParseFloat(value.AdjustedClose, 64)
 			if err != nil {
 				return err
@@ -279,6 +294,162 @@ func (m *TradeMediator) processStocks() error {
 	return nil
 }
 
+func (m *TradeMediator) getCurrency(symbol string, date time.Time) *models.ExchangeRate {
+	currencyDate := date
+	er, err := m.exchangeRateService.Find(symbol, currencyDate)
+	for err != nil {
+		// Keep finding the last valid entry
+		currencyDate = currencyDate.Add(-1 * secondsInADay * time.Second)
+		er, err = m.exchangeRateService.Find(symbol, currencyDate)
+	}
+	return er
+}
+
+func (m *TradeMediator) calculatePortfolio() error {
+	users, err := m.userService.ListUsers()
+	if err != nil {
+		return err
+	}
+
+	for _, user := range users {
+		stockSymbolsSet := make(map[string]struct{})
+		var allUserTrades []models.Trade
+
+		// iterate through all user trades
+		page := 0
+		totalPages := 1 // just to satisfy initial condition
+		for page < totalPages {
+			paginatedTrades, err := m.tradeService.List(service.TradeListOptions{
+				UserID: &user.ID,
+				PaginationOptions: service.PaginationOptions{
+					PageSize: &tradeQueryPageSize,
+					OrderBy:  &tradeOrderBy,
+					Order:    &tradeOrder,
+				},
+			})
+			if err != nil {
+				return nil
+			}
+
+			trades := paginatedTrades.Results.([]models.Trade)
+			for _, trade := range trades {
+				stockSymbolsSet[trade.Symbol] = struct{}{}
+			}
+			allUserTrades = append(allUserTrades, trades...)
+
+			totalPages = paginatedTrades.Paging.Pages
+			page++
+		}
+
+		// Get base currencies required
+		currencySymbolsSet := make(map[string]struct{})
+		stockCurrencyMap := make(map[string]string)
+		for stockSymbol := range stockSymbolsSet {
+			symbol, err := m.symbolService.Find(stockSymbol)
+			if err != nil {
+				return nil
+			}
+
+			currencySymbolsSet[symbol.BaseCurrency] = struct{}{}
+			stockCurrencyMap[stockSymbol] = symbol.BaseCurrency
+		}
+
+		// Process portfolios partially for days with active trading
+		allPortfoliosMap := make(map[string][]models.Portfolio)
+		lastPortfolioMap := make(map[string]models.Portfolio)
+		for _, trade := range allUserTrades {
+			exchangeRate := m.getCurrency(stockCurrencyMap[trade.Symbol], trade.DatePurchased)
+
+			var portfolio models.Portfolio
+			if lastPortfolio, ok := lastPortfolioMap[trade.Symbol]; !ok {
+				// Base case
+				principal := trade.PriceEach * trade.Quantity * exchangeRate.Price
+				portfolio = models.Portfolio{
+					UserID:    trade.UserID,
+					TradeDate: trade.DatePurchased,
+					Symbol:    trade.Symbol,
+					Principal: principal,
+					Quantity:  trade.Quantity,
+				}
+			} else {
+				// any other increasing trade.
+				tradeMultiplier := 1.0
+				if trade.TradeType == "sell" {
+					tradeMultiplier = -1.0
+				}
+				principal := lastPortfolio.Principal + trade.PriceEach*trade.Quantity*exchangeRate.Price*tradeMultiplier
+				portfolio = models.Portfolio{
+					UserID:    trade.UserID,
+					TradeDate: trade.DatePurchased,
+					Symbol:    trade.Symbol,
+					Principal: principal,
+					Quantity:  lastPortfolio.Quantity + trade.Quantity*tradeMultiplier,
+				}
+			}
+
+			lastPortfolioMap[trade.Symbol] = portfolio
+			allPortfoliosMap[trade.Symbol] = append(allPortfoliosMap[trade.Symbol], portfolio)
+		}
+
+		var allPortfolios []models.Portfolio
+		// Another pass through to fill gaps so that the data is continuous daily
+		loc, _ := time.LoadLocation("Asia/Singapore")
+		for symbol, partialPortfolios := range allPortfoliosMap {
+			currentDate := partialPortfolios[0].TradeDate
+			portfolioWithTradesMap := make(map[time.Time]models.Portfolio)
+			for _, portfolio := range partialPortfolios {
+				// There might be multiple trades in a single day for each symbol, we need to combine them
+				if existingPortfolio, ok := portfolioWithTradesMap[portfolio.TradeDate]; ok {
+					portfolio.Quantity += existingPortfolio.Quantity
+					portfolio.Principal += existingPortfolio.Principal
+				}
+				portfolioWithTradesMap[portfolio.TradeDate] = portfolio
+			}
+
+			now := time.Now()
+			tomorrow := time.Date(
+				now.Year(),
+				now.Month(),
+				now.Day(),
+				16, 0, 0, 0, loc,
+			)
+			var previousPortfolio models.Portfolio
+			for currentDate.Before(tomorrow) {
+				er := m.getCurrency(stockCurrencyMap[symbol], currentDate)
+
+				exchangeRate := er.Price
+				newPortfolio := previousPortfolio
+				tradeDate := currentDate
+				newPortfolio.TradeDate = tradeDate
+				newPortfolio.Symbol = symbol
+				newPortfolio.UserID = user.ID
+
+				if tradePortfolio, ok := portfolioWithTradesMap[currentDate]; ok {
+					// new trades here, we need to merge old value with new value
+					newPortfolio.Quantity = tradePortfolio.Quantity
+					newPortfolio.Principal = tradePortfolio.Principal
+				}
+
+				if stock, err := m.stockService.Find(symbol, currentDate); err == nil {
+					// Trading day, update NAV and simple returns
+					newPortfolio.NAV = newPortfolio.Quantity * stock.Price * exchangeRate
+					newPortfolio.SimpleReturns = (newPortfolio.NAV - newPortfolio.Principal) / newPortfolio.Principal
+				}
+				allPortfolios = append(allPortfolios, newPortfolio)
+
+				currentDate = currentDate.Add(secondsInADay * time.Second)
+				previousPortfolio = newPortfolio
+			}
+		}
+		err = m.portfolioService.BulkAdd(allPortfolios)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // ProcessTrades processes all the trades for all users.
 // Since I'm the only user it's not going to be optimised to calculate parallely
 func (m *TradeMediator) ProcessTrades() {
@@ -298,5 +469,11 @@ func (m *TradeMediator) ProcessTrades() {
 		log.Printf("error downloading stocks information: %s", err)
 		return
 	}
+
 	// Update portfolio for each user id
+	err = m.calculatePortfolio()
+	if err != nil {
+		log.Printf("error calculating portfolio information: %s", err)
+		return
+	}
 }

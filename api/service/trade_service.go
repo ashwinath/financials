@@ -19,7 +19,7 @@ func NewTradeService(db *gorm.DB, batchInsertSize int) *TradeService {
 	}
 }
 
-// Find finds a session by it's ID
+// Find finds a trade by it's ID
 func (s *TradeService) Find(id string) (*models.Trade, error) {
 	query := s.db.Where("id = ?", id)
 

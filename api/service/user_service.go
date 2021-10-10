@@ -43,6 +43,17 @@ func (s *UserService) FindByUsername(username string) (*models.User, error) {
 	return &user, nil
 }
 
+// ListUsers queries all the users in the db
+// I expect this to be very small so there is no pagination involved.
+func (s *UserService) ListUsers() ([]models.User, error) {
+	var users []models.User
+	err := s.db.Find(&users).Error
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
+}
+
 // Save saves the session into the database
 func (s *UserService) Save(user *models.User) error {
 	return s.db.Save(user).Error
