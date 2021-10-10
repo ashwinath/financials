@@ -25,7 +25,6 @@ export const queryPortfolio = createAsyncThunk(
   'investments/queryPortflio',
   async (from) => {
     try {
-      console.log(from)
       const url = `/api/v1/trades/portfolio?from=${encodeURIComponent(from)}`;
       const response = await axios.get(url);
       return response;
