@@ -363,6 +363,10 @@ func (m *TradeMediator) calculatePortfolio() error {
 		for _, trade := range allUserTrades {
 			exchangeRate := m.getCurrency(stockCurrencyMap[trade.Symbol], trade.DatePurchased)
 
+			tradeMultiplier := 1.0
+			if trade.TradeType == "sell" {
+				tradeMultiplier = -1.0
+			}
 			var portfolio models.Portfolio
 			if lastPortfolio, ok := lastPortfolioMap[trade.Symbol]; !ok {
 				// Base case
@@ -376,17 +380,13 @@ func (m *TradeMediator) calculatePortfolio() error {
 				}
 			} else {
 				// any other increasing trade.
-				tradeMultiplier := 1.0
-				if trade.TradeType == "sell" {
-					tradeMultiplier = -1.0
-				}
 				principal := lastPortfolio.Principal + trade.PriceEach*trade.Quantity*exchangeRate.Price*tradeMultiplier
 				portfolio = models.Portfolio{
 					UserID:    trade.UserID,
 					TradeDate: trade.DatePurchased,
 					Symbol:    trade.Symbol,
 					Principal: principal,
-					Quantity:  lastPortfolio.Quantity + trade.Quantity*tradeMultiplier,
+					Quantity:  lastPortfolio.Quantity + (trade.Quantity * tradeMultiplier),
 				}
 			}
 
@@ -403,8 +403,8 @@ func (m *TradeMediator) calculatePortfolio() error {
 			for _, portfolio := range partialPortfolios {
 				// There might be multiple trades in a single day for each symbol, we need to combine them
 				if existingPortfolio, ok := portfolioWithTradesMap[portfolio.TradeDate]; ok {
-					portfolio.Quantity += existingPortfolio.Quantity
-					portfolio.Principal += existingPortfolio.Principal
+					portfolio.Quantity = existingPortfolio.Quantity
+					portfolio.Principal = existingPortfolio.Principal
 				}
 				portfolioWithTradesMap[portfolio.TradeDate] = portfolio
 			}
