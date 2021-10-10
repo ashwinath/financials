@@ -6,6 +6,7 @@ import { Provider } from 'react-redux'
 import { store } from './redux/store'
 
 import '@elastic/eui/dist/eui_theme_light.css';
+import '@elastic/charts/dist/theme_only_light.css';
 
 ReactDOM.render(
   <React.StrictMode>

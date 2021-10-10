@@ -64,6 +64,10 @@ type listPortfolioParams struct {
 	From *time.Time `schema:"from" validate:"required"`
 }
 
+type portfolioResult struct {
+	Results []models.Portfolio `json:"results"`
+}
+
 func (c *tradeTransactionController) ListPortfolio(w http.ResponseWriter, r *http.Request) {
 	session, err := c.getSessionFromCookie(r)
 	if err != nil {
@@ -83,5 +87,5 @@ func (c *tradeTransactionController) ListPortfolio(w http.ResponseWriter, r *htt
 		return
 	}
 
-	ok(w, struct{ Results []models.Portfolio }{Results: portfolio})
+	ok(w, portfolioResult{Results: portfolio})
 }

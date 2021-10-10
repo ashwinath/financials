@@ -19,3 +19,15 @@ export function convertStringToDate(dateString) {
 
   return moment(dateString).utcOffset('+0800').set({hour:0,minute:0,second:0,millisecond:0});
 }
+
+export function getDateFromPeriod(numberOfMonthsFromNow) {
+  if (numberOfMonthsFromNow === null || numberOfMonthsFromNow === undefined) {
+    return null;
+  }
+
+  return moment()
+    .utcOffset('+0800')
+    .set({hour:16,minute:0,second:0,millisecond:0})
+    .subtract(numberOfMonthsFromNow, "months")
+    .format();
+}

@@ -21,6 +21,20 @@ export const queryTrades = createAsyncThunk(
   }
 );
 
+export const queryPortfolio = createAsyncThunk(
+  'investments/queryPortflio',
+  async (from) => {
+    try {
+      console.log(from)
+      const url = `/api/v1/trades/portfolio?from=${encodeURIComponent(from)}`;
+      const response = await axios.get(url);
+      return response;
+    } catch (error) {
+      return error.response;
+    }
+  }
+);
+
 export const submitTrade = createAsyncThunk(
   'investments/submitTrade',
   async (singleTrade) => {
@@ -77,6 +91,10 @@ export const investmentsSlice = createSlice({
     isTradeFormSubmitting: false,
     submitSuccess: "none", // can be none/success/failure
     tradeCSVRaw: "",
+    portfolio: [],
+    portfolioLoading: false,
+    portfolioLoaded: false,
+    queryPeriodInMonths: 3,
   },
   reducers: {
     updateTableInfo: (state, action) => {
@@ -197,6 +215,27 @@ export const investmentsSlice = createSlice({
         state.submitSuccess = "failure";
         state.isAddTradeModalOpen = false;
         state.errorMessage = "Had some trouble submitting your trades.";
+      });
+
+    // Submit trades
+    builder
+      .addCase(queryPortfolio.pending, (state) => {
+        state.portfolioLoading = true;
+        state.errorMessage = "";
+      })
+      .addCase(queryPortfolio.fulfilled, (state, action) => {
+        state.portfolioLoading = false;
+        state.portfolioLoaded = true;
+        if (action.payload.status === 200) {
+          state.portfolio = action.payload.data.results;
+        } else {
+          state.errorMessage = action.payload.data.message;
+        }
+      })
+      .addCase(queryPortfolio.rejected, (state) => {
+        state.portfolioLoading = false;
+        state.errorMessage = "Had some trouble submitting your trades.";
+        state.portfolioLoaded = true;
       });
   },
 });
