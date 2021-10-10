@@ -26,3 +26,5 @@ paths:
   # Trades
   "/api/v1/trades":
     $ref: "specs/trades.yaml#/paths/~1api~1v1~1trades"
+  "/api/v1/trades/portfolio":
+    $ref: "specs/trades.yaml#/paths/~1api~1v1~1trades~1portfolio"

@@ -489,3 +489,8 @@ func (m *TradeMediator) ProcessTrades() {
 		time.Sleep(m.portfolioCalculationInterval)
 	}
 }
+
+// ListPortfolio returns the portfolio for a particular user
+func (m *TradeMediator) ListPortfolio(userID string, from *time.Time) ([]models.Portfolio, error) {
+	return m.portfolioService.List(userID, from)
+}

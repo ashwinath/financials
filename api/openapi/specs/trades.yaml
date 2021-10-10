@@ -41,7 +41,7 @@ paths:
     get:
       tags: *tags
       operationID: List
-      summary: "Create trade transactions in bulk"
+      summary: "Get trade transactions in bulk"
       parameters:
         - in: query
           name: page
@@ -70,6 +70,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PaginatedTrades"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+        500:
+          description: Internal Service Error
+          content:
+            application/json:
+              schema:
+                $ref: "common.yaml#/components/schemas/Error"
+
+  "/api/v1/trades/portfolio":
+    get:
+      tags: *tags
+      operationID: ListPortfolio
+      summary: "Get trade transactions in bulk"
+      parameters:
+        - in: query
+          name: from
+          schema:
+            type: string
+            format: date-time
+      responses:
+        200:
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TradePortfolio"
         400:
           description: Bad Request
           content:
@@ -137,3 +168,44 @@ components:
       enum:
         - buy
         - sell
+
+    TradePortfolio:
+      description: The portfolio and with the date and respective values.
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/SingleTradePortfolio"
+
+    SingleTradePortfolio:
+      properties:
+        id:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        trade_date:
+          type: string
+          format: date-time
+          readOnly: true
+        symbol:
+          type: string
+          readOnly: true
+        quantity:
+          type: number
+          readOnly: true
+        principal:
+          type: number
+          readOnly: true
+        nav:
+          type: number
+          readOnly: true
+        simple_returns:
+          type: number
+          readOnly: true
