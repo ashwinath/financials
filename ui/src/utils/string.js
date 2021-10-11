@@ -159,3 +159,8 @@ function CSVToArray( strData, strDelimiter ){
   // Return the parsed data.
   return( arrData );
 }
+
+export function formatPercent(d) {
+  return `${Number(d * 100).toFixed(2)}%`;
+
+}

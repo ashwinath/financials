@@ -136,7 +136,11 @@ export const investmentsSlice = createSlice({
       state.addTradeForm[payload.name] = payload.value;
     },
     updateCSVTrades: (state, action) => {
-      state.tradeCSVRaw = action.payload
+      state.tradeCSVRaw = action.payload;
+    },
+    updateQueryPeriodInMonths: (state, action) => {
+      state.queryPeriodInMonths = action.payload;
+      state.shouldReload = true;
     },
   },
   extraReducers: (builder) => {
@@ -216,9 +220,10 @@ export const investmentsSlice = createSlice({
         state.errorMessage = "Had some trouble submitting your trades.";
       });
 
-    // Submit trades
+    // Query portfolio
     builder
       .addCase(queryPortfolio.pending, (state) => {
+        state.shouldReload = false;
         state.portfolioLoading = true;
         state.errorMessage = "";
       })
@@ -247,6 +252,7 @@ export const {
   updateAddTradeForm,
   toggleIsAddBulkTradeModalOpen,
   updateCSVTrades,
+  updateQueryPeriodInMonths,
 } = investmentsSlice.actions;
 
 export default investmentsSlice.reducer;
