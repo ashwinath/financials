@@ -76,6 +76,13 @@ func (m *TradeMediator) CreateTransactionInBulk(
 	}
 
 	go m.createSymbolIfNotExists(symbolSet)
+	go func(userID string) {
+		user, err := m.userService.Find(userID)
+		if err != nil {
+			log.Printf("error querying user: %s", err)
+		}
+		m.calculatePortfolio(*user)
+	}(session.UserID)
 
 	return m.tradeService.BulkAdd(transactions)
 }
@@ -308,184 +315,188 @@ func (m *TradeMediator) getCurrency(symbol string, date time.Time) *models.Excha
 	return er
 }
 
-func (m *TradeMediator) calculatePortfolio() error {
-	users, err := m.userService.ListUsers()
+func (m *TradeMediator) calculatePortfolio(user models.User) error {
+	stockSymbolsSet := make(map[string]struct{})
+	var allUserTrades []models.Trade
+
+	// iterate through all user trades
+	page := 0
+	totalPages := 1 // just to satisfy initial condition
+	for page < totalPages {
+		paginatedTrades, err := m.tradeService.List(service.TradeListOptions{
+			UserID: &user.ID,
+			PaginationOptions: service.PaginationOptions{
+				PageSize: &tradeQueryPageSize,
+				OrderBy:  &tradeOrderBy,
+				Order:    &tradeOrder,
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		trades := paginatedTrades.Results.([]models.Trade)
+		for _, trade := range trades {
+			stockSymbolsSet[trade.Symbol] = struct{}{}
+		}
+		allUserTrades = append(allUserTrades, trades...)
+
+		totalPages = paginatedTrades.Paging.Pages
+		page++
+	}
+
+	// Get base currencies required
+	currencySymbolsSet := make(map[string]struct{})
+	stockCurrencyMap := make(map[string]string)
+	for stockSymbol := range stockSymbolsSet {
+		symbol, err := m.symbolService.Find(stockSymbol)
+		if err != nil {
+			return err
+		}
+
+		currencySymbolsSet[symbol.BaseCurrency] = struct{}{}
+		stockCurrencyMap[stockSymbol] = symbol.BaseCurrency
+	}
+
+	// Process portfolios partially for days with active trading
+	allPortfoliosMap := make(map[string][]models.Portfolio)
+	lastPortfolioMap := make(map[string]models.Portfolio)
+	for _, trade := range allUserTrades {
+		exchangeRate := m.getCurrency(stockCurrencyMap[trade.Symbol], trade.DatePurchased)
+
+		tradeMultiplier := 1.0
+		if trade.TradeType == "sell" {
+			tradeMultiplier = -1.0
+		}
+		var portfolio models.Portfolio
+		if lastPortfolio, ok := lastPortfolioMap[trade.Symbol]; !ok {
+			// Base case
+			principal := trade.PriceEach * trade.Quantity * exchangeRate.Price
+			portfolio = models.Portfolio{
+				UserID:    trade.UserID,
+				TradeDate: trade.DatePurchased,
+				Symbol:    trade.Symbol,
+				Principal: principal,
+				Quantity:  trade.Quantity,
+			}
+		} else {
+			// any other increasing trade.
+			principal := lastPortfolio.Principal + trade.PriceEach*trade.Quantity*exchangeRate.Price*tradeMultiplier
+			portfolio = models.Portfolio{
+				UserID:    trade.UserID,
+				TradeDate: trade.DatePurchased,
+				Symbol:    trade.Symbol,
+				Principal: principal,
+				Quantity:  lastPortfolio.Quantity + (trade.Quantity * tradeMultiplier),
+			}
+		}
+
+		lastPortfolioMap[trade.Symbol] = portfolio
+		allPortfoliosMap[trade.Symbol] = append(allPortfoliosMap[trade.Symbol], portfolio)
+	}
+
+	var allPortfolios []models.Portfolio
+	// Another pass through to fill gaps so that the data is continuous daily
+	loc, _ := time.LoadLocation("Asia/Singapore")
+	for symbol, partialPortfolios := range allPortfoliosMap {
+		currentDate := partialPortfolios[0].TradeDate
+		portfolioWithTradesMap := make(map[time.Time]models.Portfolio)
+		for _, portfolio := range partialPortfolios {
+			// There might be multiple trades in a single day for each symbol, we need to combine them
+			if existingPortfolio, ok := portfolioWithTradesMap[portfolio.TradeDate]; ok {
+				portfolio.Quantity = existingPortfolio.Quantity
+				portfolio.Principal = existingPortfolio.Principal
+			}
+			portfolioWithTradesMap[portfolio.TradeDate] = portfolio
+		}
+
+		now := time.Now()
+		tomorrow := time.Date(
+			now.Year(),
+			now.Month(),
+			now.Day(),
+			16, 0, 0, 0, loc,
+		)
+		var previousPortfolio models.Portfolio
+		for currentDate.Before(tomorrow) {
+			er := m.getCurrency(stockCurrencyMap[symbol], currentDate)
+
+			exchangeRate := er.Price
+			newPortfolio := previousPortfolio
+			tradeDate := currentDate
+			newPortfolio.TradeDate = tradeDate
+			newPortfolio.Symbol = symbol
+			newPortfolio.UserID = user.ID
+
+			if tradePortfolio, ok := portfolioWithTradesMap[currentDate]; ok {
+				// new trades here, we need to merge old value with new value
+				newPortfolio.Quantity = tradePortfolio.Quantity
+				newPortfolio.Principal = tradePortfolio.Principal
+			}
+
+			if stock, err := m.stockService.Find(symbol, currentDate); err == nil {
+				// Trading day, update NAV and simple returns
+				newPortfolio.NAV = newPortfolio.Quantity * stock.Price * exchangeRate
+				newPortfolio.SimpleReturns = (newPortfolio.NAV - newPortfolio.Principal) / newPortfolio.Principal
+			}
+			allPortfolios = append(allPortfolios, newPortfolio)
+
+			currentDate = currentDate.Add(secondsInADay * time.Second)
+			previousPortfolio = newPortfolio
+		}
+	}
+
+	err := m.portfolioService.BulkAdd(allPortfolios)
 	if err != nil {
 		return err
 	}
 
+	return nil
+}
+
+func (m *TradeMediator) processOneRoundOfTrades() {
+	start := time.Now()
+	log.Printf("Running one round of process trades")
+	// Gets currencies involved and synchronises the tables
+	m.syncSymbolTable()
+
+	// Gets the exchange rates for all currencies to SGD
+	err := m.processCurrency()
+	if err != nil {
+		log.Printf("error downloading currency information: %s", err)
+		return
+	}
+
+	// Query stock rates and put into table
+	err = m.processStocks()
+	if err != nil {
+		log.Printf("error downloading stocks information: %s", err)
+		return
+	}
+
+	// Update portfolio for each user id
+	users, err := m.userService.ListUsers()
+	if err != nil {
+		log.Printf("error querying users: %s", err)
+		return
+	}
+
 	for _, user := range users {
-		stockSymbolsSet := make(map[string]struct{})
-		var allUserTrades []models.Trade
-
-		// iterate through all user trades
-		page := 0
-		totalPages := 1 // just to satisfy initial condition
-		for page < totalPages {
-			paginatedTrades, err := m.tradeService.List(service.TradeListOptions{
-				UserID: &user.ID,
-				PaginationOptions: service.PaginationOptions{
-					PageSize: &tradeQueryPageSize,
-					OrderBy:  &tradeOrderBy,
-					Order:    &tradeOrder,
-				},
-			})
-			if err != nil {
-				return err
-			}
-
-			trades := paginatedTrades.Results.([]models.Trade)
-			for _, trade := range trades {
-				stockSymbolsSet[trade.Symbol] = struct{}{}
-			}
-			allUserTrades = append(allUserTrades, trades...)
-
-			totalPages = paginatedTrades.Paging.Pages
-			page++
-		}
-
-		// Get base currencies required
-		currencySymbolsSet := make(map[string]struct{})
-		stockCurrencyMap := make(map[string]string)
-		for stockSymbol := range stockSymbolsSet {
-			symbol, err := m.symbolService.Find(stockSymbol)
-			if err != nil {
-				return err
-			}
-
-			currencySymbolsSet[symbol.BaseCurrency] = struct{}{}
-			stockCurrencyMap[stockSymbol] = symbol.BaseCurrency
-		}
-
-		// Process portfolios partially for days with active trading
-		allPortfoliosMap := make(map[string][]models.Portfolio)
-		lastPortfolioMap := make(map[string]models.Portfolio)
-		for _, trade := range allUserTrades {
-			exchangeRate := m.getCurrency(stockCurrencyMap[trade.Symbol], trade.DatePurchased)
-
-			tradeMultiplier := 1.0
-			if trade.TradeType == "sell" {
-				tradeMultiplier = -1.0
-			}
-			var portfolio models.Portfolio
-			if lastPortfolio, ok := lastPortfolioMap[trade.Symbol]; !ok {
-				// Base case
-				principal := trade.PriceEach * trade.Quantity * exchangeRate.Price
-				portfolio = models.Portfolio{
-					UserID:    trade.UserID,
-					TradeDate: trade.DatePurchased,
-					Symbol:    trade.Symbol,
-					Principal: principal,
-					Quantity:  trade.Quantity,
-				}
-			} else {
-				// any other increasing trade.
-				principal := lastPortfolio.Principal + trade.PriceEach*trade.Quantity*exchangeRate.Price*tradeMultiplier
-				portfolio = models.Portfolio{
-					UserID:    trade.UserID,
-					TradeDate: trade.DatePurchased,
-					Symbol:    trade.Symbol,
-					Principal: principal,
-					Quantity:  lastPortfolio.Quantity + (trade.Quantity * tradeMultiplier),
-				}
-			}
-
-			lastPortfolioMap[trade.Symbol] = portfolio
-			allPortfoliosMap[trade.Symbol] = append(allPortfoliosMap[trade.Symbol], portfolio)
-		}
-
-		var allPortfolios []models.Portfolio
-		// Another pass through to fill gaps so that the data is continuous daily
-		loc, _ := time.LoadLocation("Asia/Singapore")
-		for symbol, partialPortfolios := range allPortfoliosMap {
-			currentDate := partialPortfolios[0].TradeDate
-			portfolioWithTradesMap := make(map[time.Time]models.Portfolio)
-			for _, portfolio := range partialPortfolios {
-				// There might be multiple trades in a single day for each symbol, we need to combine them
-				if existingPortfolio, ok := portfolioWithTradesMap[portfolio.TradeDate]; ok {
-					portfolio.Quantity = existingPortfolio.Quantity
-					portfolio.Principal = existingPortfolio.Principal
-				}
-				portfolioWithTradesMap[portfolio.TradeDate] = portfolio
-			}
-
-			now := time.Now()
-			tomorrow := time.Date(
-				now.Year(),
-				now.Month(),
-				now.Day(),
-				16, 0, 0, 0, loc,
-			)
-			var previousPortfolio models.Portfolio
-			for currentDate.Before(tomorrow) {
-				er := m.getCurrency(stockCurrencyMap[symbol], currentDate)
-
-				exchangeRate := er.Price
-				newPortfolio := previousPortfolio
-				tradeDate := currentDate
-				newPortfolio.TradeDate = tradeDate
-				newPortfolio.Symbol = symbol
-				newPortfolio.UserID = user.ID
-
-				if tradePortfolio, ok := portfolioWithTradesMap[currentDate]; ok {
-					// new trades here, we need to merge old value with new value
-					newPortfolio.Quantity = tradePortfolio.Quantity
-					newPortfolio.Principal = tradePortfolio.Principal
-				}
-
-				if stock, err := m.stockService.Find(symbol, currentDate); err == nil {
-					// Trading day, update NAV and simple returns
-					newPortfolio.NAV = newPortfolio.Quantity * stock.Price * exchangeRate
-					newPortfolio.SimpleReturns = (newPortfolio.NAV - newPortfolio.Principal) / newPortfolio.Principal
-				}
-				allPortfolios = append(allPortfolios, newPortfolio)
-
-				currentDate = currentDate.Add(secondsInADay * time.Second)
-				previousPortfolio = newPortfolio
-			}
-		}
-		err = m.portfolioService.BulkAdd(allPortfolios)
+		err = m.calculatePortfolio(user)
 		if err != nil {
-			return err
+			log.Printf("error calculating portfolio information: %s", err)
+			return
 		}
 	}
 
-	return nil
+	log.Printf("Finished one round of process trades, time taken: %s", time.Since(start))
 }
 
 // ProcessTrades processes all the trades for all users.
 // Since I'm the only user it's not going to be optimised to calculate parallely
 func (m *TradeMediator) ProcessTrades() {
 	for {
-		start := time.Now()
-		log.Printf("Running one round of process trades")
-		// Gets currencies involved and synchronises the tables
-		m.syncSymbolTable()
-
-		// Gets the exchange rates for all currencies to SGD
-		err := m.processCurrency()
-		if err != nil {
-			log.Printf("error downloading currency information: %s", err)
-			goto endloop
-		}
-
-		// Query stock rates and put into table
-		err = m.processStocks()
-		if err != nil {
-			log.Printf("error downloading stocks information: %s", err)
-			goto endloop
-		}
-
-		// Update portfolio for each user id
-		err = m.calculatePortfolio()
-		if err != nil {
-			log.Printf("error calculating portfolio information: %s", err)
-			goto endloop
-		}
-		log.Printf("Finished one round of process trades, time taken: %s", time.Since(start))
-		goto endloop
-
-	endloop:
+		m.processOneRoundOfTrades()
 		log.Printf("ProcessTrades Sleeping for: %s", m.portfolioCalculationInterval)
 		time.Sleep(m.portfolioCalculationInterval)
 	}
