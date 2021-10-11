@@ -26,7 +26,7 @@ func NewPortfolioService(db *gorm.DB, batchInsertSize int) *PortfolioService {
 func (s *PortfolioService) BulkAdd(portfolios []models.Portfolio) error {
 	return s.db.
 		Clauses(clause.OnConflict{
-			Columns: []clause.Column{{Name: "trade_date"}, {Name: "symbol"}},
+			Columns: []clause.Column{{Name: "trade_date"}, {Name: "symbol"}, {Name: "user_id"}},
 			DoUpdates: clause.AssignmentColumns([]string{
 				"principal",
 				"nav",

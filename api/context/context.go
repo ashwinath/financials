@@ -8,6 +8,7 @@ import (
 	"github.com/ashwinath/financials/api/service"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 // Context contains all the dependencies as part of DI
@@ -78,5 +79,7 @@ func initDB(dbConfig config.Database) (*gorm.DB, error) {
 		dbConfig.Port,
 		dbConfig.TimeZone,
 	)
-	return gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	return gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Silent),
+	})
 }

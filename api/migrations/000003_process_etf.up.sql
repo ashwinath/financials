@@ -44,4 +44,4 @@ CREATE TABLE IF NOT EXISTS portfolios (
     created_at     timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at     timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-CREATE UNIQUE INDEX uidx_portfolios ON portfolios(trade_date, symbol);
+CREATE UNIQUE INDEX uidx_portfolios ON portfolios(user_id, trade_date, symbol);

@@ -331,7 +331,7 @@ func (m *TradeMediator) calculatePortfolio() error {
 				},
 			})
 			if err != nil {
-				return nil
+				return err
 			}
 
 			trades := paginatedTrades.Results.([]models.Trade)
@@ -350,7 +350,7 @@ func (m *TradeMediator) calculatePortfolio() error {
 		for stockSymbol := range stockSymbolsSet {
 			symbol, err := m.symbolService.Find(stockSymbol)
 			if err != nil {
-				return nil
+				return err
 			}
 
 			currencySymbolsSet[symbol.BaseCurrency] = struct{}{}
@@ -483,6 +483,7 @@ func (m *TradeMediator) ProcessTrades() {
 			goto endloop
 		}
 		log.Printf("Finished one round of process trades, time taken: %s", time.Since(start))
+		goto endloop
 
 	endloop:
 		log.Printf("ProcessTrades Sleeping for: %s", m.portfolioCalculationInterval)
