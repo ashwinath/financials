@@ -42,6 +42,87 @@ import {
   formatPercent,
 } from "../../utils";
 
+const columns = [
+  {
+    field: 'symbol',
+    name: 'Symbol',
+    truncateText: true,
+    render: (field) => capitaliseAll(field),
+  },
+  {
+    field: 'principal',
+    name: 'Principal',
+    truncateText: true,
+    render: (field) => formatMoney(field),
+  },
+  {
+    field: 'nav',
+    name: 'NAV',
+    truncateText: true,
+    render: (field) => formatMoney(field),
+  },
+  {
+    field: 'quantity',
+    name: 'Quantity',
+    truncateText: true,
+  },
+  {
+    field: 'simple_returns',
+    name: 'Returns',
+    truncateText: true,
+    render: (field) => formatPercent(field),
+  },
+  {
+    field: 'percent',
+    name: 'Percentage',
+    truncateText: true,
+    render: (field) => formatPercent(field),
+  },
+];
+
+const timeOptions = [
+  {
+    value: 1,
+    inputDisplay: "Past Month",
+  },
+  {
+    value: 3,
+    inputDisplay: "Past Quarter",
+  },
+  {
+    value: 6,
+    inputDisplay: "Past Half",
+  },
+  {
+    value: 12,
+    inputDisplay: "Past Year",
+  },
+  {
+    value: 24,
+    inputDisplay: "Past 2 Years",
+  },
+  {
+    value: 36,
+    inputDisplay: "Past 3 Years",
+  },
+  {
+    value: 60,
+    inputDisplay: "Past 5 Years",
+  },
+  {
+    value: 120,
+    inputDisplay: "Past 10 Years",
+  },
+  {
+    value: 240,
+    inputDisplay: "Past 20 Years",
+  },
+  {
+    value: 360,
+    inputDisplay: "Past 30 Years",
+  },
+]
+
 export function InvestmentsMainPage() {
   const status = useLoginHook();
   const dispatch = useDispatch();
@@ -73,7 +154,7 @@ export function InvestmentsMainPage() {
   const aggregatedNavPrincipal = {}; // trade_date: {nav, principal}
   Object.entries(allSymbols).forEach(([symbol, items]) => {
     for (const item of items) {
-      if (aggregatedNavPrincipal[item.trade_date] in aggregatedNavPrincipal) {
+      if (item.trade_date in aggregatedNavPrincipal) {
         aggregatedNavPrincipal[item.trade_date] = {
           nav: aggregatedNavPrincipal[item.trade_date].nav + item.nav,
           principal: aggregatedNavPrincipal[item.trade_date].principal + item.principal,
@@ -119,90 +200,14 @@ export function InvestmentsMainPage() {
     };
   });
 
-  const columns = [
-    {
-      field: 'symbol',
-      name: 'Symbol',
-      truncateText: true,
-      render: (field) => capitaliseAll(field),
-    },
-    {
-      field: 'principal',
-      name: 'Principal',
-      truncateText: true,
-      render: (field) => formatMoney(field),
-    },
-    {
-      field: 'nav',
-      name: 'NAV',
-      truncateText: true,
-      render: (field) => formatMoney(field),
-    },
-    {
-      field: 'quantity',
-      name: 'Quantity',
-      truncateText: true,
-    },
-    {
-      field: 'simple_returns',
-      name: 'Returns',
-      truncateText: true,
-      render: (field) => formatPercent(field),
-    },
-    {
-      field: 'percent',
-      name: 'Percentage',
-      truncateText: true,
-      render: (field) => formatPercent(field),
-    },
-  ];
 
-  const timeOptions = [
-    {
-      value: 1,
-      inputDisplay: "Past Month",
-    },
-    {
-      value: 3,
-      inputDisplay: "Past Quarter",
-    },
-    {
-      value: 6,
-      inputDisplay: "Past Half",
-    },
-    {
-      value: 12,
-      inputDisplay: "Past Year",
-    },
-    {
-      value: 24,
-      inputDisplay: "Past 2 Years",
-    },
-    {
-      value: 36,
-      inputDisplay: "Past 3 Years",
-    },
-    {
-      value: 60,
-      inputDisplay: "Past 5 Years",
-    },
-    {
-      value: 120,
-      inputDisplay: "Past 10 Years",
-    },
-    {
-      value: 240,
-      inputDisplay: "Past 20 Years",
-    },
-    {
-      value: 360,
-      inputDisplay: "Past 30 Years",
-    },
-  ]
-
-  const latestSimpleReturns = simpleReturns["Simple Returns"].at(-1).simple_returns
-  const latestNAV = navVsPrincipal["NAV"].at(-1).value
-  const latestPrincipal = navVsPrincipal["Principal"].at(-1).value
+  const latestNAV = navVsPrincipal["NAV"]
+    .at(-1)
+    .value
+  const latestPrincipal = navVsPrincipal["Principal"]
+    .at(-1)
+    .value
+  const latestSimpleReturns = (latestNAV - latestPrincipal) / latestPrincipal
 
   return (
     <EuiPageTemplate
