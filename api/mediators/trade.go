@@ -304,6 +304,7 @@ func (m *TradeMediator) processStocks() error {
 	return nil
 }
 
+// Data might be dirty so we take the previous entry so that it's most accurate
 func (m *TradeMediator) getCurrency(symbol string, date time.Time) *models.ExchangeRate {
 	currencyDate := date
 	er, err := m.exchangeRateService.Find(symbol, currencyDate)
@@ -313,6 +314,18 @@ func (m *TradeMediator) getCurrency(symbol string, date time.Time) *models.Excha
 		er, err = m.exchangeRateService.Find(symbol, currencyDate)
 	}
 	return er
+}
+
+// Data might be dirty so we take the previous entry so that it's most accurate
+func (m *TradeMediator) getStock(symbol string, date time.Time) *models.Stock {
+	currencyDate := date
+	stonk, err := m.stockService.Find(symbol, currencyDate)
+	for err != nil {
+		// Keep finding the last valid entry
+		currencyDate = currencyDate.Add(-1 * secondsInADay * time.Second)
+		stonk, err = m.stockService.Find(symbol, currencyDate)
+	}
+	return stonk
 }
 
 func (m *TradeMediator) calculatePortfolio(user models.User) error {
@@ -434,11 +447,10 @@ func (m *TradeMediator) calculatePortfolio(user models.User) error {
 				newPortfolio.Principal = tradePortfolio.Principal
 			}
 
-			if stock, err := m.stockService.Find(symbol, currentDate); err == nil {
-				// Trading day, update NAV and simple returns
-				newPortfolio.NAV = newPortfolio.Quantity * stock.Price * exchangeRate
-				newPortfolio.SimpleReturns = (newPortfolio.NAV - newPortfolio.Principal) / newPortfolio.Principal
-			}
+			// update every nav and simple returns
+			stock := m.getStock(symbol, currentDate)
+			newPortfolio.NAV = newPortfolio.Quantity * stock.Price * exchangeRate
+			newPortfolio.SimpleReturns = (newPortfolio.NAV - newPortfolio.Principal) / newPortfolio.Principal
 			allPortfolios = append(allPortfolios, newPortfolio)
 
 			currentDate = currentDate.Add(secondsInADay * time.Second)
