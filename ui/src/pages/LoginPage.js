@@ -17,6 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUsername, updatePassword, loginAsync } from '../redux/loginSlice';
 
 import { LoadingPage } from ".";
+import { useLoginHook } from "../hooks/login";
 
 function LoginForm() {
   const {
@@ -81,6 +82,7 @@ export function LoginPage() {
     errorMessage,
     status,
   } = useSelector((state) => state.login)
+  useLoginHook();
 
   if (status === "loading") {
     return <LoadingPage/>;
