@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { EuiSideNav, EuiIcon } from '@elastic/eui';
+import { htmlIdGenerator, EuiSideNav, EuiIcon } from '@elastic/eui';
 import { useLocation, useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
@@ -23,23 +23,26 @@ export function SideBar() {
     history.push("/login");
   }
 
-  let i = 0;
   const sideNav = [
     {
       name: 'Investments',
       icon: <EuiIcon type="logoElasticsearch" />,
-      id: `${i++}`,
+      id: `${htmlIdGenerator()()}`,
+      href: PATH_MAPPING[INVESTMENTS_SUMMARY],
+      onClick: (e) => {
+        e.preventDefault();
+        history.push(PATH_MAPPING[INVESTMENTS_SUMMARY])
+      },
+      isSelected: pathname === PATH_MAPPING[INVESTMENTS_SUMMARY],
       items: [
-        {
-          name: INVESTMENTS_SUMMARY,
-          id: INVESTMENTS_SUMMARY,
-          onClick: () => history.push(PATH_MAPPING[INVESTMENTS_SUMMARY]),
-          isSelected: pathname === PATH_MAPPING[INVESTMENTS_SUMMARY],
-        },
         {
           name: INVESTMENTS_TRADES,
           id: INVESTMENTS_TRADES,
-          onClick: () => history.push(PATH_MAPPING[INVESTMENTS_TRADES]),
+          href: PATH_MAPPING[INVESTMENTS_TRADES],
+          onClick: (e) => {
+            e.preventDefault();
+            history.push(PATH_MAPPING[INVESTMENTS_TRADES])
+          },
           isSelected: pathname === PATH_MAPPING[INVESTMENTS_TRADES],
         },
       ],

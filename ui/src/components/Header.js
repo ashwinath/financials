@@ -14,13 +14,15 @@ import {
   htmlIdGenerator,
 } from '@elastic/eui';
 
-import { useHistory } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutAsync } from '../redux/loginSlice';
+import { capitaliseFirstLetter } from '../utils';
 
 export function Header() {
   const { loggedInUsername } = useSelector((state) => state.login)
   const history = useHistory();
+  const { pathname } = useLocation();
   const renderLogo = (
     <EuiHeaderLogo
       iconType="logoElastic"
@@ -33,26 +35,14 @@ export function Header() {
     />
   );
 
-  // TODO: deal with this
-  const breadcrumbs = [
-    {
-      text: 'Management',
-      href: '#',
-      onClick: (e) => {
-        e.preventDefault();
-      },
-    },
-    {
-      text: 'Users',
-      href: '#',
-      onClick: (e) => {
-        e.preventDefault();
-      },
-    },
-    {
-      text: 'Create',
-    },
-  ];
+  // Generate breadcrumbs
+  const crumbs = pathname.split("/")
+  crumbs[0] = "financials";
+  const breadcrumbs = crumbs.map((item) => {
+    return {
+      text: capitaliseFirstLetter(item),
+    };
+  });
 
   const loginButton = (
     <HeaderUserMenu username={loggedInUsername}/>
@@ -74,7 +64,6 @@ export function Header() {
   return (
     <EuiHeader
       sections={sections}
-      postion="fixed"
     />
   );
 };
