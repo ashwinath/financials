@@ -64,6 +64,7 @@ export function Header() {
   return (
     <EuiHeader
       sections={sections}
+      position="fixed"
     />
   );
 };
