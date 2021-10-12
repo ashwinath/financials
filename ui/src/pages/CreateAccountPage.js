@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUsername, updatePassword, createAsync } from '../redux/createAccountSlice';
 import { LoadingPage } from ".";
 import { ErrorBar } from "../components"
-import { useLoginHook } from "../hooks/login";
 
 function CreateAccountForm() {
   const {
@@ -73,7 +72,6 @@ export function CreateAccountPage() {
     errorMessage,
     status,
   } = useSelector((state) => state.createAccount);
-  useLoginHook();
 
   if (status === "loading") {
     return <LoadingPage/>;
