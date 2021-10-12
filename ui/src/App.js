@@ -5,15 +5,15 @@ import {
   Route,
 } from "react-router-dom";
 
-import { BrandBar } from "./components/BrandBar";
+import { Header } from "./components";
 import { HomePage, LoginPage, CreateAccountPage } from "./pages";
 import { InvestmentsTradesPage, InvestmentsMainPage } from "./pages/investments";
 
 function App() {
   return (
     <div className="App">
-      <BrandBar/>
       <Router>
+        <Header/>
         <Switch>
           <Route path="/create">
             <CreateAccountPage/>

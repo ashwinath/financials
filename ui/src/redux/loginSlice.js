@@ -53,6 +53,7 @@ export const loginSlice = createSlice({
     isLoggedIn: false,
     errorMessage: "",
     triedLoggingIn: false,
+    loggedInUsername: "",
   },
   reducers: {
     updateUsername: (state, action) => {
@@ -104,6 +105,7 @@ export const loginSlice = createSlice({
         state.triedLoggingIn = true;
         if (action.payload.status === 200) {
           state.isLoggedIn = true;
+          state.loggedInUsername = action.payload.data.username;
         } else {
           state.isLoggedIn = false;
         }
