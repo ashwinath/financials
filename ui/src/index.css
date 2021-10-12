@@ -1,3 +1,8 @@
 .euiBody--headerIsFixed {
     padding-top: 48px;
 }
+
+.euiBody--headerIsFixed .euiPageSideBar--sticky {
+    max-height: calc(100vh - 49px) !important;
+    top: 49px;
+}
