@@ -44,6 +44,7 @@ func (s *PortfolioService) List(userID string, from *time.Time) ([]models.Portfo
 	err := s.db.
 		Where("user_id = ?", userID).
 		Where("trade_date >= ?", from).
+		Order("trade_date asc").
 		Find(&portfolio).
 		Error
 
