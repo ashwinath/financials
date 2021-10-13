@@ -81,7 +81,10 @@ func (m *TradeMediator) CreateTransactionInBulk(
 		if err != nil {
 			log.Printf("error querying user: %s", err)
 		}
-		m.calculatePortfolio(*user)
+		err = m.calculatePortfolio(*user)
+		if err != nil {
+			log.Printf("error processing user: %s", err)
+		}
 	}(session.UserID)
 
 	return m.tradeService.BulkAdd(transactions)
