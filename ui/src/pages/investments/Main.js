@@ -24,9 +24,9 @@ import {
 
 import { EUI_CHARTS_THEME_LIGHT } from '@elastic/eui/dist/eui_charts_theme';
 
-import { SideBar, Stat, Header } from "../../components";
+import { SideBar, Stat } from "../../components";
 import { LoadingPage } from "../";
-import { useLoginHook } from "../../hooks/login";
+import { useLoginHook } from "../../hooks";
 import { useDispatch, useSelector } from 'react-redux';
 
 import {

@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateUsername, updatePassword, loginAsync } from '../redux/loginSlice';
 
 import { LoadingPage } from ".";
-import { useLoginHook } from "../hooks/login";
+import { useLoginHook } from "../hooks";
 
 function LoginForm() {
   const {

@@ -13,6 +13,7 @@ import {
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUsername, updatePassword, createAsync } from '../redux/createAccountSlice';
+import { setIsLoggedIn } from '../redux/loginSlice';
 import { LoadingPage } from ".";
 import { ErrorBar } from "../components"
 
@@ -29,6 +30,7 @@ function CreateAccountForm() {
   const dispatch = useDispatch()
   const history = useHistory();
   if (isLoggedIn) {
+    dispatch(setIsLoggedIn(true));
     history.push("/");
   }
 

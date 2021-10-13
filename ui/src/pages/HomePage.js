@@ -6,7 +6,7 @@ import {
 
 import { SideBar } from "../components";
 import { LoadingPage } from ".";
-import { useLoginHook } from "../hooks/login";
+import { useLoginHook } from "../hooks";
 
 export function HomePage() {
   const status = useLoginHook();

@@ -13,7 +13,7 @@ import {
 
 import { SideBar, AddTradeModal, AddBulkTradeModal } from "../../components";
 import { LoadingPage } from "../";
-import { useLoginHook } from "../../hooks/login";
+import { useLoginHook } from "../../hooks";
 import {
   queryTrades,
   updateTableInfo,

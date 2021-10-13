@@ -64,6 +64,9 @@ export const loginSlice = createSlice({
       state.password = action.payload;
       state.errorMessage = "";
     },
+    setIsLoggedIn: (state, action) => {
+      state.isLoggedIn = action.payload;
+    },
   },
   extraReducers: (builder) => {
     // Login
@@ -117,6 +120,6 @@ export const loginSlice = createSlice({
   },
 });
 
-export const { updateUsername, updatePassword } = loginSlice.actions
+export const { updateUsername, updatePassword, setIsLoggedIn } = loginSlice.actions
 
 export default loginSlice.reducer;
