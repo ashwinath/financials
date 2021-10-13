@@ -30,7 +30,7 @@ function CreateAccountForm() {
   const dispatch = useDispatch()
   const history = useHistory();
   if (isLoggedIn) {
-    dispatch(setIsLoggedIn(true));
+    dispatch(setIsLoggedIn({isLoggedIn: true, username: username}));
     history.push("/");
   }
 

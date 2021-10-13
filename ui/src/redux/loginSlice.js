@@ -65,7 +65,8 @@ export const loginSlice = createSlice({
       state.errorMessage = "";
     },
     setIsLoggedIn: (state, action) => {
-      state.isLoggedIn = action.payload;
+      state.isLoggedIn = action.payload.isLoggedIn;
+      state.loggedInUsername = action.payload.username;
     },
   },
   extraReducers: (builder) => {
@@ -94,6 +95,7 @@ export const loginSlice = createSlice({
       .addCase(logoutAsync.fulfilled, (state, action) => {
         if (action.payload.status === 200) {
           state.isLoggedIn = false;
+          state.loggedInUsername = "";
           state.triedLoggingIn = false;
         }
       });
