@@ -123,7 +123,11 @@ function HeaderUserMenu({username}) {
               <EuiFlexItem>
                 <EuiFlexGroup justifyContent="spaceBetween">
                   <EuiFlexItem grow={false}>
-                    <EuiLink onClick={() => {dispatch(logoutAsync()); history.push("/login")}}>Log out</EuiLink>
+                    <EuiLink onClick={() => {
+                      closeMenu();
+                      dispatch(logoutAsync());
+                      history.push("/login")}
+                    }>Log out</EuiLink>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
