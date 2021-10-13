@@ -39,6 +39,10 @@ func (c *loginController) CreateUser(w http.ResponseWriter, r *http.Request) {
 	created(w, user)
 }
 
+type loginResponse struct {
+	Username string `json:"username"`
+}
+
 func (c *loginController) Login(w http.ResponseWriter, r *http.Request) {
 	user := &models.User{}
 	if err := c.getBody(r, user); err != nil {
@@ -67,7 +71,7 @@ func (c *loginController) Login(w http.ResponseWriter, r *http.Request) {
 		Expires: *session.Expiry,
 	})
 
-	ok(w, struct{}{})
+	ok(w, loginResponse{Username: user.Username})
 }
 
 func (c *loginController) GetUserFromSession(w http.ResponseWriter, r *http.Request) {

@@ -67,7 +67,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                properties:
+                  username:
+                    type: string
         400:
           description: Bad Request
           content:

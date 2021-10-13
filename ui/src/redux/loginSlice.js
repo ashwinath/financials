@@ -32,12 +32,13 @@ export const loginAsync = createAsyncThunk(
 
 export const logoutAsync = createAsyncThunk(
   'login/logoutAsync',
-  async () => {
+  async (_, thunkAPI) => {
     try {
       const response = await axios.post(
         '/api/v1/logout',
       );
-      return response;
+      thunkAPI.dispatch(loginSlice.actions.logout())
+      return response
     } catch (error) {
       return error.response;
     }
@@ -68,6 +69,9 @@ export const loginSlice = createSlice({
       state.isLoggedIn = action.payload.isLoggedIn;
       state.loggedInUsername = action.payload.username;
     },
+    logout: (state) => {
+      // do nothing, we let the root reducer handle
+    }
   },
   extraReducers: (builder) => {
     // Login
@@ -81,6 +85,7 @@ export const loginSlice = createSlice({
         if (action.payload.status === 200) {
           state.isLoggedIn = true;
           state.errorMessage = ""
+          state.loggedInUsername = action.payload.data.username;
         } else {
           state.errorMessage = action.payload.data.message;
         }
