@@ -70,6 +70,7 @@ export function Header() {
 };
 
 function HeaderUserMenu({username}) {
+  const history = useHistory();
   const dispatch = useDispatch();
   const id = htmlIdGenerator()();
   const [isOpen, setIsOpen] = useState(false);
@@ -122,7 +123,7 @@ function HeaderUserMenu({username}) {
               <EuiFlexItem>
                 <EuiFlexGroup justifyContent="spaceBetween">
                   <EuiFlexItem grow={false}>
-                    <EuiLink onClick={() => dispatch(logoutAsync())}>Log out</EuiLink>
+                    <EuiLink onClick={() => {dispatch(logoutAsync()); history.push("/login")}}>Log out</EuiLink>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
