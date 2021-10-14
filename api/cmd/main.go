@@ -1,12 +1,17 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/ashwinath/financials/api/config"
-	"github.com/ashwinath/financials/api/context"
+	appcontext "github.com/ashwinath/financials/api/context"
 	"github.com/ashwinath/financials/api/controller"
 )
 
@@ -16,14 +21,14 @@ func main() {
 		log.Panic(err.Error())
 	}
 
-	ctx, err := context.InitContext(c)
+	appctx, err := appcontext.InitContext(c)
 	if err != nil {
 		log.Panic(err.Error())
 	}
 
-	go ctx.TradeMediator.ProcessTrades()
+	go appctx.TradeMediator.ProcessTrades()
 
-	router := controller.MakeRouter(ctx)
+	router := controller.MakeRouter(appctx)
 
 	srv := &http.Server{
 		Handler:      router,
@@ -32,8 +37,22 @@ func main() {
 		ReadTimeout:  c.Server.ReadTimeoutInSeconds,
 	}
 
-	log.Printf("Starting server on port: %d", c.Server.Port)
-	if err := srv.ListenAndServe(); err != nil {
-		log.Fatalf("%s", err.Error())
+	go func() {
+		log.Printf("Starting server on port: %d", c.Server.Port)
+		if err := srv.ListenAndServe(); err != nil {
+			log.Fatalf("%s", err.Error())
+		}
+	}()
+
+	// Setting up signal capturing
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	<-stop
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Printf("Error shutting down server")
 	}
 }

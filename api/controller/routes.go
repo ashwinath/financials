@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/ashwinath/financials/api/context"
@@ -29,6 +30,17 @@ func makeRoutes(ctx *context.Context) []routes {
 	login := loginController{controller: base}
 	trades := tradeTransactionController{controller: base}
 
+	index := func (w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(
+			w,
+			r,
+			fmt.Sprintf(
+				"%s/index.html",
+				ctx.Config.Server.ReactFilePath,
+			),
+		)
+	}
+
 	return []routes{
 		{"/alive", http.MethodGet, health.Alive},
 		{"/ready", http.MethodGet, health.Ready},
@@ -39,6 +51,7 @@ func makeRoutes(ctx *context.Context) []routes {
 		{"/api/v1/trades", http.MethodGet, trades.List},
 		{"/api/v1/trades", http.MethodPost, trades.CreateTransactionInBulk},
 		{"/api/v1/trades/portfolio", http.MethodGet, trades.ListPortfolio},
+		{"/", http.MethodGet, index},
 	}
 }
 
@@ -48,5 +61,10 @@ func MakeRouter(ctx *context.Context) *mux.Router {
 	for _, route := range makeRoutes(ctx) {
 		r.HandleFunc(route.path, route.handler).Methods(route.method)
 	}
+
+	// Serve react files
+	frontendHandler := http.FileServer(http.Dir(ctx.Config.Server.ReactFilePath))
+	r.PathPrefix("/").Handler(frontendHandler)
+
 	return r
 }

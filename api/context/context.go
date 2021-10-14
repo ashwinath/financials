@@ -13,6 +13,9 @@ import (
 
 // Context contains all the dependencies as part of DI
 type Context struct {
+	// All the configurations
+	Config *config.Config
+
 	// Database
 	DB *gorm.DB
 
@@ -39,6 +42,7 @@ func InitContext(c *config.Config) (*Context, error) {
 		return nil, err
 	}
 	context.DB = db
+	context.Config = c
 
 	// Services
 	context.SessionService = service.NewSessionService(db)

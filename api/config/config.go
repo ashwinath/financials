@@ -19,13 +19,14 @@ func (c *configFile) Set(value string) error {
 	return nil
 }
 
+// Load loads the config file
 func Load() (*Config, error) {
 	var c configFile
 	flag.Var(&c, "config", "Path to a configuration file.")
 	flag.Parse()
 
 	if c == "" {
-		return nil, fmt.Errorf("Must set config file with -config flag.")
+		return nil, fmt.Errorf("must set config file with -config flag")
 	}
 
 	viper.SetConfigFile(c.String())
