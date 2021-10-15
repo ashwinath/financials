@@ -17,7 +17,7 @@ jobs:
       uses: stefanprodan/helm-gh-pages@v1.4.1
       with:
         token: "${{ secrets.HELM_CHART_TOKEN }}"
-        charts_url: https://github.com/ashwinath/helm-charts
+        charts_url: https://ashwinath.github.io/helm-charts/
         charts_dir: charts
         owner: ashwinath
         repository: helm-charts
