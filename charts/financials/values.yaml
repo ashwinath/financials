@@ -41,7 +41,7 @@ financials:
       Port: 8000
       WriteTimeoutInSeconds: 5s
       ReadTimeoutInSeconds: 5s
-      ReactFilePath: "../ui/build"
+      ReactFilePath: "/opt/build"
 
     Database:
       # TODO: Allow dynamic host
