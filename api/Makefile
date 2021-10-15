@@ -1,12 +1,12 @@
 setup:
-	@docker stop financial
-	@docker rm financial
 	@docker run -d \
 		-p 5432:5432 \
 		-e POSTGRES_PASSWORD=password \
 		--name financial \
 		postgres:13-alpine
-	@sleep 30
+	@timeout 30 bash -c "until docker exec financial pg_isready; do sleep 2; done"
+
+migrate:
 	@docker run \
 		--net="container:financial" \
 		--volume ${PWD}/migrations:/etc/migrations \
@@ -17,8 +17,6 @@ setup:
 deps:
 	go mod vendor
 	go mod tidy
-
-test-ci: setup deps test
 
 test:
 	DB_HOST="localhost" \
