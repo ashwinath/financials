@@ -1,0 +1,81 @@
+financials:
+  # -- Number of replicas
+  replicaCount: 1
+  image:
+    # -- Respository of the image.
+    repository: ghcr.io/ashwinath/financials
+    # -- Image pull policy in Kubernetes
+    pullPolicy: IfNotPresent
+    # -- Override this value for the desired image tag
+    tag: latest
+  # -- Kubernetes pod annotations in key pair value
+  podAnnotations: {}
+
+  service:
+    # -- Kubernetes service type
+    type: ClusterIP
+    # -- Kubernetes service port
+    port: 80
+
+  # -- Resources requests and limits for the financial app
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  migrate:
+    image:
+      # -- migrate/migrate image tag for db migrations
+      tag: v4.15.0
+
+  # -- Config for financials api, see api/config.yaml
+  config:
+    Server:
+      # Don't change this port
+      Port: 8000
+      WriteTimeoutInSeconds: 5s
+      ReadTimeoutInSeconds: 5s
+      ReactFilePath: "../ui/build"
+
+    Database:
+      # TODO: Allow dynamic host
+      Host: <release name>-postgresql.<namespace>.svc.cluster.local
+      Port: 5432
+      User: postgres
+      Password: password
+      Name: postgres
+      TimeZone: Asia/Singapore
+      BatchInsertSize: 100
+
+    AlphaVantageAPIKey: test
+    PortfolioCalculationInterval: 1h
+
+
+postgresql:
+  # -- Resources requests and limits for the database
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi
+  persistence:
+    # -- Persist Postgresql data in a Persistent Volume Claim 
+    enabled: true
+  # -- Database name for Turing Postgresql database
+  postgresqlDatabase: postgres
+  # -- Username for postgresql database
+  postgresqlUsername: postgres
+  # -- Password for postgresql database, highly recommended to change this value
+  postgresqlPassword: password
