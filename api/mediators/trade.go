@@ -486,7 +486,7 @@ func (m *TradeMediator) processOneRoundOfTrades() {
 	err = m.processStocks()
 	if err != nil {
 		log.Printf("error downloading stocks information: %s", err)
-		return
+		// Don't return here there may be errornous stocks that we can't download
 	}
 
 	// Update portfolio for each user id
