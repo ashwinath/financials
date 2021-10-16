@@ -16,9 +16,6 @@ import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUsername, updatePassword, loginAsync } from '../redux/loginSlice';
 
-import { LoadingPage } from ".";
-import { useLoginHook } from "../hooks";
-
 function LoginForm() {
   const {
     username,
@@ -78,15 +75,7 @@ function LoginForm() {
 }
 
 export function LoginPage() {
-  const {
-    errorMessage,
-    status,
-  } = useSelector((state) => state.login)
-  useLoginHook();
-
-  if (status === "loading") {
-    return <LoadingPage/>;
-  }
+  const { errorMessage } = useSelector((state) => state.login)
 
   return (
     <>

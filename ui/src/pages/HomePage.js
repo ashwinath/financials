@@ -5,16 +5,8 @@ import {
 } from '@elastic/eui';
 
 import { SideBar } from "../components";
-import { LoadingPage } from ".";
-import { useLoginHook } from "../hooks";
 
 export function HomePage() {
-  const status = useLoginHook();
-
-  if (status === "loading") {
-    return <LoadingPage/>;
-  }
-
   return (
     <EuiPageTemplate
       pageSideBar={<SideBar/>}

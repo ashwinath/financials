@@ -30,8 +30,6 @@ import { EUI_CHARTS_THEME_LIGHT } from '@elastic/eui/dist/eui_charts_theme';
 import { useHistory } from "react-router-dom";
 
 import { SideBar, Stat } from "../../components";
-import { LoadingPage } from "../";
-import { useLoginHook } from "../../hooks";
 import { useDispatch, useSelector } from 'react-redux';
 
 import {
@@ -129,7 +127,6 @@ const timeOptions = [
 ]
 
 export function InvestmentsMainPage() {
-  const status = useLoginHook();
   const dispatch = useDispatch();
   const history = useHistory();
   const {
@@ -142,10 +139,6 @@ export function InvestmentsMainPage() {
 
   if ((!portfolioLoading && !portfolioLoaded) || shouldReload) {
     dispatch(queryPortfolio(getDateFromPeriod(queryPeriodInMonths)))
-  }
-
-  if (status === "loading" || portfolioLoading) {
-    return <LoadingPage/>;
   }
 
   if (portfolio.length === 0) {

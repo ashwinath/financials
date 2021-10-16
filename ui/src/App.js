@@ -2,10 +2,9 @@ import React from 'react';
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
 } from "react-router-dom";
 
-import { Header } from "./components";
+import { Header, PublicRoute, PrivateRoute } from "./components";
 import { HomePage, LoginPage, CreateAccountPage } from "./pages";
 import { InvestmentsTradesPage, InvestmentsMainPage } from "./pages/investments";
 
@@ -15,21 +14,21 @@ function App() {
       <Router>
         <Header/>
         <Switch>
-          <Route path="/create">
+          <PublicRoute path="/create">
             <CreateAccountPage/>
-          </Route>
-          <Route path="/login">
+          </PublicRoute>
+          <PublicRoute path="/login">
             <LoginPage/>
-          </Route>
-          <Route path="/investments/trades">
+          </PublicRoute>
+          <PrivateRoute path="/investments/trades">
             <InvestmentsTradesPage/>
-          </Route>
-          <Route path="/investments">
+          </PrivateRoute>
+          <PrivateRoute path="/investments">
             <InvestmentsMainPage/>
-          </Route>
-          <Route path="/">
+          </PrivateRoute>
+          <PrivateRoute path="/">
             <HomePage/>
-          </Route>
+          </PrivateRoute>
         </Switch>
       </Router>
     </div>

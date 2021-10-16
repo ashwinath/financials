@@ -12,8 +12,6 @@ import {
 } from '@elastic/eui';
 
 import { SideBar, AddTradeModal, AddBulkTradeModal } from "../../components";
-import { LoadingPage } from "../";
-import { useLoginHook } from "../../hooks";
 import {
   queryTrades,
   updateTableInfo,
@@ -28,7 +26,6 @@ import { capitaliseFirstLetter, capitaliseAll, formatMoney } from "../../utils";
 import { useHistory, useLocation } from "react-router-dom";
 
 export function InvestmentsTradesPage() {
-  const loginStatus = useLoginHook();
   const history = useHistory();
   const dispatch = useDispatch();
   const location = useLocation();
@@ -55,10 +52,6 @@ export function InvestmentsTradesPage() {
 
   if (init && status === "idle" && (payload === null || shouldReload)) {
     dispatch(queryTrades({page, pageSize, orderBy, order}));
-  }
-
-  if (loginStatus === "loading") {
-    return <LoadingPage/>;
   }
 
   if (shouldReload) {
@@ -180,7 +173,7 @@ export function InvestmentsTradesPage() {
           columns={columns}
           pagination={pagination}
           onChange={(value) => dispatch(updateTableInfo(value))}
-          loading={(loginStatus === "loading" || status === "loading")}
+          loading={status === "loading"}
           sorting={sorting}
         />
       </EuiPageTemplate>

@@ -14,7 +14,6 @@ import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateUsername, updatePassword, createAsync } from '../redux/createAccountSlice';
 import { setIsLoggedIn } from '../redux/loginSlice';
-import { LoadingPage } from ".";
 import { ErrorBar } from "../components"
 
 function CreateAccountForm() {
@@ -72,12 +71,7 @@ function CreateAccountForm() {
 export function CreateAccountPage() {
   const {
     errorMessage,
-    status,
   } = useSelector((state) => state.createAccount);
-
-  if (status === "loading") {
-    return <LoadingPage/>;
-  }
 
   return (
     <>
