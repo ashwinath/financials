@@ -1,8 +1,9 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/ashwinath/financials/api/context"
 	"github.com/go-playground/validator/v10"
@@ -10,10 +11,12 @@ import (
 	"github.com/gorilla/schema"
 )
 
+const indexPath = "index.html"
+
 type routes struct {
 	path    string
 	method  string
-	handler func(w http.ResponseWriter, _ *http.Request)
+	handler func(http.ResponseWriter, *http.Request)
 }
 
 func makeRoutes(ctx *context.Context) []routes {
@@ -30,17 +33,6 @@ func makeRoutes(ctx *context.Context) []routes {
 	login := loginController{controller: base}
 	trades := tradeTransactionController{controller: base}
 
-	index := func (w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(
-			w,
-			r,
-			fmt.Sprintf(
-				"%s/index.html",
-				ctx.Config.Server.ReactFilePath,
-			),
-		)
-	}
-
 	return []routes{
 		{"/alive", http.MethodGet, health.Alive},
 		{"/ready", http.MethodGet, health.Ready},
@@ -51,7 +43,29 @@ func makeRoutes(ctx *context.Context) []routes {
 		{"/api/v1/trades", http.MethodGet, trades.List},
 		{"/api/v1/trades", http.MethodPost, trades.CreateTransactionInBulk},
 		{"/api/v1/trades/portfolio", http.MethodGet, trades.ListPortfolio},
-		{"/", http.MethodGet, index},
+	}
+}
+
+func makeFrontendHandler(ctx *context.Context) func(http.ResponseWriter, *http.Request) {
+	frontendPath := ctx.Config.Server.ReactFilePath
+	frontendHandler := http.FileServer(http.Dir(frontendPath))
+	return func(w http.ResponseWriter, r *http.Request) {
+		path, err := filepath.Abs(r.URL.Path)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		path = filepath.Join(frontendPath, path)
+		_, err = os.Stat(path)
+		if os.IsNotExist(err) {
+			// file does not exist, serve index.html
+			http.ServeFile(w, r, filepath.Join(frontendPath, indexPath))
+			return
+		} else if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		frontendHandler.ServeHTTP(w, r)
 	}
 }
 
@@ -61,10 +75,7 @@ func MakeRouter(ctx *context.Context) *mux.Router {
 	for _, route := range makeRoutes(ctx) {
 		r.HandleFunc(route.path, route.handler).Methods(route.method)
 	}
-
-	// Serve react files
-	frontendHandler := http.FileServer(http.Dir(ctx.Config.Server.ReactFilePath))
-	r.PathPrefix("/").Handler(frontendHandler)
+	r.PathPrefix("/").HandlerFunc(makeFrontendHandler(ctx))
 
 	return r
 }
