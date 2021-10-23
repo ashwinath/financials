@@ -64,6 +64,19 @@ export const submitTrades = createAsyncThunk(
   }
 );
 
+export const deleteTrades = createAsyncThunk(
+  'investments/deleteTrades',
+  async (trades) => {
+    try {
+      const allDeletePromises = trades.map((item) => axios.delete(`/api/v1/trades/${item.id}`))
+      const responses = await axios.all(allDeletePromises)
+      return responses;
+    } catch (error) {
+      return error.response;
+    }
+  }
+);
+
 const addTradeFormInitState = {
   date_purchased: convertDateToString(moment()),
   symbol: "",
@@ -94,6 +107,8 @@ export const investmentsSlice = createSlice({
     portfolioLoading: false,
     portfolioLoaded: false,
     queryPeriodInMonths: 3,
+    selectedItems: [],
+    successMessage: "",
   },
   reducers: {
     updateTableInfo: (state, action) => {
@@ -142,6 +157,9 @@ export const investmentsSlice = createSlice({
       state.queryPeriodInMonths = action.payload;
       state.shouldReload = true;
     },
+    setSelectedItems: (state, action) => {
+      state.selectedItems = action.payload;
+    },
   },
   extraReducers: (builder) => {
     // Get trades
@@ -180,6 +198,7 @@ export const investmentsSlice = createSlice({
           state.shouldReload = true;
           state.addTradeForm = addTradeFormInitState
           state.tradeCSVRaw = ""
+          state.successMessage = "Your trade has been successfully submitted!";
         } else {
           state.submitSuccess = "failure";
           state.isAddTradeModalOpen = false;
@@ -208,6 +227,7 @@ export const investmentsSlice = createSlice({
           state.shouldReload = true;
           state.addTradeForm = addTradeFormInitState
           state.tradeCSVRaw = ""
+          state.successMessage = "Your trades has been successfully submitted!";
         } else {
           state.submitSuccess = "failure";
           state.errorMessage = action.payload.data.message;
@@ -241,6 +261,36 @@ export const investmentsSlice = createSlice({
         state.errorMessage = "Had some trouble submitting your trades.";
         state.portfolioLoaded = true;
       });
+
+    // Delete trades
+    builder
+      .addCase(deleteTrades.pending, (state) => {
+        state.errorMessage = "";
+      })
+      .addCase(deleteTrades.fulfilled, (state, action) => {
+        let hasError = false;
+        action.payload.forEach(item => {
+          if (item.status !== 200) {
+            hasError = true;
+          }
+        });
+
+        if (!hasError) {
+          state.successMessage = "Your trade has been successfully deleted!";
+          state.submitSuccess = "success";
+          state.errorMessage = "";
+          state.shouldReload = true;
+          state.selectedItems = [];
+        } else {
+          state.submitSuccess = "failure";
+          state.errorMessage = "Some error occurred while deleting.";
+        }
+      })
+      .addCase(deleteTrades.rejected, (state) => {
+        state.submitSuccess = "failure";
+        state.isAddTradeModalOpen = false;
+        state.errorMessage = "Had some trouble deleting your trades.";
+      });
   },
 });
 
@@ -253,6 +303,7 @@ export const {
   toggleIsAddBulkTradeModalOpen,
   updateCSVTrades,
   updateQueryPeriodInMonths,
+  setSelectedItems,
 } = investmentsSlice.actions;
 
 export default investmentsSlice.reducer;

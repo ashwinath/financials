@@ -19,6 +19,8 @@ import {
   setInitialState,
   toggleIsAddTradeModalOpen,
   toggleIsAddBulkTradeModalOpen,
+  setSelectedItems,
+  deleteTrades,
 } from '../../redux/investmentsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { ErrorBar, SuccessBar } from "../../components";
@@ -44,6 +46,8 @@ export function InvestmentsTradesPage() {
     isAddTradeModalOpen,
     isAddBulkTradeModalOpen,
     submitSuccess,
+    selectedItems,
+    successMessage,
   } = investmentsState;
 
   if (!init) {
@@ -131,6 +135,28 @@ export function InvestmentsTradesPage() {
     },
   };
 
+  const selection = {
+    onSelectionChange: (items) => dispatch(setSelectedItems(items)),
+    initialSelected: selectedItems,
+  };
+
+  const renderDeleteButton = () => {
+    if (selectedItems.length === 0) {
+      return null;
+    }
+
+    return (
+      <EuiButton
+        color="danger"
+        size="s"
+        iconType="trash"
+        onClick={() => dispatch(deleteTrades(selectedItems))}
+      >
+         Delete {selectedItems.length} trades
+      </EuiButton>
+    );
+  }
+
   return (
     <>
       <ErrorBar 
@@ -138,7 +164,7 @@ export function InvestmentsTradesPage() {
         errorMessage={errorMessage}
       />
       <SuccessBar 
-        title="Your trade has been successfully submitted!"
+        title={successMessage}
         message={submitSuccess === "success" ? "We did it!" : null}
       />
 
@@ -150,7 +176,7 @@ export function InvestmentsTradesPage() {
         }}
       >
         <EuiFlexGroup responsive={false} wrap gutterSize="s" alignItems="center">
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false} alignItems="center">
             <EuiButton
               size="s"
               onClick={() => dispatch(toggleIsAddTradeModalOpen())}
@@ -166,10 +192,15 @@ export function InvestmentsTradesPage() {
               Add bulk trade
             </EuiButton>
           </EuiFlexItem>
+          <EuiFlexItem/>
+          {renderDeleteButton()}
         </EuiFlexGroup>
         <EuiSpacer size="s" />
         <EuiBasicTable
           items={results}
+          itemId="id"
+          isSelectable={true}
+          selection={selection}
           columns={columns}
           pagination={pagination}
           onChange={(value) => dispatch(updateTableInfo(value))}
