@@ -26,7 +26,7 @@ func main() {
 		log.Panic(err.Error())
 	}
 
-	go appctx.TradeMediator.ProcessTrades()
+	//go appctx.TradeMediator.ProcessTrades()
 
 	router := controller.MakeRouter(appctx)
 

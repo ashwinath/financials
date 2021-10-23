@@ -42,6 +42,11 @@ func (s *TradeService) Delete(transaction *models.Trade) error {
 	return s.db.Delete(transaction).Error
 }
 
+// DeleteWithUserID deletes a transaction with userid verification
+func (s *TradeService) DeleteWithUserID(id, userID string) error {
+	return s.db.Where("user_id = ?", userID).Delete(&models.Trade{Model: models.Model{ID: id}}).Error
+}
+
 // TradeListOptions lists the trades from a user.
 type TradeListOptions struct {
 	PaginationOptions

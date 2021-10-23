@@ -521,3 +521,8 @@ func (m *TradeMediator) ProcessTrades() {
 func (m *TradeMediator) ListPortfolio(userID string, from *time.Time) ([]models.Portfolio, error) {
 	return m.portfolioService.List(userID, from)
 }
+
+// Delete deletes the trade
+func (m *TradeMediator) Delete(id, userID string) error {
+	return m.tradeService.DeleteWithUserID(id, userID)
+}

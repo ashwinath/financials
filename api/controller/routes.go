@@ -42,6 +42,7 @@ func makeRoutes(ctx *context.Context) []routes {
 		{"/api/v1/session", http.MethodGet, login.GetUserFromSession},
 		{"/api/v1/trades", http.MethodGet, trades.List},
 		{"/api/v1/trades", http.MethodPost, trades.CreateTransactionInBulk},
+		{"/api/v1/trades/{id}", http.MethodDelete, trades.Delete},
 		{"/api/v1/trades/portfolio", http.MethodGet, trades.ListPortfolio},
 	}
 }

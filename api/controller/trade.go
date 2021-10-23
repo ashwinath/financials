@@ -6,6 +6,7 @@ import (
 
 	"github.com/ashwinath/financials/api/models"
 	"github.com/ashwinath/financials/api/service"
+	"github.com/gorilla/mux"
 )
 
 type tradeTransactionController struct {
@@ -88,4 +89,26 @@ func (c *tradeTransactionController) ListPortfolio(w http.ResponseWriter, r *htt
 	}
 
 	ok(w, portfolioResult{Results: portfolio})
+}
+
+func (c *tradeTransactionController) Delete(w http.ResponseWriter, r *http.Request) {
+	session, err := c.getSessionFromCookie(r)
+	if err != nil {
+		badRequest(w, "session not found", "not a valid session.")
+		return
+	}
+
+	params := mux.Vars(r)
+	id := params["id"]
+	if id == "" {
+		badRequest(w, "id must be provided", err.Error())
+	}
+
+	err = c.context.TradeMediator.Delete(id, session.UserID)
+	if err != nil {
+		internalServiceError(w, "error insert", "Error deleting trade transaction.")
+		return
+	}
+
+	ok(w, struct{}{})
 }
