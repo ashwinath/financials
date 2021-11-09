@@ -1,21 +1,13 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: CronJob
 metadata:
   name: {{ include "financials.fullname" . }}
   labels:
     {{- include "financials.labels" . | nindent 4 }}
 spec:
-  selector:
-    matchLabels:
-      {{- include "financials.selectorLabels" . | nindent 6 }}
-  template:
-    metadata:
-      {{- with .Values.podAnnotations }}
-      annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      labels:
-        {{- include "financials.selectorLabels" . | nindent 8 }}
+  concurrencyPolicy: Forbid
+  schedule: 0 */1 * * *
+  jobTemplate:
     spec:
       initContainers:
       - name: migration
@@ -37,21 +29,9 @@ spec:
         - name: migrations
           mountPath: /etc/migrations
       containers:
-      - name: {{ .Chart.Name }}
+      - name: financials
         image: "{{ .Values.financials.image.repository }}:{{ .Values.financials.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.financials.image.pullPolicy }}
-        ports:
-        - name: http
-          containerPort: 8000
-          protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /alive
-            port: http
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: http
         env:
         - name: CONFIG_FILE
           value: /etc/financials/config.yaml
@@ -60,6 +40,8 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /etc/financials
+        - name: trades-csv
+          mountPath: {{ .Values.financials.tradeCSVDirectory }}
       volumes:
       - name: config
         secret:
@@ -67,3 +49,6 @@ spec:
       - name: migrations
         configMap:
           name: {{ .Release.Name }}-migrations
+      - name: trades-csv
+        configMap:
+          name: {{ .Release.Name }}-trades-csv

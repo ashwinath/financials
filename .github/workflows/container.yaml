@@ -3,6 +3,9 @@ on:
   push:
     branches:
     - master
+  pull_request:
+    branches:
+    - master
 
 jobs:
   publish:
@@ -17,4 +20,5 @@ jobs:
     - name: Setup GitHub Container Registry
       run: echo ${{ secrets.GHCR_TOKEN }} | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
     - name: Build and push
+      working-directory: app
       run: make
