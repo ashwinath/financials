@@ -18,5 +18,5 @@ handle_sig_int() {
 trap 'handle_sig_term' TERM
 trap 'handle_sig_int' INT
 
-./api -config=${CONFIG_FILE} & pid=$!
+./app -config=${CONFIG_FILE} & pid=$!
 wait ${pid}

@@ -1,27 +1,18 @@
-# Build UI
-FROM node:14-alpine as ui
-
-WORKDIR /ui
-COPY ./ui .
-
-RUN yarn
-RUN yarn build
-
 # Build API
-FROM golang:1.17.2-alpine as api
+FROM golang:1.17.3-alpine as app
 
-WORKDIR /api
-COPY ./api .
+WORKDIR /app
+COPY ./app .
 RUN go mod vendor
 RUN go mod tidy
-RUN go build -o api ./cmd/main.go
+RUN go build -o app ./cmd/main.go
 
 # Combine into one image
 FROM alpine:3
 
 RUN apk --no-cache add tzdata
 WORKDIR /opt
-COPY --from=api /api/api /opt
+COPY --from=app /app/app /opt
 COPY --from=ui /ui/build /opt/build
 COPY ./entrypoint.sh /opt
 
