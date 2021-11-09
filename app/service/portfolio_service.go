@@ -1,8 +1,6 @@
 package service
 
 import (
-	"time"
-
 	"github.com/ashwinath/financials/api/models"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -26,7 +24,7 @@ func NewPortfolioService(db *gorm.DB, batchInsertSize int) *PortfolioService {
 func (s *PortfolioService) BulkAdd(portfolios []models.Portfolio) error {
 	return s.db.
 		Clauses(clause.OnConflict{
-			Columns: []clause.Column{{Name: "trade_date"}, {Name: "symbol"}, {Name: "user_id"}},
+			Columns: []clause.Column{{Name: "trade_date"}, {Name: "symbol"}},
 			DoUpdates: clause.AssignmentColumns([]string{
 				"principal",
 				"nav",
@@ -36,21 +34,4 @@ func (s *PortfolioService) BulkAdd(portfolios []models.Portfolio) error {
 		}).
 		CreateInBatches(portfolios, s.batchInsertSize).
 		Error
-}
-
-// List returns the portfolio for a particular user with a time constraint
-func (s *PortfolioService) List(userID string, from *time.Time) ([]models.Portfolio, error) {
-	var portfolio []models.Portfolio
-	err := s.db.
-		Where("user_id = ?", userID).
-		Where("trade_date >= ?", from).
-		Order("trade_date asc").
-		Find(&portfolio).
-		Error
-
-	if err != nil {
-		return nil, err
-	}
-
-	return portfolio, err
 }

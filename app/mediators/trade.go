@@ -1,8 +1,10 @@
 package mediator
 
 import (
+	"encoding/csv"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -32,6 +34,7 @@ type TradeMediator struct {
 	exchangeRateService *service.ExchangeRateService
 	stockService        *service.StockService
 	portfolioService    *service.PortfolioService
+	csvPath             string
 }
 
 // NewTradeMediator creates a new NewTradeMediator
@@ -42,6 +45,7 @@ func NewTradeMediator(
 	exchangeRateService *service.ExchangeRateService,
 	stockService *service.StockService,
 	portfolioService *service.PortfolioService,
+	csvPath string,
 ) *TradeMediator {
 	return &TradeMediator{
 		tradeService:        tradeService,
@@ -50,12 +54,63 @@ func NewTradeMediator(
 		exchangeRateService: exchangeRateService,
 		stockService:        stockService,
 		portfolioService:    portfolioService,
+		csvPath:             csvPath,
 	}
 }
 
-// CreateTransactionInBulk creates multiple trade transactions at once
-func (m *TradeMediator) CreateTransactionInBulk() {
-	// TODO: impl
+func (m *TradeMediator) insertTradesWithCSV() error {
+	f, err := os.Open(m.csvPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	csvReader := csv.NewReader(f)
+	records, err := csvReader.ReadAll()
+	if err != nil {
+		return err
+	}
+
+	symbolSet := make(map[string]struct{})
+	headers := records[0]
+	var trades []*models.Trade
+	for recordNum := 1; recordNum < len(records); recordNum++ {
+		trade := &models.Trade{}
+		for i, value := range records[recordNum] {
+			switch headers[i] {
+			case "date_purchased":
+				layout := "2006-01-02T15:04:05.000Z"
+				str := fmt.Sprintf("%sT08:00:00.000Z", value)
+				t, err := time.Parse(layout, str)
+				if err != nil {
+					return err
+				}
+				trade.DatePurchased = t
+			case "symbol":
+				trade.Symbol = value
+				symbolSet[value] = struct{}{}
+			case "trade_type":
+				trade.TradeType = value
+			case "price_each":
+				if v, err := strconv.ParseFloat(value, 64); err == nil {
+					trade.PriceEach = v
+				} else {
+					return err
+				}
+			case "quantity":
+				if v, err := strconv.ParseFloat(value, 64); err == nil {
+					trade.Quantity = v
+				} else {
+					return err
+				}
+			}
+		}
+		trades = append(trades, trade)
+	}
+
+	// Create symbol set
+	m.createSymbolIfNotExists(symbolSet)
+	return m.tradeService.BulkAdd(trades)
 }
 
 func (m *TradeMediator) createSymbolIfNotExists(symbolSet map[string]struct{}) {
@@ -418,11 +473,19 @@ func (m *TradeMediator) calculatePortfolio() error {
 func (m *TradeMediator) ProcessTrades() {
 	start := time.Now()
 	log.Printf("Running one round of process trades")
+
+	// Get trades from csv
+	err := m.insertTradesWithCSV()
+	if err != nil {
+		log.Printf("error parsing csv: %s", err)
+		return
+	}
+
 	// Gets currencies involved and synchronises the tables
 	m.syncSymbolTable()
 
 	// Gets the exchange rates for all currencies to SGD
-	err := m.processCurrency()
+	err = m.processCurrency()
 	if err != nil {
 		log.Printf("error downloading currency information: %s", err)
 		return

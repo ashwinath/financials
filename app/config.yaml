@@ -1,9 +1,3 @@
-Server:
-  Port: 8000
-  WriteTimeoutInSeconds: 5s
-  ReadTimeoutInSeconds: 5s
-  ReactFilePath: "../ui/build"
-
 Database:
   Host: localhost
   Port: 5432
@@ -14,4 +8,4 @@ Database:
   BatchInsertSize: 100
 
 AlphaVantageAPIKey: test
-PortfolioCalculationInterval: 1h
+TradesCSVFile: ./trades.csv

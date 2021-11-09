@@ -57,6 +57,7 @@ func InitContext(c *config.Config) (*Context, error) {
 		context.ExchangeRateService,
 		context.StockService,
 		context.PortfolioService,
+		c.TradesCSVFile,
 	)
 
 	return &context, nil
