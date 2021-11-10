@@ -54,6 +54,19 @@ local currentStateTable = tablePanel.new(
     {
       "unit": "currencyUSD",
       "type": "number",
+      "alias": "Current Price (USD)",
+      "decimals": 2,
+      "pattern": "current_price",
+    },
+    {
+      "pattern": "quantity",
+      "alias": "Quantity",
+      "decimals": 0,
+      "type": "number",
+    },
+    {
+      "unit": "currencyUSD",
+      "type": "number",
       "alias": "NAV",
       "decimals": 2,
       "pattern": "nav",
@@ -83,24 +96,40 @@ local currentStateTable = tablePanel.new(
 )
 .addTarget(
   sql.target("
-    WITH total as (
-      select
-        sum(nav) as total
+    WITH total AS (
+      SELECT
+        sum(nav) AS total
       FROM portfolios
       WHERE
         trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'
+    ),
+    stock as (
+      SELECT
+        symbol,
+        price
+      FROM stocks
+      WHERE
+        trade_date = (
+          SELECT
+            trade_date
+          FROM stocks
+          ORDER BY trade_date desc
+          LIMIT 1
+        )
     )
     SELECT
       trade_date as time,
-      symbol as symbol,
+      stock.symbol as symbol,
+      stock.price as current_price,
+      quantity as quantity,
       sum(nav) as nav,
       sum(principal) as principal,
       (sum(nav) - sum(principal)) / sum(principal) as returns,
       sum(nav)/total.total as percentage
-    FROM portfolios, total
+    FROM portfolios inner join stock on portfolios.symbol = stock.symbol, total
     WHERE
       trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'
-    group by trade_date, symbol, total.total
+    group by trade_date, stock.symbol, total.total, quantity, stock.price
     order by trade_date",
     format='table',
   )
@@ -254,11 +283,11 @@ dashboard.new(
   gridPos= { h: 8, w: 6, x: 10, y: 0 },
 )
 .addPanel(
-  currentPrincipal,
+  currentNAV,
   gridPos= { h: 4, w: 4, x: 16, y: 0 },
 )
 .addPanel(
-  currentNAV,
+  currentPrincipal,
   gridPos= { h: 4, w: 4, x: 20, y: 0 },
 )
 .addPanel(
