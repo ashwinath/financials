@@ -110,6 +110,12 @@ func (m *TradeMediator) insertTradesWithCSV() error {
 
 	// Create symbol set
 	m.createSymbolIfNotExists(symbolSet)
+
+	// Truncate the table first since we don't want to deal with duplicate trades
+	if err := m.tradeService.TruncateTable(); err != nil {
+		return err
+	}
+
 	return m.tradeService.BulkAdd(trades)
 }
 

@@ -19,6 +19,10 @@ func NewTradeService(db *gorm.DB, batchInsertSize int) *TradeService {
 	}
 }
 
+func (s *TradeService) TruncateTable() error {
+	return s.db.Exec("TRUNCATE TABLE trades;").Error
+}
+
 // BulkAdd adds multiple transactions at once
 func (s *TradeService) BulkAdd(transactions []*models.Trade) error {
 	return s.db.CreateInBatches(transactions, s.batchInsertSize).Error
