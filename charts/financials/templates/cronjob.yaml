@@ -1,0 +1,70 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "financials.fullname" . }}
+  labels:
+    {{- include "financials.labels" . | nindent 4 }}
+spec:
+  concurrencyPolicy: Forbid
+  schedule: "0 */1 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: migration-init
+            image: migrate/migrate:{{ .Values.financials.migrate.image.tag }}
+            command: ["/bin/sh", "-c"]
+            args:
+            - |
+              migrate \
+              -path /etc/migrations \
+              -database='postgres://{{ .Values.postgresql.postgresqlUsername }}:$(PG_PASSWORD)@{{ template "postgresql.host" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable' \
+              up
+            env:
+            - name: PG_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-postgresql
+                  key: postgresql-password
+            volumeMounts:
+            - name: migrations
+              mountPath: /etc/migrations
+          - name: grafana-init
+            image: "{{ .Values.financials.financialsGrafana.image.repository }}:{{ .Values.financials.financialsGrafana.image.tag }}"
+            command: ["/bin/sh", "-c"]
+            args:
+            - /app/load.sh
+            env:
+            - name: GRAFANA_API_KEY
+              value: {{ .Values.financials.financialsGrafana.apiKey }}
+            - name: GRAFANA_ENDPOINT
+              value: {{ .Values.financials.financialsGrafana.endpoint }}
+            volumeMounts:
+            - name: migrations
+              mountPath: /etc/migrations
+          containers:
+          - name: financials
+            image: "{{ .Values.financials.image.repository }}:{{ .Values.financials.image.tag }}"
+            imagePullPolicy: {{ .Values.financials.image.pullPolicy }}
+            env:
+            - name: CONFIG_FILE
+              value: /etc/financials/config.yaml
+            resources:
+              {{- toYaml .Values.financials.resources | nindent 16 }}
+            volumeMounts:
+            - name: config
+              mountPath: /etc/financials
+            - name: trades-csv
+              mountPath: {{ .Values.financials.tradeCSVDirectory }}
+          restartPolicy: OnFailure
+          volumes:
+          - name: config
+            secret:
+              secretName: {{ template "financials.fullname" .}}-config
+          - name: migrations
+            configMap:
+              name: {{ .Release.Name }}-migrations
+          - name: trades-csv
+            configMap:
+              name: {{ .Release.Name }}-trades-csv

@@ -1,21 +1,11 @@
 financials:
-  # -- Number of replicas
-  replicaCount: 1
   image:
     # -- Respository of the image.
     repository: ghcr.io/ashwinath/financials
     # -- Image pull policy in Kubernetes
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     # -- Override this value for the desired image tag
     tag: latest
-  # -- Kubernetes pod annotations in key pair value
-  podAnnotations: {}
-
-  service:
-    # -- Kubernetes service type
-    type: ClusterIP
-    # -- Kubernetes service port
-    port: 80
 
   # -- Resources requests and limits for the financial app
   resources: {}
@@ -34,15 +24,29 @@ financials:
       # -- migrate/migrate image tag for db migrations
       tag: v4.15.0
 
+  financialsGrafana:
+    image:
+      # -- Respository of the image.
+      repository: ghcr.io/ashwinath/financials-grafana
+      # -- Image pull policy in Kubernetes
+      pullPolicy: Always
+      # -- Override this value for the desired image tag
+      tag: latest
+    apiKey: secret
+    # -- URL and port of the grafana site
+    endpoint: www.example.com:3000
+
+
+  # -- folder containing the csv files
+  tradeCSVDirectory: /etc/trades
+
+  # -- csv values for the trades
+  trades: |-
+    date_purchased,symbol,trade_type,price_each,quantity
+    2021-03-11,IWDA.LON,buy,76.34,10
+
   # -- Config for financials api, see api/config.yaml
   config:
-    Server:
-      # Don't change this port
-      Port: 8000
-      WriteTimeoutInSeconds: 5s
-      ReadTimeoutInSeconds: 5s
-      ReactFilePath: "/opt/build"
-
     Database:
       # TODO: Allow dynamic host
       Host: <release name>-postgresql.<namespace>.svc.cluster.local
@@ -54,8 +58,7 @@ financials:
       BatchInsertSize: 100
 
     AlphaVantageAPIKey: test
-    PortfolioCalculationInterval: 1h
-
+    TradesCSVFile: /etc/trades/trades.csv
 
 postgresql:
   # -- Resources requests and limits for the database
