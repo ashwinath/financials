@@ -42,6 +42,7 @@ local portfolioPieChart = pieChartPanel.new(
 
 local currentStateTable = tablePanel.new(
   "Current Portfolio",
+  datasource='PostgreSQL',
   styles=[
     {
       "type": "hidden",
