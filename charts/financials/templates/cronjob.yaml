@@ -6,7 +6,7 @@ metadata:
     {{- include "financials.labels" . | nindent 4 }}
 spec:
   concurrencyPolicy: Forbid
-  schedule: "0 */1 * * *"
+  schedule: "{{ .Values.financials.cronSchedule }}"
   jobTemplate:
     spec:
       template:

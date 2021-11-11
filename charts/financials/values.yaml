@@ -1,4 +1,6 @@
 financials:
+  # -- cron schedule
+  cronSchedule: "0 */4 * * *"
   image:
     # -- Respository of the image.
     repository: ghcr.io/ashwinath/financials
