@@ -2,10 +2,11 @@ commit=$(shell git rev-parse HEAD)
 all: build push
 
 build:
-	docker build -t $(REGISTRY)/financials:$(commit) .
+	docker build -t $(REGISTRY)/financials:$(commit) -t $(REGISTRY)/financials:latest .
 
 push:
 	docker push $(REGISTRY)/financials:$(commit)
+	docker push $(REGISTRY)/financials:latest
 
 setup:
 	@docker run -d \

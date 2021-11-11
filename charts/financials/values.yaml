@@ -3,7 +3,7 @@ financials:
     # -- Respository of the image.
     repository: ghcr.io/ashwinath/financials
     # -- Image pull policy in Kubernetes
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     # -- Override this value for the desired image tag
     tag: latest
 
@@ -23,6 +23,19 @@ financials:
     image:
       # -- migrate/migrate image tag for db migrations
       tag: v4.15.0
+
+  financialsGrafana:
+    image:
+      # -- Respository of the image.
+      repository: ghcr.io/ashwinath/financials-grafana
+      # -- Image pull policy in Kubernetes
+      pullPolicy: Always
+      # -- Override this value for the desired image tag
+      tag: latest
+    apiKey: secret
+    # -- URL and port of the grafana site
+    endpoint: www.example.com:3000
+
 
   # -- folder containing the csv files
   tradeCSVDirectory: /etc/trades

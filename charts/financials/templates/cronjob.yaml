@@ -12,7 +12,7 @@ spec:
       template:
         spec:
           initContainers:
-          - name: migration
+          - name: migration-init
             image: migrate/migrate:{{ .Values.financials.migrate.image.tag }}
             command: ["/bin/sh", "-c"]
             args:
@@ -30,9 +30,22 @@ spec:
             volumeMounts:
             - name: migrations
               mountPath: /etc/migrations
+          - name: grafana-init
+            image: "{{ .Values.financials.financialsGrafana.image.repository }}:{{ .Values.financials.financialsGrafana.image.tag }}"
+            command: ["/bin/sh", "-c"]
+            args:
+            - /app/load.sh
+            env:
+            - name: GRAFANA_API_KEY
+              value: {{ .Values.financials.financialsGrafana.apiKey }}
+            - name: GRAFANA_ENDPOINT
+              value: {{ .Values.financials.financialsGrafana.endpoint }}
+            volumeMounts:
+            - name: migrations
+              mountPath: /etc/migrations
           containers:
           - name: financials
-            image: "{{ .Values.financials.image.repository }}:{{ .Values.financials.image.tag | default .Chart.AppVersion }}"
+            image: "{{ .Values.financials.image.repository }}:{{ .Values.financials.image.tag }}"
             imagePullPolicy: {{ .Values.financials.image.pullPolicy }}
             env:
             - name: CONFIG_FILE
