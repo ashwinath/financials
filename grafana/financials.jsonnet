@@ -209,7 +209,7 @@ local portfolioSimpleReturns = createPanel(
   unit='percentunit',
   query='SELECT
     trade_date as "time",
-    (sum(nav) - sum(principal)) / sum(principal)
+    (sum(nav) - sum(principal)) / sum(principal) as "returns"
   FROM portfolios
   WHERE
     $__timeFilter(trade_date)
@@ -268,7 +268,8 @@ dashboard.new(
   schemaVersion=16,
   tags=['financials'],
   time_from='now-90d',
-  editable=true,
+  editable=false,
+  graphTooltip='shared_tooltip',
 )
 // CURRENT STATE
 .addPanel(
