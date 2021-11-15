@@ -194,6 +194,8 @@ local createPanel(name, unit, query, legend_show) =
     datasource='PostgreSQL',
     format=unit,
     legend_show=legend_show,
+    fillGradient=4,
+    linewidth=2,
   )
   .addTarget(
     sql.target(
