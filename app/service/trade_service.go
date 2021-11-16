@@ -19,6 +19,7 @@ func NewTradeService(db *gorm.DB, batchInsertSize int) *TradeService {
 	}
 }
 
+// TruncateTable truncates the trades table
 func (s *TradeService) TruncateTable() error {
 	return s.db.Exec("TRUNCATE TABLE trades;").Error
 }

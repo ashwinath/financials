@@ -1,15 +1,14 @@
 package mediator
 
 import (
-	"encoding/csv"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/ashwinath/financials/api/models"
 	"github.com/ashwinath/financials/api/service"
+	"github.com/ashwinath/financials/api/utils"
 )
 
 var (
@@ -59,14 +58,7 @@ func NewTradeMediator(
 }
 
 func (m *TradeMediator) insertTradesWithCSV() error {
-	f, err := os.Open(m.csvPath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
+	records, err := utils.ReadCSV(m.csvPath)
 	if err != nil {
 		return err
 	}

@@ -26,9 +26,11 @@ type Context struct {
 	ExchangeRateService     *service.ExchangeRateService
 	StockService            *service.StockService
 	PortfolioService        *service.PortfolioService
+	ExpenseService          *service.ExpenseService
 
 	// Mediators
-	TradeMediator *mediator.TradeMediator
+	TradeMediator   *mediator.TradeMediator
+	ExpenseMediator *mediator.ExpenseMediator
 }
 
 // InitContext inits all dependencies required by API server
@@ -48,6 +50,7 @@ func InitContext(c *config.Config) (*Context, error) {
 	context.ExchangeRateService = service.NewExchangeRateService(db, c.Database.BatchInsertSize)
 	context.StockService = service.NewStockService(db, c.Database.BatchInsertSize)
 	context.PortfolioService = service.NewPortfolioService(db, c.Database.BatchInsertSize)
+	context.ExpenseService = service.NewExpenseService(db, c.Database.BatchInsertSize)
 
 	// Mediators
 	context.TradeMediator = mediator.NewTradeMediator(
@@ -58,6 +61,11 @@ func InitContext(c *config.Config) (*Context, error) {
 		context.StockService,
 		context.PortfolioService,
 		c.TradesCSVFile,
+	)
+
+	context.ExpenseMediator = mediator.NewExpensesMediator(
+		context.ExpenseService,
+		c.ExpensesCSVFile,
 	)
 
 	return &context, nil

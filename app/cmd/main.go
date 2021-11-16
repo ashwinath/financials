@@ -19,4 +19,5 @@ func main() {
 	}
 
 	appctx.TradeMediator.ProcessTrades()
+	appctx.ExpenseMediator.ProcessExpenses()
 }

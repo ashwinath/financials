@@ -9,3 +9,4 @@ Database:
 
 AlphaVantageAPIKey: test
 TradesCSVFile: ./trades.csv
+ExpensesCSVFile: ./expenses.csv
