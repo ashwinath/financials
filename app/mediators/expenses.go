@@ -65,22 +65,22 @@ func (m *ExpenseMediator) parseCSV() ([]*models.Expense, error) {
 }
 
 // ProcessExpenses reads the csvs and stores them
-func (m *ExpenseMediator) ProcessExpenses() {
+func (m *ExpenseMediator) ProcessExpenses() error {
+	log.Printf("Updating expenses.")
 	expenses, err := m.parseCSV()
 	if err != nil {
-		log.Printf("Could not parse CSV: %s", err)
-		return
+		return err
 	}
 
 	err = m.expenseService.TruncateTable()
 	if err != nil {
-		log.Printf("Could not truncate expenses table: %s", err)
-		return
+		return err
 	}
 
 	err = m.expenseService.BulkAdd(expenses)
 	if err != nil {
-		log.Printf("Could not bulk add expenses: %s", err)
-		return
+		return err
 	}
+
+	return nil
 }

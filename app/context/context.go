@@ -6,6 +6,9 @@ import (
 	"github.com/ashwinath/financials/api/config"
 	mediator "github.com/ashwinath/financials/api/mediators"
 	"github.com/ashwinath/financials/api/service"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres" // required for gomigrate
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -72,6 +75,33 @@ func InitContext(c *config.Config) (*Context, error) {
 }
 
 func initDB(dbConfig config.Database) (*gorm.DB, error) {
+	// Migrate DB first
+	m, err := migrate.New(
+		fmt.Sprintf("file://./migrations"),
+		fmt.Sprintf(
+			"postgres://%s:%s@%s:%d/%s?sslmode=disable",
+			dbConfig.User,
+			dbConfig.Password,
+			dbConfig.Host,
+			dbConfig.Port,
+			dbConfig.Name,
+		),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("Failed to open migrations folder: %s", err)
+	}
+
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		return nil, fmt.Errorf("Failed to run migrations: %s", err)
+	}
+
+	if sourceErr, dbErr := m.Close(); sourceErr != nil {
+		return nil, fmt.Errorf("Failed to close source after migration")
+	} else if dbErr != nil {
+		return nil, fmt.Errorf("Failed to close database after migration")
+	}
+
+	// Initialise Gorm
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable TimeZone=%s",
 		dbConfig.Host,

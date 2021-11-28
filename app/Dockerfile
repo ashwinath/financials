@@ -14,5 +14,6 @@ RUN apk --no-cache add tzdata
 WORKDIR /opt
 COPY --from=app /app/app /opt
 COPY ./entrypoint.sh /opt
+COPY ./migrations /opt/migrations
 
 ENTRYPOINT ["/opt/entrypoint.sh"]

@@ -42,10 +42,20 @@ financials:
   # -- folder containing the csv files
   tradeCSVDirectory: /etc/trades
 
-  # -- csv values for the trades
+  # -- CSV values for the trades
   trades: |-
     date_purchased,symbol,trade_type,price_each,quantity
     2021-03-11,IWDA.LON,buy,76.34,10
+
+  # -- folder containing the expenses directories
+  expensesCSVDirectory: /etc/expenses
+
+  # -- CSV values for the expenses
+  expenses: |-
+    date,type,amount
+    2020-03-31,Credit Card,500
+    2020-03-31,Reimbursement,-200
+    2020-03-31,Tithe,800
 
   # -- Config for financials api, see api/config.yaml
   config:
@@ -61,6 +71,7 @@ financials:
 
     AlphaVantageAPIKey: test
     TradesCSVFile: /etc/trades/trades.csv
+    ExpensesCSVFile: /etc/expenses/expenses.csv
 
 postgresql:
   # -- Resources requests and limits for the database
