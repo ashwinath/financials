@@ -1,15 +1,14 @@
 package mediator
 
 import (
-	"encoding/csv"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"time"
 
 	"github.com/ashwinath/financials/api/models"
 	"github.com/ashwinath/financials/api/service"
+	"github.com/ashwinath/financials/api/utils"
 )
 
 var (
@@ -59,14 +58,7 @@ func NewTradeMediator(
 }
 
 func (m *TradeMediator) insertTradesWithCSV() error {
-	f, err := os.Open(m.csvPath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
+	records, err := utils.ReadCSV(m.csvPath)
 	if err != nil {
 		return err
 	}
@@ -476,15 +468,15 @@ func (m *TradeMediator) calculatePortfolio() error {
 	return nil
 }
 
-func (m *TradeMediator) ProcessTrades() {
+// ProcessTrades processes the trades.
+func (m *TradeMediator) ProcessTrades() error {
 	start := time.Now()
 	log.Printf("Running one round of process trades")
 
 	// Get trades from csv
 	err := m.insertTradesWithCSV()
 	if err != nil {
-		log.Printf("error parsing csv: %s", err)
-		return
+		return fmt.Errorf("error parsing csv: %s", err)
 	}
 
 	// Gets currencies involved and synchronises the tables
@@ -493,23 +485,21 @@ func (m *TradeMediator) ProcessTrades() {
 	// Gets the exchange rates for all currencies to SGD
 	err = m.processCurrency()
 	if err != nil {
-		log.Printf("error downloading currency information: %s", err)
-		return
+		return fmt.Errorf("error downloading currency information: %s", err)
 	}
 
 	// Query stock rates and put into table
 	err = m.processStocks()
 	if err != nil {
-		log.Printf("error downloading stocks information: %s", err)
-		// Don't return here there may be errornous stocks that we can't download
+		return fmt.Errorf("error downloading stocks information: %s", err)
 	}
 
 	// Update portfolio
 	err = m.calculatePortfolio()
 	if err != nil {
-		log.Printf("error calculating portfolio information: %s", err)
-		return
+		return fmt.Errorf("error calculating portfolio information: %s", err)
 	}
 
 	log.Printf("Finished one round of process trades, time taken: %s", time.Since(start))
+	return nil
 }

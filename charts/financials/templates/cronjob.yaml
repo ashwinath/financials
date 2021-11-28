@@ -12,24 +12,6 @@ spec:
       template:
         spec:
           initContainers:
-          - name: migration-init
-            image: migrate/migrate:{{ .Values.financials.migrate.image.tag }}
-            command: ["/bin/sh", "-c"]
-            args:
-            - |
-              migrate \
-              -path /etc/migrations \
-              -database='postgres://{{ .Values.postgresql.postgresqlUsername }}:$(PG_PASSWORD)@{{ template "postgresql.host" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?sslmode=disable' \
-              up
-            env:
-            - name: PG_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Release.Name }}-postgresql
-                  key: postgresql-password
-            volumeMounts:
-            - name: migrations
-              mountPath: /etc/migrations
           - name: grafana-init
             image: "{{ .Values.financials.financialsGrafana.image.repository }}:{{ .Values.financials.financialsGrafana.image.tag }}"
             command: ["/bin/sh", "-c"]
@@ -40,9 +22,6 @@ spec:
               value: {{ .Values.financials.financialsGrafana.apiKey }}
             - name: GRAFANA_ENDPOINT
               value: {{ .Values.financials.financialsGrafana.endpoint }}
-            volumeMounts:
-            - name: migrations
-              mountPath: /etc/migrations
           containers:
           - name: financials
             image: "{{ .Values.financials.image.repository }}:{{ .Values.financials.image.tag }}"
@@ -57,14 +36,16 @@ spec:
               mountPath: /etc/financials
             - name: trades-csv
               mountPath: {{ .Values.financials.tradeCSVDirectory }}
+            - name: expenses-csv
+              mountPath: {{ .Values.financials.expensesCSVDirectory }}
           restartPolicy: OnFailure
           volumes:
           - name: config
             secret:
               secretName: {{ template "financials.fullname" .}}-config
-          - name: migrations
-            configMap:
-              name: {{ .Release.Name }}-migrations
           - name: trades-csv
             configMap:
               name: {{ .Release.Name }}-trades-csv
+          - name: expenses-csv
+            configMap:
+              name: {{ .Release.Name }}-expenses-csv

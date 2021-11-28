@@ -12,7 +12,7 @@ type PortfolioService struct {
 	batchInsertSize int
 }
 
-// NewPortfolioService creates a new UserService
+// NewPortfolioService creates a new PortfolioService
 func NewPortfolioService(db *gorm.DB, batchInsertSize int) *PortfolioService {
 	return &PortfolioService{
 		db:              db,

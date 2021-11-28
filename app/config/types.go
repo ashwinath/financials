@@ -5,6 +5,7 @@ type Config struct {
 	Database           Database `validate:"required,dive"`
 	AlphaVantageAPIKey string   `validate:"required"`
 	TradesCSVFile      string   `validate:"required"`
+	ExpensesCSVFile    string   `validate:"required"`
 }
 
 // Database contains the database related configurations
