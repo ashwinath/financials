@@ -22,7 +22,7 @@ func NewExpenseService(db *gorm.DB, batchInsertSize int) *ExpenseService {
 
 // TruncateTable truncates the expenses table
 func (s *ExpenseService) TruncateTable() error {
-	return s.db.Exec("TRUNCATE TABLE trades;").Error
+	return s.db.Exec("TRUNCATE TABLE expenses;").Error
 }
 
 // BulkAdd adds multiple transactions at once
