@@ -40,6 +40,8 @@ spec:
               mountPath: {{ .Values.financials.expensesCSVDirectory }}
             - name: assets-csv
               mountPath: {{ .Values.financials.assetsCSVDirectory }}
+            - name: income-csv
+              mountPath: {{ .Values.financials.incomeCSVDirectory }}
           restartPolicy: OnFailure
           volumes:
           - name: config
@@ -54,3 +56,6 @@ spec:
           - name: assets-csv
             configMap:
               name: {{ .Release.Name }}-assets-csv
+          - name: income-csv
+            configMap:
+              name: {{ .Release.Name }}-income-csv

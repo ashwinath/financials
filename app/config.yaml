@@ -11,3 +11,4 @@ AlphaVantageAPIKey: test
 TradesCSVFile: ./trades.csv
 ExpensesCSVFile: ./expenses.csv
 AssetsCSVFile: ./assets.csv
+IncomeCSVFile: ./income.csv

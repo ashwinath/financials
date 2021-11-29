@@ -9,7 +9,7 @@ Financials is a way to track your financial independence track in Singapore's co
 This list is not exhaustive but a wishlist that I would work on when I'm free.
 
 - [x] Stock Portfolio
-- [ ] Daily/monthly expenditure
+- [ ] Monthly expenditure
 - [ ] Total Net assets
 - [ ] Liabilities
 - [ ] Income

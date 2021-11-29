@@ -7,6 +7,7 @@ type Config struct {
 	TradesCSVFile      string   `validate:"required"`
 	ExpensesCSVFile    string   `validate:"required"`
 	AssetsCSVFile      string   `validate:"required"`
+	IncomeCSVFile      string   `validate:"required"`
 }
 
 // Database contains the database related configurations

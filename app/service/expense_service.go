@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// ExpenseService is the interface to the database for the sessions tables
+// ExpenseService is the interface to the database for the expenses tables
 type ExpenseService struct {
 	db              *gorm.DB
 	batchInsertSize int
