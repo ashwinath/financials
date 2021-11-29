@@ -24,9 +24,16 @@ func main() {
 		log.Fatalf("Could not process trades: %s.", err)
 		os.Exit(1)
 	}
+
 	err = appctx.ExpenseMediator.ProcessExpenses()
 	if err != nil {
 		log.Fatalf("Could not process expenses: %s.", err)
+		os.Exit(1)
+	}
+
+	err = appctx.AssetMediator.ProcessAssets()
+	if err != nil {
+		log.Fatalf("Could not process assets: %s.", err)
 		os.Exit(1)
 	}
 }

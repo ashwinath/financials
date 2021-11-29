@@ -38,6 +38,8 @@ spec:
               mountPath: {{ .Values.financials.tradeCSVDirectory }}
             - name: expenses-csv
               mountPath: {{ .Values.financials.expensesCSVDirectory }}
+            - name: assets-csv
+              mountPath: {{ .Values.financials.assetsCSVDirectory }}
           restartPolicy: OnFailure
           volumes:
           - name: config
@@ -49,3 +51,6 @@ spec:
           - name: expenses-csv
             configMap:
               name: {{ .Release.Name }}-expenses-csv
+          - name: assets-csv
+            configMap:
+              name: {{ .Release.Name }}-assets-csv

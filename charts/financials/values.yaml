@@ -57,6 +57,17 @@ financials:
     2020-03-31,Reimbursement,-200
     2020-03-31,Tithe,800
 
+  # -- folder containing the assets directories
+  assetsCSVDirectory: /etc/assets
+
+  # -- CSV values for the assets
+  assets: |-
+    date,type,amount
+    2020-03-31,CPF,1000
+    2020-03-31,Bank,20000
+    2020-03-31,Mortgage,-40000
+    2020-03-31,Investments,20000
+
   # -- Config for financials api, see api/config.yaml
   config:
     Database:

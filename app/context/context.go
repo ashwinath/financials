@@ -23,6 +23,7 @@ type Context struct {
 	DB *gorm.DB
 
 	// Services
+	AssetService            *service.AssetService
 	TradeTransactionService *service.TradeService
 	SymbolService           *service.SymbolService
 	AlphaVantageService     *service.AlphaVantageService
@@ -32,6 +33,7 @@ type Context struct {
 	ExpenseService          *service.ExpenseService
 
 	// Mediators
+	AssetMediator   *mediator.AssetMediator
 	TradeMediator   *mediator.TradeMediator
 	ExpenseMediator *mediator.ExpenseMediator
 }
@@ -54,6 +56,7 @@ func InitContext(c *config.Config) (*Context, error) {
 	context.StockService = service.NewStockService(db, c.Database.BatchInsertSize)
 	context.PortfolioService = service.NewPortfolioService(db, c.Database.BatchInsertSize)
 	context.ExpenseService = service.NewExpenseService(db, c.Database.BatchInsertSize)
+	context.AssetService = service.NewAssetService(db, c.Database.BatchInsertSize)
 
 	// Mediators
 	context.TradeMediator = mediator.NewTradeMediator(
@@ -64,6 +67,11 @@ func InitContext(c *config.Config) (*Context, error) {
 		context.StockService,
 		context.PortfolioService,
 		c.TradesCSVFile,
+	)
+
+	context.AssetMediator = mediator.NewAssetMediator(
+		context.AssetService,
+		c.AssetsCSVFile,
 	)
 
 	context.ExpenseMediator = mediator.NewExpensesMediator(
