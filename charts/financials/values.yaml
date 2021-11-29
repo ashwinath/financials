@@ -92,6 +92,8 @@ financials:
     AlphaVantageAPIKey: test
     TradesCSVFile: /etc/trades/trades.csv
     ExpensesCSVFile: /etc/expenses/expenses.csv
+    AssetsCSVFile: /etc/assets/assets.csv
+    IncomeCSVFile: /etc/income/income.csv
 
 postgresql:
   # -- Resources requests and limits for the database

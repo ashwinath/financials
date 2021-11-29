@@ -1,6 +1,6 @@
 # financials
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Helm chart for financials
 
@@ -16,7 +16,7 @@ Helm chart for financials
 |-----|------|---------|-------------|
 | financials.assets | string | `"date,type,amount\n2020-03-31,CPF,1000\n2020-03-31,Bank,20000\n2020-03-31,Mortgage,-40000\n2020-03-31,Investments,20000"` | CSV values for the assets |
 | financials.assetsCSVDirectory | string | `"/etc/assets"` | folder containing the assets directories |
-| financials.config | object | `{"AlphaVantageAPIKey":"test","Database":{"BatchInsertSize":100,"Host":"<release name>-postgresql.<namespace>.svc.cluster.local","Name":"postgres","Password":"password","Port":5432,"TimeZone":"Asia/Singapore","User":"postgres"},"ExpensesCSVFile":"/etc/expenses/expenses.csv","TradesCSVFile":"/etc/trades/trades.csv"}` | Config for financials api, see api/config.yaml |
+| financials.config | object | `{"AlphaVantageAPIKey":"test","AssetsCSVFile":"/etc/assets/assets.csv","Database":{"BatchInsertSize":100,"Host":"<release name>-postgresql.<namespace>.svc.cluster.local","Name":"postgres","Password":"password","Port":5432,"TimeZone":"Asia/Singapore","User":"postgres"},"ExpensesCSVFile":"/etc/expenses/expenses.csv","IncomeCSVFile":"/etc/income/income.csv","TradesCSVFile":"/etc/trades/trades.csv"}` | Config for financials api, see api/config.yaml |
 | financials.cronSchedule | string | `"0 */4 * * *"` | cron schedule |
 | financials.expenses | string | `"date,type,amount\n2020-03-31,Credit Card,500\n2020-03-31,Reimbursement,-200\n2020-03-31,Tithe,800"` | CSV values for the expenses |
 | financials.expensesCSVDirectory | string | `"/etc/expenses"` | folder containing the expenses directories |
