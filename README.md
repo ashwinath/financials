@@ -66,6 +66,24 @@ financials:
     2021-09-24,IWDA.LON,buy,85.29,250
     2021-10-27,IWDA.LON,buy,87.28,250
 
+  assets: |-
+    date,type,amount
+    2020-03-31,CPF,1000
+    2020-03-31,Bank,20000
+    2020-03-31,Mortgage,-40000
+    2020-03-31,Investments,20000
+
+  expenses: |-
+    date,type,amount
+    2020-03-31,Credit Card,500
+    2020-03-31,Reimbursement,-200
+    2020-03-31,Tithe,800
+
+  income: |-
+    date,type,amount
+    2021-03-11,Base,500
+    2021-03-11,Bonus,200
+
 postgresql:
   postgresqlPassword: somePasswordHere
   persistence:
