@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// AssetService is the interface to the database for the sessions tables
+// AssetService is the interface to the database for the assets tables
 type AssetService struct {
 	db              *gorm.DB
 	batchInsertSize int

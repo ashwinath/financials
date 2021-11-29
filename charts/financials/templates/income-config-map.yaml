@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-income-csv
+data:
+  expenses.csv: |-
+{{ .Values.financials.income | indent 4 }}

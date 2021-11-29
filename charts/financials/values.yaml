@@ -68,6 +68,15 @@ financials:
     2020-03-31,Mortgage,-40000
     2020-03-31,Investments,20000
 
+  # -- folder containing the income directories
+  incomeCSVDirectory: /etc/income
+
+  # -- CSV values for the income
+  income: |-
+    date,type,amount
+    2021-03-11,Base,500
+    2021-03-11,Bonus,200
+
   # -- Config for financials api, see api/config.yaml
   config:
     Database:

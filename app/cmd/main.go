@@ -36,4 +36,10 @@ func main() {
 		log.Fatalf("Could not process assets: %s.", err)
 		os.Exit(1)
 	}
+
+	err = appctx.IncomeMediator.ProcessIncome()
+	if err != nil {
+		log.Fatalf("Could not process income: %s.", err)
+		os.Exit(1)
+	}
 }
