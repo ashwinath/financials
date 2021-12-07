@@ -188,7 +188,7 @@ local currentSimpleReturns = createStat(
   order by trade_date",
 );
 
-local createPanel(name, unit, query, legend_show) =
+local createPanel(name, unit, query, legend_show, stack=false) =
   graphPanel.new(
     name,
     datasource='PostgreSQL',
@@ -196,6 +196,8 @@ local createPanel(name, unit, query, legend_show) =
     legend_show=legend_show,
     fillGradient=4,
     linewidth=2,
+    stack=stack,
+    nullPointMode='null as zero'
   )
   .addTarget(
     sql.target(
@@ -263,61 +265,144 @@ local simpleReturns = createPanel(
   legend_show=true,
 );
 
+// Summary of Financials
+local netAssets = createPanel(
+  name='Net Assets',
+  unit='currencyUSD',
+  query='SELECT
+    transaction_date as "time",
+    type,
+    amount
+  FROM assets
+  WHERE
+    $__timeFilter(transaction_date)
+  group by transaction_date,type, amount
+  order by transaction_date',
+  legend_show=false,
+  stack=true,
+);
+
+local salary = createPanel(
+  name='Salary',
+  unit='currencyUSD',
+  query='SELECT
+    transaction_date as "time",
+    type,
+    amount
+  FROM incomes
+  WHERE
+    $__timeFilter(transaction_date)
+  group by transaction_date, type, amount
+  order by transaction_date',
+  legend_show=true,
+  stack=true,
+);
+
+local expenses = createPanel(
+  name='Expenses',
+  unit='currencyUSD',
+  query='WITH cc as (
+    SELECT
+      transaction_date as "transaction_date",
+      sum(amount) as "amount"
+    FROM
+      expenses
+    WHERE
+      $__timeFilter(transaction_date)
+      AND type in (\'Credit Card\', \'Reimbursement\')
+    group by transaction_date
+    order by transaction_date
+  )
+  SELECT
+      transaction_date as "time",
+      type,
+      amount
+  FROM expenses
+  WHERE
+      $__timeFilter(transaction_date)
+      AND type not in (\'Credit Card\', \'Reimbursement\')
+  UNION select transaction_date as "time", \'Credit Card\' as type, amount from cc
+  group by transaction_date, type, amount
+  order by time',
+  legend_show=true,
+  stack=true,
+);
+
 dashboard.new(
   'Financials',
   schemaVersion=16,
   tags=['financials'],
   time_from='now-90d',
-  editable=false,
+  editable=true,
   graphTooltip='shared_tooltip',
+)
+// Summary Of Financials
+.addPanel(
+  row.new(
+    title="Financials Summary"
+  ),
+  gridPos={ h: 1, w: 12, x: 0, y: 0 },
+)
+.addPanel(
+  netAssets,
+  gridPos={ h: 8, w: 12, x: 0, y: 1 },
+)
+.addPanel(
+  salary,
+  gridPos={ h: 8, w: 12, x: 12, y: 1 },
+)
+.addPanel(
+  expenses,
+  gridPos={ h: 8, w: 12, x: 0, y: 9 },
 )
 // CURRENT STATE
 .addPanel(
   row.new(
-    title="Current State"
+    title="Current Investments"
   ),
-  gridPos= { h: 1, w: 12, x: 0, y: 0 },
+  gridPos={ h: 1, w: 12, x: 0, y: 17 },
 )
 .addPanel(
   currentStateTable,
-  gridPos= { h: 8, w: 10, x: 0, y: 0 },
+  gridPos={ h: 8, w: 10, x: 0, y: 18 },
 )
 .addPanel(
   portfolioPieChart,
-  gridPos= { h: 8, w: 6, x: 10, y: 0 },
+  gridPos={ h: 8, w: 6, x: 10, y: 18 },
 )
 .addPanel(
   currentNAV,
-  gridPos= { h: 4, w: 4, x: 16, y: 0 },
+  gridPos={ h: 4, w: 4, x: 16, y: 18 },
 )
 .addPanel(
   currentPrincipal,
-  gridPos= { h: 4, w: 4, x: 20, y: 0 },
+  gridPos={ h: 4, w: 4, x: 20, y: 18 },
 )
 .addPanel(
   currentSimpleReturns,
-  gridPos= { h: 4, w: 4, x: 16, y: 0 },
+  gridPos={ h: 4, w: 4, x: 16, y: 22 },
 )
+
 // PERFORMANCE
 .addPanel(
   row.new(
-    title="Historical Performance"
+    title="Investment Historical Performance"
   ),
-  gridPos= { h: 11, w: 12, x: 0, y: 1 },
+  gridPos={ h: 1, w: 12, x: 0, y: 23 },
 )
 .addPanel(
   portfolioSimpleReturns,
-  gridPos= { h: 10, w: 12, x: 0, y: 2 },
+  gridPos={ h: 8, w: 12, x: 0, y: 24 },
 )
 .addPanel(
   portfolioNAV,
-  gridPos= { h: 10, w: 12, x: 12, y: 2 },
+  gridPos={ h: 8, w: 12, x: 12, y: 24 },
 )
 .addPanel(
   simpleReturns,
-  gridPos= { h: 10, w: 12, x: 0, y: 3 },
+  gridPos={ h: 8, w: 12, x: 0, y: 32 },
 )
 .addPanel(
   nav,
-  gridPos= { h: 10, w: 12, x: 12, y: 3 },
+  gridPos={ h: 8, w: 12, x: 12, y: 32 },
 )
