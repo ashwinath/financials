@@ -29,5 +29,8 @@ type AlphaVantageStockResult struct {
 
 // AlphaVantageStockDailyResult contains the single value of a daily stock result
 type AlphaVantageStockDailyResult struct {
+	// Alphavantage just made this a premium feature so we have to fix splits next time manually
 	AdjustedClose string `json:"5. adjusted close"`
+	// Using close after adjusted became a premium feature
+	Close string `json:"4. close"`
 }

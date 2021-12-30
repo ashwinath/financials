@@ -284,7 +284,7 @@ func (m *TradeMediator) processStocks() error {
 			}
 
 			// TODO: Handle split coefficient.
-			price, err := strconv.ParseFloat(value.AdjustedClose, 64)
+			price, err := strconv.ParseFloat(value.Close, 64)
 			if err != nil {
 				return err
 			}

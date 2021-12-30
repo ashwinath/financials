@@ -9,7 +9,8 @@ import (
 const (
 	searchURLFormat = "https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords=%s&apikey=%s"
 	fxURLFormat     = "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=%s&to_symbol=SGD&apikey=%s&outputsize=%s"
-	stockURLFormat  = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol=%s&apikey=%s&outputsize=%s"
+	// This has been changed from TIME_SERIES_DAILY_ADJUSTED to TIME_SERIES_DAILY because it suddenly became a premium feature
+	stockURLFormat = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=%s&apikey=%s&outputsize=%s"
 )
 
 // AlphaVantageService is an external service that queries stock info
