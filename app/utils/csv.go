@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"log"
 	"os"
+	"strings"
 )
 
 // ReadCSV reads the csv and returns a 2 dimensional array:
@@ -26,5 +27,13 @@ func ReadCSV(csvPath string) ([][]string, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// trim whitespace
+	for recordNum := 1; recordNum < len(records); recordNum++ {
+		for i, value := range records[recordNum] {
+			records[recordNum][i] = strings.Trim(value, " ")
+		}
+	}
+
 	return records, nil
 }
