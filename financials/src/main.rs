@@ -4,9 +4,9 @@ use models::{read_from_csv, Trade};
 #[macro_use]
 extern crate diesel;
 
+use crate::diesel::RunQueryDsl;
 use diesel::{Connection, insert_into};
 use diesel::pg::PgConnection;
-use crate::diesel::RunQueryDsl;
 use schema::trades::dsl::trades;
 use diesel_migrations::run_pending_migrations;
 
@@ -17,12 +17,11 @@ mod schema;
 fn main() {
     let c = Config::new();
 
-    // TODO: Test CSV, to be removed.
+    let conn = init_db(&c.database_url);
+
     let t: Vec<Trade> = read_from_csv(&c.stocks_csv).unwrap();
-    println!("{:?}", t);
 
     // Initialise DB
-    let conn = init_db(&c.database_url);
     insert_into(trades)
         .values(&t)
         .execute(&conn)
