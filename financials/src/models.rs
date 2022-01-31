@@ -2,9 +2,12 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use std::error::Error;
+use crate::schema::trades;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Queryable, Insertable)]
+#[table_name = "trades"]
 pub struct Trade {
+    pub id: Option<i32>,
     #[serde(with = "yymmdd_format")]
     pub date_purchased: DateTime<Utc>,
     pub symbol: String,

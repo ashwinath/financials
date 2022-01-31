@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS trades (
-    id             text NOT NULL PRIMARY KEY,
+    id             serial NOT NULL PRIMARY KEY,
     date_purchased timestamptz NOT NULL,
     symbol         text NOT NULL,
     price_each     double precision NOT NULL,

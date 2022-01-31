@@ -7,6 +7,6 @@ edition = "2021"
 chrono = "0.4"
 clap = { version = "3.0.13", features = ["derive"] }
 csv = "1.1"
-diesel = { version = "1.4.8", features = ["postgres"] }
+diesel = { version = "1.4.8", features = ["postgres", "chrono"] }
 diesel_migrations ="1.4.0"
 serde = { version = "1.0", features = ["derive"] }
