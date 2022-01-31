@@ -28,3 +28,32 @@ mod yymmdd_format {
         Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
     }
 }
+
+pub fn read_from_csv<T>(csv: &str) -> Vec<T>
+    where
+    T: for<'de> serde::Deserialize<'de>,
+{
+
+    let mut rdr = csv::Reader::from_path(csv).unwrap();
+
+    let mut data = Vec::new();
+
+    for result in rdr.deserialize() {
+        let record: T = result.unwrap();
+        data.push(record);
+    }
+
+    data
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn parse_csv() {
+        let result: Vec<Trade> = read_from_csv("./test/trade.csv");
+        println!("{:?}", result);
+    }
+}
