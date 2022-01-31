@@ -5,6 +5,8 @@ use clap::Parser;
 pub struct Config {
     #[clap(long)]
     pub stocks_csv: String,
+    #[clap(long)]
+    pub database_url: String,
 }
 
 impl Config {
