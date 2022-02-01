@@ -1,5 +1,9 @@
 use config::Config;
-use models::{read_from_csv, Trade};
+use models::{read_from_csv, Trade, Expense, Asset, Income};
+use schema::trades::dsl::trades;
+use schema::assets::dsl::assets;
+use schema::incomes::dsl::incomes;
+use schema::expenses::dsl::expenses;
 use std::error::Error;
 use std::process;
 
@@ -7,9 +11,8 @@ use std::process;
 extern crate diesel;
 
 use crate::diesel::RunQueryDsl;
-use diesel::{Connection, insert_into};
+use diesel::{Connection, insert_into, delete};
 use diesel::pg::PgConnection;
-use schema::trades::dsl::trades;
 use diesel_migrations::run_pending_migrations;
 
 mod config;
@@ -27,8 +30,26 @@ fn main() {
 }
 
 fn load_data(conn: &PgConnection, c: &Config) -> Result<(), Box<dyn Error>> {
-    // Load Stocks data
-    let t: Vec<Trade> = read_from_csv(&c.stocks_csv)?;
+    delete(assets).execute(conn)?;
+    let t: Vec<Asset> = read_from_csv(&c.assets_csv)?;
+    insert_into(assets)
+        .values(&t)
+        .execute(conn)?;
+
+    delete(expenses).execute(conn)?;
+    let t: Vec<Expense> = read_from_csv(&c.expenses_csv)?;
+    insert_into(expenses)
+        .values(&t)
+        .execute(conn)?;
+
+    delete(incomes).execute(conn)?;
+    let t: Vec<Income> = read_from_csv(&c.income_csv)?;
+    insert_into(incomes)
+        .values(&t)
+        .execute(conn)?;
+
+    delete(trades).execute(conn)?;
+    let t: Vec<Trade> = read_from_csv(&c.trades_csv)?;
     insert_into(trades)
         .values(&t)
         .execute(conn)?;

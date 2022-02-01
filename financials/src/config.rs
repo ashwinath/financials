@@ -6,7 +6,13 @@ pub struct Config {
     #[clap(long)]
     pub database_url: String,
     #[clap(long)]
-    pub stocks_csv: String,
+    pub assets_csv: String,
+    #[clap(long)]
+    pub expenses_csv: String,
+    #[clap(long)]
+    pub income_csv: String,
+    #[clap(long)]
+    pub trades_csv: String,
 }
 
 impl Config {
