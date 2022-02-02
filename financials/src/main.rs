@@ -1,11 +1,12 @@
 use alphavantage::{search_alphavantage_symbol, get_currency_history, get_stock_history};
 use config::Config;
-use models::{read_from_csv, Trade, Expense, Asset, Income, Symbol};
+use models::{read_from_csv, Trade, Expense, Asset, Income, Symbol, SymbolWithId, ExchangeRate};
 use schema::trades::dsl::trades;
 use schema::assets::dsl::assets;
 use schema::incomes::dsl::incomes;
 use schema::expenses::dsl::expenses;
 use schema::symbols::dsl::symbols;
+use schema::exchange_rates::dsl::exchange_rates;
 use std::error::Error;
 use std::process;
 
@@ -13,7 +14,7 @@ use std::process;
 extern crate diesel;
 
 use crate::diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
-use chrono::Utc;
+use chrono::{Utc, TimeZone};
 use diesel::{Connection, insert_into, delete};
 use diesel::pg::PgConnection;
 use diesel_migrations::run_pending_migrations;
@@ -22,6 +23,8 @@ mod alphavantage;
 mod config;
 mod models;
 mod schema;
+
+const FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
 
 fn main() {
     let start_time = Utc::now().time();
@@ -37,9 +40,47 @@ fn main() {
         eprintln!("failed to load csv data: {}", e);
         process::exit(1);
     }
+
+    if let Err(e) = process_currencies(&conn, &c.alphavantage_key) {
+        eprintln!("failed to load csv data: {}", e);
+        process::exit(1);
+    }
+
     let end_time = Utc::now().time();
     let diff = end_time - start_time;
     println!("Total time taken to run is {} ms.", diff.num_milliseconds());
+}
+
+fn process_currencies(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
+    let currencies = symbols
+        .filter(schema::symbols::dsl::symbol_type.eq("currency"))
+        .load::<SymbolWithId>(conn)?;
+
+    for currency in currencies {
+        let is_compact = currency.last_processed_date.is_some();
+        let history = get_currency_history(&currency.symbol, "SGD", is_compact, alphavantage_key)?
+            .results;
+
+        let mut currency_history = Vec::new();
+        for (date, value) in history {
+            let date = format!("{} 16:00:00", date);
+            let date = Utc.datetime_from_str(&date, FORMAT)?;
+            let value = value.close;
+            let er = ExchangeRate {
+                trade_date: date,
+                symbol: currency.symbol.to_string(),
+                price: value,
+            };
+            currency_history.push(er);
+        }
+
+        insert_into(exchange_rates)
+            .values(&currency_history)
+            .on_conflict_do_nothing()
+            .execute(conn)?;
+    }
+
+    Ok(())
 }
 
 fn sync_symbol_table(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
@@ -63,7 +104,6 @@ fn sync_symbol_table(conn: &PgConnection, alphavantage_key: &str) -> Result<(), 
                 .currency;
 
             let symbol_object = Symbol {
-                id: None,
                 symbol_type: "stock".to_string(),
                 symbol: symbol.to_string(),
                 base_currency: Some(base_currency.to_string()),
@@ -89,14 +129,13 @@ fn sync_symbol_table(conn: &PgConnection, alphavantage_key: &str) -> Result<(), 
         let currency = currency.unwrap(); // Guaranteed to be here
 
         let count = symbols
-            .filter(schema::symbols::dsl::symbol_type.eq("currrency"))
+            .filter(schema::symbols::dsl::symbol_type.eq("currency"))
             .filter(schema::symbols::dsl::symbol.eq(&currency))
             .count()
             .get_result::<i64>(conn)?;
 
         if count == 0 {
             let symbol_object = Symbol {
-                id: None,
                 symbol_type: "currency".to_string(),
                 symbol: currency.to_string(),
                 base_currency: None,

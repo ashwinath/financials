@@ -9,6 +9,15 @@ table! {
 }
 
 table! {
+    exchange_rates (id) {
+        id -> Int4,
+        trade_date -> Timestamptz,
+        symbol -> Text,
+        price -> Float8,
+    }
+}
+
+table! {
     expenses (id) {
         id -> Int4,
         transaction_date -> Timestamptz,
@@ -25,6 +34,15 @@ table! {
         #[sql_name = "type"]
         type_ -> Text,
         amount -> Float8,
+    }
+}
+
+table! {
+    stocks (id) {
+        id -> Int4,
+        trade_date -> Timestamptz,
+        symbol -> Text,
+        price -> Float8,
     }
 }
 
@@ -51,8 +69,10 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     assets,
+    exchange_rates,
     expenses,
     incomes,
+    stocks,
     symbols,
     trades,
 );

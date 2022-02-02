@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use std::error::Error;
-use crate::schema::{trades, assets, incomes, expenses, symbols};
+use crate::schema::{trades, assets, incomes, expenses, symbols, exchange_rates};
 
 mod yymmdd_format {
     use chrono::{DateTime, Utc, TimeZone};
@@ -87,14 +87,34 @@ pub struct Expense {
     pub amount: f64,
 }
 
+// Need to create another struct for inserting without id
+// https://github.com/diesel-rs/diesel/issues/1440
+
 #[derive(Debug, Queryable, Insertable)]
 #[table_name = "symbols"]
-pub struct Symbol {
-    pub id: Option<i32>,
+pub struct SymbolWithId {
+    pub id: i32,
     pub symbol_type: String,
     pub symbol: String,
     pub base_currency: Option<String>,
     pub last_processed_date: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Insertable)]
+#[table_name = "symbols"]
+pub struct Symbol {
+    pub symbol_type: String,
+    pub symbol: String,
+    pub base_currency: Option<String>,
+    pub last_processed_date: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Insertable, Queryable)]
+#[table_name = "exchange_rates"]
+pub struct ExchangeRate {
+    pub trade_date: DateTime<Utc>,
+    pub symbol: String,
+    pub price: f64,
 }
 
 #[cfg(test)]

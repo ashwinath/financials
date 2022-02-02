@@ -41,3 +41,21 @@ CREATE TABLE IF NOT EXISTS symbols (
     base_currency       text,
     last_processed_date timestamptz
 );
+
+CREATE TABLE IF NOT EXISTS exchange_rates (
+    id         serial NOT NULL PRIMARY KEY,
+    trade_date timestamptz NOT NULL,
+    symbol     text NOT NULL,
+    price      double precision not null
+);
+
+CREATE UNIQUE INDEX uidx_exchange_rates ON exchange_rates(trade_date, symbol);
+
+CREATE TABLE IF NOT EXISTS stocks (
+    id         serial NOT NULL PRIMARY KEY,
+    trade_date timestamptz NOT NULL,
+    symbol     text NOT NULL,
+    price      double precision not null
+);
+
+CREATE UNIQUE INDEX uidx_stocks ON stocks(trade_date, symbol);
