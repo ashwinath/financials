@@ -1,3 +1,4 @@
+use alphavantage::search_alphavantage_symbol;
 use config::Config;
 use models::{read_from_csv, Trade, Expense, Asset, Income};
 use schema::trades::dsl::trades;
@@ -15,6 +16,7 @@ use diesel::{Connection, insert_into, delete};
 use diesel::pg::PgConnection;
 use diesel_migrations::run_pending_migrations;
 
+mod alphavantage;
 mod config;
 mod models;
 mod schema;
@@ -27,6 +29,13 @@ fn main() {
         eprintln!("failed to load csv data: {}", e);
         process::exit(1);
     }
+
+    // TODO: dummy func
+    let search_result = search_alphavantage_symbol(
+        "IWDA.LON",
+        &c.alphavantage_key,
+    );
+    println!("{:?}", search_result);
 }
 
 fn load_data(conn: &PgConnection, c: &Config) -> Result<(), Box<dyn Error>> {
