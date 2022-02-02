@@ -38,17 +38,26 @@ pub fn read_from_csv<T>(csv: &str) -> Result<Vec<T>, Box<dyn Error>>
 
     Ok(data)
 }
-
 #[derive(Debug, Deserialize, Queryable, Insertable)]
 #[table_name = "trades"]
+pub struct TradeWithId {
+    pub id: i32,
+    pub date_purchased: DateTime<Utc>,
+    pub symbol: String,
+    pub price_each: f64,
+    pub quantity: f64,
+    pub trade_type: String,
+}
+
+#[derive(Debug, Deserialize, Insertable)]
+#[table_name = "trades"]
 pub struct Trade {
-    pub id: Option<i32>,
     #[serde(with = "yymmdd_format")]
     pub date_purchased: DateTime<Utc>,
     pub symbol: String,
-    pub trade_type: String,
     pub price_each: f64,
     pub quantity: f64,
+    pub trade_type: String,
 }
 
 #[derive(Debug, Deserialize, Queryable, Insertable)]
@@ -116,7 +125,7 @@ pub struct ExchangeRate {
     pub price: f64,
 }
 
-#[derive(Debug, Insertable, Queryable)]
+#[derive(Debug, Insertable)]
 #[table_name = "stocks"]
 pub struct Stock {
     pub trade_date: DateTime<Utc>,

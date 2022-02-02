@@ -39,7 +39,7 @@ table! {
 
 table! {
     portfolios (id) {
-        id -> Text,
+        id -> Int4,
         trade_date -> Timestamptz,
         symbol -> Text,
         principal -> Float8,
