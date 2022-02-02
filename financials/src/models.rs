@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use std::error::Error;
-use crate::schema::{trades, assets, incomes, expenses};
+use crate::schema::{trades, assets, incomes, expenses, symbols};
 
 mod yymmdd_format {
     use chrono::{DateTime, Utc, TimeZone};
@@ -85,6 +85,16 @@ pub struct Expense {
     #[serde(rename(deserialize = "type"))]
     pub type_: String,
     pub amount: f64,
+}
+
+#[derive(Debug, Queryable, Insertable)]
+#[table_name = "symbols"]
+pub struct Symbol {
+    pub id: Option<i32>,
+    pub symbol_type: String,
+    pub symbol: String,
+    pub base_currency: Option<String>,
+    pub last_processed_date: Option<DateTime<Utc>>,
 }
 
 #[cfg(test)]

@@ -5,8 +5,6 @@ table! {
         #[sql_name = "type"]
         type_ -> Text,
         amount -> Float8,
-        created_at -> Timestamptz,
-        updated_at -> Timestamptz,
     }
 }
 
@@ -17,8 +15,6 @@ table! {
         #[sql_name = "type"]
         type_ -> Text,
         amount -> Float8,
-        created_at -> Timestamptz,
-        updated_at -> Timestamptz,
     }
 }
 
@@ -29,8 +25,16 @@ table! {
         #[sql_name = "type"]
         type_ -> Text,
         amount -> Float8,
-        created_at -> Timestamptz,
-        updated_at -> Timestamptz,
+    }
+}
+
+table! {
+    symbols (id) {
+        id -> Int4,
+        symbol_type -> Text,
+        symbol -> Text,
+        base_currency -> Nullable<Text>,
+        last_processed_date -> Nullable<Timestamptz>,
     }
 }
 
@@ -42,8 +46,6 @@ table! {
         price_each -> Float8,
         quantity -> Float8,
         trade_type -> Text,
-        created_at -> Timestamptz,
-        updated_at -> Timestamptz,
     }
 }
 
@@ -51,5 +53,6 @@ allow_tables_to_appear_in_same_query!(
     assets,
     expenses,
     incomes,
+    symbols,
     trades,
 );

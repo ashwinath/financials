@@ -8,3 +8,5 @@ DROP INDEX IF EXISTS ix_date_type_assets;
 
 DROP TABLE IF EXISTS expenses;
 DROP INDEX IF EXISTS ix_date_type_expenses;
+
+DROP TABLE IF EXISTS symbols;
