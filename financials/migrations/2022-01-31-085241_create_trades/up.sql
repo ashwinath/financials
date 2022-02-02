@@ -59,3 +59,14 @@ CREATE TABLE IF NOT EXISTS stocks (
 );
 
 CREATE UNIQUE INDEX uidx_stocks ON stocks(trade_date, symbol);
+
+CREATE TABLE IF NOT EXISTS portfolios (
+    id             text NOT NULL PRIMARY KEY,
+    trade_date     timestamptz NOT NULL,
+    symbol         text NOT NULL,
+    principal      double precision NOT NULL,
+    nav            double precision NOT NULL,
+    simple_returns double precision NOT NULL,
+    quantity       double precision NOT NULL
+);
+CREATE UNIQUE INDEX uidx_portfolios ON portfolios(trade_date, symbol);

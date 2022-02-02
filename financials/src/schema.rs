@@ -38,6 +38,18 @@ table! {
 }
 
 table! {
+    portfolios (id) {
+        id -> Text,
+        trade_date -> Timestamptz,
+        symbol -> Text,
+        principal -> Float8,
+        nav -> Float8,
+        simple_returns -> Float8,
+        quantity -> Float8,
+    }
+}
+
+table! {
     stocks (id) {
         id -> Int4,
         trade_date -> Timestamptz,
@@ -72,6 +84,7 @@ allow_tables_to_appear_in_same_query!(
     exchange_rates,
     expenses,
     incomes,
+    portfolios,
     stocks,
     symbols,
     trades,

@@ -1,6 +1,6 @@
 use alphavantage::{search_alphavantage_symbol, get_currency_history, get_stock_history};
 use config::Config;
-use models::{read_from_csv, Trade, Expense, Asset, Income, Symbol, SymbolWithId, ExchangeRate, Stock};
+use models::{read_from_csv, Trade, Expense, Asset, Income, Symbol, SymbolWithId, ExchangeRate, Stock, Portfolio};
 use schema::trades::dsl::trades;
 use schema::assets::dsl::assets;
 use schema::incomes::dsl::incomes;
@@ -8,6 +8,7 @@ use schema::expenses::dsl::expenses;
 use schema::symbols::dsl::symbols;
 use schema::exchange_rates::dsl::exchange_rates;
 use schema::stocks::dsl::stocks;
+use schema::portfolios::dsl::portfolios;
 use std::error::Error;
 use std::process;
 
@@ -15,8 +16,8 @@ use std::process;
 extern crate diesel;
 
 use crate::diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
-use chrono::{Utc, TimeZone};
-use diesel::{Connection, insert_into, delete};
+use chrono::{DateTime, Utc, TimeZone};
+use diesel::{Connection, insert_into, delete, update};
 use diesel::pg::PgConnection;
 use diesel_migrations::run_pending_migrations;
 
@@ -55,9 +56,19 @@ fn main() {
         process::exit(1);
     }
 
+    if let Err(e) = calculate_portfolio(&conn, &c.alphavantage_key) {
+        eprintln!("failed to calculate portfolio: {}", e);
+        process::exit(1);
+    }
+
     let end_time = Utc::now().time();
     let diff = end_time - start_time;
     println!("Total time taken to run is {} ms.", diff.num_milliseconds());
+}
+
+fn calculate_portfolio(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
+
+    Ok(())
 }
 
 fn process_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
@@ -71,10 +82,20 @@ fn process_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box
         let stock_history = get_stock_history(&stock_symbol.symbol, is_compact, alphavantage_key)?
             .results;
 
+        let mut last_processed_date: Option<DateTime<Utc>> = None;
         let mut stock_histories = Vec::new();
+
         for (date, value) in stock_history {
             let date = format!("{} 16:00:00", date);
             let date = Utc.datetime_from_str(&date, FORMAT)?;
+            last_processed_date = if last_processed_date.is_none() {
+                Some(date)
+            } else if last_processed_date.unwrap().lt(&date) {
+                Some(date)
+            } else {
+                last_processed_date
+            };
+
             let value = value.close;
             let er = Stock {
                 trade_date: date,
@@ -87,6 +108,10 @@ fn process_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box
         insert_into(stocks)
             .values(&stock_histories)
             .on_conflict_do_nothing()
+            .execute(conn)?;
+
+        update(symbols.filter(schema::symbols::dsl::id.eq(stock_symbol.id)))
+            .set(schema::symbols::dsl::last_processed_date.eq(last_processed_date))
             .execute(conn)?;
     }
     Ok(())
@@ -103,10 +128,20 @@ fn process_currencies(conn: &PgConnection, alphavantage_key: &str) -> Result<(),
         let history = get_currency_history(&currency.symbol, "SGD", is_compact, alphavantage_key)?
             .results;
 
+        let mut last_processed_date: Option<DateTime<Utc>> = None;
         let mut currency_history = Vec::new();
+
         for (date, value) in history {
             let date = format!("{} 16:00:00", date);
             let date = Utc.datetime_from_str(&date, FORMAT)?;
+            last_processed_date = if last_processed_date.is_none() {
+                Some(date)
+            } else if last_processed_date.unwrap().lt(&date) {
+                Some(date)
+            } else {
+                last_processed_date
+            };
+
             let value = value.close;
             let er = ExchangeRate {
                 trade_date: date,
@@ -119,6 +154,10 @@ fn process_currencies(conn: &PgConnection, alphavantage_key: &str) -> Result<(),
         insert_into(exchange_rates)
             .values(&currency_history)
             .on_conflict_do_nothing()
+            .execute(conn)?;
+
+        update(symbols.filter(schema::symbols::dsl::id.eq(currency.id)))
+            .set(schema::symbols::dsl::last_processed_date.eq(last_processed_date))
             .execute(conn)?;
     }
 

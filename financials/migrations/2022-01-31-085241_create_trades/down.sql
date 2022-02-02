@@ -16,3 +16,6 @@ DROP INDEX IF EXISTS uidx_exchange_rates;
 
 DROP TABLE IF EXISTS stocks;
 DROP INDEX IF EXISTS uidx_stocks;
+
+DROP TABLE IF EXISTS portfolios;
+DROP INDEX IF EXISTS uidx_portfolios;
