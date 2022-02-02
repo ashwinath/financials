@@ -1,4 +1,4 @@
-use alphavantage::{search_alphavantage_symbol, get_currency_history};
+use alphavantage::{search_alphavantage_symbol, get_currency_history, get_stock_history};
 use config::Config;
 use models::{read_from_csv, Trade, Expense, Asset, Income};
 use schema::trades::dsl::trades;
@@ -35,7 +35,7 @@ fn main() {
         "IWDA.LON",
         &c.alphavantage_key,
     );
-    println!("{:?}", search_result);
+    println!("{:?}", search_result.unwrap());
 
     let currency_history = get_currency_history(
         "USD",
@@ -44,6 +44,13 @@ fn main() {
         &c.alphavantage_key,
     );
     println!("{:?}", currency_history.unwrap().results.get("2022-02-02").unwrap());
+
+    let stock_history = get_stock_history(
+        "IWDA.LON",
+        true,
+        &c.alphavantage_key,
+    );
+    println!("{:?}", stock_history.unwrap().results.get("2022-02-01").unwrap());
 }
 
 fn load_data(conn: &PgConnection, c: &Config) -> Result<(), Box<dyn Error>> {

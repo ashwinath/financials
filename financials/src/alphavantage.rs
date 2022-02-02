@@ -5,9 +5,6 @@ use serde::{Deserialize, Deserializer};
 use serde_json::Value;
 use reqwest;
 
-//const FX_URL_FORMAT: &str = "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={}&to_symbol=SGD&apikey={}&outputsize={}";
-//const STOCK_URL_FORMAT: &str = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&apikey=%s&outputsize={}";
-
 #[derive(Debug, Clone)]
 pub struct AlphaVantageError {
     pub message: String,
@@ -63,8 +60,32 @@ pub fn get_currency_history(from_symbol: &str, to_symbol: &str, is_compact: bool
         "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={}&to_symbol={}&outputsize={}&apikey={}",
         from_symbol,
         to_symbol,
-        api_key,
         if is_compact {"compact"} else {"full"},
+        api_key,
+    );
+
+    call_alphavantage(&url)
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AlphaVantageStockResult {
+    #[serde(rename(deserialize = "Time Series (Daily)"))]
+    pub results: HashMap<String, AlphaVantageStockDailyResult>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AlphaVantageStockDailyResult {
+    #[serde(deserialize_with = "de_float")]
+    #[serde(rename(deserialize = "4. close"))]
+    pub close: f64,
+}
+
+pub fn get_stock_history(symbol: &str, is_compact: bool, api_key: &str) -> Result<AlphaVantageStockResult, Box<dyn Error>> {
+    let url = format!(
+        "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&outputsize={}&apikey={}",
+        symbol,
+        if is_compact {"compact"} else {"full"},
+        api_key,
     );
 
     call_alphavantage(&url)
@@ -107,6 +128,13 @@ mod tests {
     fn currency_history() {
         let result = get_currency_history("EUR", "USD", false, "demo").unwrap();
         let result = result.results.get("2022-02-02").unwrap();
+        assert!(result.close > 0.0);
+    }
+
+    #[test]
+    fn stock_history() {
+        let result = get_stock_history("IBM", false, "demo").unwrap();
+        let result = result.results.get("2022-02-01").unwrap();
         assert!(result.close > 0.0);
     }
 }
