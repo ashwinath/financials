@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use std::error::Error;
-use crate::schema::{trades, assets, incomes, expenses, symbols, exchange_rates};
+use crate::schema::{assets, exchange_rates, expenses, incomes, stocks, symbols, trades};
 
 mod yymmdd_format {
     use chrono::{DateTime, Utc, TimeZone};
@@ -112,6 +112,14 @@ pub struct Symbol {
 #[derive(Debug, Insertable, Queryable)]
 #[table_name = "exchange_rates"]
 pub struct ExchangeRate {
+    pub trade_date: DateTime<Utc>,
+    pub symbol: String,
+    pub price: f64,
+}
+
+#[derive(Debug, Insertable, Queryable)]
+#[table_name = "stocks"]
+pub struct Stock {
     pub trade_date: DateTime<Utc>,
     pub symbol: String,
     pub price: f64,
