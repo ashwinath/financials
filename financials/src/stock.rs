@@ -86,7 +86,7 @@ fn calculate_portfolio(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
 
         let mut all_portfolios: Vec<Portfolio> = Vec::new();
         let today = chrono::offset::Utc::now();
-        let tomorrow = Utc.ymd(today.year(), today.month(), today.day()).and_hms(16, 0, 0);
+        let tomorrow = Utc.ymd(today.year(), today.month(), today.day()).and_hms(8, 0, 0);
         while current_date < tomorrow {
             let exchange_rate = get_currency_rate(conn, current_date, &currency_symbol);
             let price = get_stock_price(conn, current_date, &symbol);
