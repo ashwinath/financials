@@ -17,7 +17,7 @@ mod yymmdd_format {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        let s = format!("{} 16:00:00", s);
+        let s = format!("{} 08:00:00", s);
         Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
     }
 }
@@ -160,7 +160,7 @@ mod tests {
         assert_eq!(result.price_each, 76.34);
         assert_eq!(result.quantity, 10.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-03-11 16:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2021-03-11 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.date_purchased, expected_date);
     }
@@ -175,7 +175,7 @@ mod tests {
         assert_eq!(result.type_, "CPF");
         assert_eq!(result.amount, 1000.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2020-03-31 16:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2020-03-31 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
     }
@@ -190,7 +190,7 @@ mod tests {
         assert_eq!(result.type_, "Base");
         assert_eq!(result.amount, 500.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-03-11 16:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2021-03-11 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
     }
@@ -205,7 +205,7 @@ mod tests {
         assert_eq!(result.type_, "Credit Card");
         assert_eq!(result.amount, 500.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2020-03-31 16:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2020-03-31 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
     }

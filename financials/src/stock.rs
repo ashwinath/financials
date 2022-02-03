@@ -173,7 +173,7 @@ fn process_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box
         let mut stock_histories = Vec::new();
 
         for (date, value) in stock_history {
-            let date = format!("{} 16:00:00", date);
+            let date = format!("{} 08:00:00", date);
             let date = Utc.datetime_from_str(&date, FORMAT)?;
             last_processed_date = if last_processed_date.is_none() {
                 Some(date)
@@ -220,7 +220,7 @@ fn process_currencies(conn: &PgConnection, alphavantage_key: &str) -> Result<(),
         let mut currency_history = Vec::new();
 
         for (date, value) in history {
-            let date = format!("{} 16:00:00", date);
+            let date = format!("{} 08:00:00", date);
             let date = Utc.datetime_from_str(&date, FORMAT)?;
             last_processed_date = if last_processed_date.is_none() {
                 Some(date)
