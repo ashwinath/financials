@@ -31,22 +31,25 @@ spec:
               value: /etc/financials/config.yaml
             resources:
               {{- toYaml .Values.financials.resources | nindent 16 }}
+            args:
+            - ./financials
+            - --database-url postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.postgresql.postgresqlDatabase }} \
+            - --alphavantage-key {{ .Values.financials.alphavantageApiKey }}
+            - --trades-csv /etc/trades/trades.csv
+            - --assets-csv /etc/assets/assets.csv
+            - --income-csv /etc/income/income.csv
+            - --expenses-csv /etc/expenses/expenses.csv
             volumeMounts:
-            - name: config
-              mountPath: /etc/financials
             - name: trades-csv
-              mountPath: {{ .Values.financials.tradeCSVDirectory }}
+              mountPath: /etc/trades
             - name: expenses-csv
-              mountPath: {{ .Values.financials.expensesCSVDirectory }}
+              mountPath: expenses
             - name: assets-csv
-              mountPath: {{ .Values.financials.assetsCSVDirectory }}
+              mountPath: /etc/assets
             - name: income-csv
-              mountPath: {{ .Values.financials.incomeCSVDirectory }}
+              mountPath: /etc/income
           restartPolicy: OnFailure
           volumes:
-          - name: config
-            secret:
-              secretName: {{ template "financials.fullname" .}}-config
           - name: trades-csv
             configMap:
               name: {{ .Release.Name }}-trades-csv
