@@ -1,6 +1,7 @@
 financials:
   # -- cron schedule
   cronSchedule: "0 */4 * * *"
+  alphavantageApiKey: secret
   image:
     # -- Respository of the image.
     repository: ghcr.io/ashwinath/financials
@@ -21,10 +22,6 @@ financials:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
-  migrate:
-    image:
-      # -- migrate/migrate image tag for db migrations
-      tag: v4.15.0
 
   financialsGrafana:
     image:
@@ -38,17 +35,10 @@ financials:
     # -- URL and port of the grafana site
     endpoint: www.example.com:3000
 
-
-  # -- folder containing the csv files
-  tradeCSVDirectory: /etc/trades
-
   # -- CSV values for the trades
   trades: |-
     date_purchased,symbol,trade_type,price_each,quantity
     2021-03-11,IWDA.LON,buy,76.34,10
-
-  # -- folder containing the expenses directories
-  expensesCSVDirectory: /etc/expenses
 
   # -- CSV values for the expenses
   expenses: |-
@@ -56,9 +46,6 @@ financials:
     2020-03-31,Credit Card,500
     2020-03-31,Reimbursement,-200
     2020-03-31,Tithe,800
-
-  # -- folder containing the assets directories
-  assetsCSVDirectory: /etc/assets
 
   # -- CSV values for the assets
   assets: |-
@@ -68,32 +55,11 @@ financials:
     2020-03-31,Mortgage,-40000
     2020-03-31,Investments,20000
 
-  # -- folder containing the income directories
-  incomeCSVDirectory: /etc/income
-
   # -- CSV values for the income
   income: |-
     date,type,amount
     2021-03-11,Base,500
     2021-03-11,Bonus,200
-
-  # -- Config for financials api, see api/config.yaml
-  config:
-    Database:
-      # TODO: Allow dynamic host
-      Host: <release name>-postgresql.<namespace>.svc.cluster.local
-      Port: 5432
-      User: postgres
-      Password: password
-      Name: postgres
-      TimeZone: Asia/Singapore
-      BatchInsertSize: 100
-
-    AlphaVantageAPIKey: test
-    TradesCSVFile: /etc/trades/trades.csv
-    ExpensesCSVFile: /etc/expenses/expenses.csv
-    AssetsCSVFile: /etc/assets/assets.csv
-    IncomeCSVFile: /etc/income/income.csv
 
 postgresql:
   # -- Resources requests and limits for the database

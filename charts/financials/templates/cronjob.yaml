@@ -33,17 +33,23 @@ spec:
               {{- toYaml .Values.financials.resources | nindent 16 }}
             args:
             - ./financials
-            - --database-url postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.postgresql.postgresqlDatabase }} \
-            - --alphavantage-key {{ .Values.financials.alphavantageApiKey }}
-            - --trades-csv /etc/trades/trades.csv
-            - --assets-csv /etc/assets/assets.csv
-            - --income-csv /etc/income/income.csv
-            - --expenses-csv /etc/expenses/expenses.csv
+            - --database-url
+            - postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.postgresql.postgresqlDatabase }}
+            - --alphavantage-key
+            - {{ .Values.financials.alphavantageApiKey }}
+            - --trades-csv
+            - /etc/trades/trades.csv
+            - --assets-csv
+            - /etc/assets/assets.csv
+            - --income-csv
+            - /etc/income/income.csv
+            - --expenses-csv
+            - /etc/expenses/expenses.csv
             volumeMounts:
             - name: trades-csv
               mountPath: /etc/trades
             - name: expenses-csv
-              mountPath: expenses
+              mountPath: /etc/expenses
             - name: assets-csv
               mountPath: /etc/assets
             - name: income-csv
