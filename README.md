@@ -6,7 +6,7 @@ Financials is a way to track your financial independence track in Singapore's co
 
 ## Feature roadmap
 
-This list is not exhaustive but a wishlist that I would work on when I'm free. Mostly credit to this [link](https://www.reddit.com/r/singaporefi/comments/p9p668/the_vital_ratios_to_track_on_your_journey_to/)
+This list is not exhaustive but a wishlist that I would work on when I'm free. Mostly credit to this [link](https://www.reddit.com/r/singaporefi/comments/p9p668/the_vital_ratios_to_track_on_your_journey_to/).
 
 - [x] Stock Portfolio
 - [x] Monthly expenditure
@@ -36,11 +36,7 @@ A sample `values.yaml` may look something like this, with all the trade informat
 
 ```yaml
 financials:
-  config:
-    AlphaVantageAPIKey: yourAlphaVantageAPIKeyHere
-    Database:
-      Host: financials-postgresql.financials.svc.cluster.local
-      Password: somePasswordHere
+  alphavantageAPIKey: yourAlphaVantageAPIKeyHere
 
   financialsGrafana:
     apiKey: yourAPIKeyHere
