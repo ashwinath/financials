@@ -1,4 +1,6 @@
 FROM docker.io/bitnami/minideb:buster
+LABEL org.opencontainers.image.authors="ashwinath@hotmail.com"
+LABEL org.opencontainers.image.source https://github.com/ashwinath/financials
 
 COPY --from=bitnami/jsonnet:0.17.0 /opt/bitnami/jsonnet/bin/jsonnet /usr/bin/jsonnet
 RUN apt update && apt install -y curl bash jq
