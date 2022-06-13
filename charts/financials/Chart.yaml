@@ -7,4 +7,4 @@ version: 2.0.0
 dependencies:
 - name: postgresql
   version: 10.12.4
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami
