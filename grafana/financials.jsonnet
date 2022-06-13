@@ -328,6 +328,25 @@ local expenses = createPanel(
   stack=true,
 );
 
+local savingsRate = createPanel(
+  name='Savings Rate',
+  unit='percentunit',
+  query='WITH expenditure AS (
+  select date_trunc(\'month\', transaction_date) as time, sum(amount) as amount from expenses where $__timeFilter(transaction_date) group by time
+),
+income as (
+  select date_trunc(\'month\', transaction_date) as time, sum(amount) as amount from incomes where $__timeFilter(transaction_date) and type in (\'base\', \'base_bonus\') group by time
+)
+SELECT
+  expenditure.time AS "time",
+  (1 - (expenditure.amount / income.amount)) as savings_rate
+FROM expenditure inner join income on income.time = expenditure.time
+WHERE $__timeFilter(expenditure.time)
+ORDER BY expenditure.time;',
+  legend_show=true,
+  stack=true,
+);
+
 dashboard.new(
   'Financials',
   schemaVersion=16,
@@ -354,6 +373,10 @@ dashboard.new(
 .addPanel(
   expenses,
   gridPos={ h: 8, w: 12, x: 0, y: 9 },
+)
+.addPanel(
+  savingsRate,
+  gridPos={ h: 8, w: 12, x: 12, y: 1 },
 )
 // CURRENT STATE
 .addPanel(
