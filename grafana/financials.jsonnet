@@ -338,7 +338,7 @@ income as (
   select date_trunc(\'month\', transaction_date) as time, sum(amount) as amount from incomes where $__timeFilter(transaction_date) and type in (\'base\', \'base_bonus\') group by time
 )
 SELECT
-  expenditure.time AS "time",
+  expenditure.time + interval \'1 month\' - interval \'1 day\' AS "time",
   (1 - (expenditure.amount / income.amount)) as savings_rate
 FROM expenditure inner join income on income.time = expenditure.time
 WHERE $__timeFilter(expenditure.time)
