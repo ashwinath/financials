@@ -271,14 +271,47 @@ local netAssets = createPanel(
   unit='currencyUSD',
   query='SELECT
     transaction_date as "time",
-    type,
-    amount
+    SUM(amount) as "Amount"
   FROM assets
   WHERE
     $__timeFilter(transaction_date)
-  group by transaction_date,type, amount
+  group by transaction_date
   order by transaction_date',
   legend_show=false,
+  stack=true,
+);
+
+local liquidAssets = createPanel(
+  name='Net Liquid Assets',
+  unit='currencyUSD',
+  query='SELECT
+    transaction_date as "time",
+    type,
+    amount AS "Amount"
+  FROM assets
+  WHERE
+    $__timeFilter(transaction_date)
+    AND type IN (\'Bank\', \'Investments\')
+  group by transaction_date, type, amount
+  order by transaction_date',
+  legend_show=true,
+  stack=true,
+);
+
+local nonLiquidAssets = createPanel(
+  name='Net Illiquid Assets',
+  unit='currencyUSD',
+  query='SELECT
+    transaction_date as "time",
+    type,
+    amount AS "Amount"
+  FROM assets
+  WHERE
+    $__timeFilter(transaction_date)
+    AND type IN (\'OA\', \'SA\', \'Medisave\', \'SRS\')
+  group by transaction_date, type, amount
+  order by transaction_date',
+  legend_show=true,
   stack=true,
 );
 
@@ -288,7 +321,7 @@ local salary = createPanel(
   query='SELECT
     transaction_date as "time",
     type,
-    amount
+    amount AS "Amount"
   FROM incomes
   WHERE
     $__timeFilter(transaction_date)
@@ -316,7 +349,7 @@ local expenses = createPanel(
   SELECT
       transaction_date as "time",
       type,
-      amount
+      amount AS "Amount"
   FROM expenses
   WHERE
       $__timeFilter(transaction_date)
@@ -332,14 +365,14 @@ local savingsRate = createPanel(
   name='Savings Rate',
   unit='percentunit',
   query='WITH expenditure AS (
-  select date_trunc(\'month\', transaction_date) as time, sum(amount) as amount from expenses where $__timeFilter(transaction_date) group by time
+  select date_trunc(\'month\', transaction_date) as time, sum(amount) as Amount from expenses where $__timeFilter(transaction_date) group by time
 ),
 income as (
-  select date_trunc(\'month\', transaction_date) as time, sum(amount) as amount from incomes where $__timeFilter(transaction_date) and type in (\'base\', \'base_bonus\') group by time
+  select date_trunc(\'month\', transaction_date) as time, sum(amount) as Amount from incomes where $__timeFilter(transaction_date) and type in (\'Base\', \'Base Bonus\') group by time
 )
 SELECT
   expenditure.time + interval \'1 month\' - interval \'1 day\' AS "time",
-  (1 - (expenditure.amount / income.amount)) as savings_rate
+  (1 - (expenditure.amount / income.amount)) as \"Savings Rate\"
 FROM expenditure inner join income on income.time = expenditure.time
 WHERE $__timeFilter(expenditure.time)
 ORDER BY expenditure.time;',
@@ -362,21 +395,32 @@ dashboard.new(
   ),
   gridPos={ h: 1, w: 12, x: 0, y: 0 },
 )
+# Assets
 .addPanel(
   netAssets,
-  gridPos={ h: 8, w: 12, x: 0, y: 1 },
+  gridPos={ h: 8, w: 8, x: 0, y: 1 },
 )
 .addPanel(
+  liquidAssets,
+  gridPos={ h: 8, w: 8, x: 8, y: 1 },
+)
+.addPanel(
+  nonLiquidAssets,
+  gridPos={ h: 8, w: 8, x: 16, y: 1 },
+)
+
+# Salary/Expenses Information
+.addPanel(
   salary,
-  gridPos={ h: 8, w: 12, x: 12, y: 1 },
+  gridPos={ h: 8, w: 8, x: 0, y: 9 },
 )
 .addPanel(
   expenses,
-  gridPos={ h: 8, w: 12, x: 0, y: 9 },
+  gridPos={ h: 8, w: 8, x: 8, y: 9 },
 )
 .addPanel(
   savingsRate,
-  gridPos={ h: 8, w: 12, x: 12, y: 1 },
+  gridPos={ h: 8, w: 8, x: 16, y: 9 },
 )
 // CURRENT STATE
 .addPanel(
