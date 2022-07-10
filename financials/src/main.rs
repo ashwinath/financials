@@ -5,6 +5,7 @@ use schema::assets::dsl::assets;
 use schema::incomes::dsl::incomes;
 use schema::expenses::dsl::expenses;
 use stock::calculate_stocks;
+use asset::populate_investments;
 use std::error::Error;
 use std::process;
 
@@ -16,6 +17,7 @@ use diesel::{Connection, insert_into, delete, RunQueryDsl};
 use diesel::pg::PgConnection;
 use diesel_migrations::run_pending_migrations;
 
+mod asset;
 mod config;
 mod models;
 mod schema;
@@ -34,6 +36,11 @@ fn main() {
 
     if let Err(e) = calculate_stocks(&conn, &c.alphavantage_key) {
         eprintln!("failed to load process stocks: {}", e);
+        process::exit(1);
+    }
+
+    if let Err(e) = populate_investments(&conn) {
+        eprintln!("failed to load populate investments into assets: {}", e);
         process::exit(1);
     }
 

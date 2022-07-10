@@ -12,7 +12,7 @@ This list is not exhaustive but a wishlist that I would work on when I'm free. M
 - [x] Monthly expenditure
 - [x] Income
 - [x] Total Net assets
-- [ ] Automatic detection of investment amount (right now it is manually keyed in by user)
+- [x] Automatic detection of investment amount (right now it is manually keyed in by user)
 - [ ] Liabilities
 - [ ] Financial Independence Quotient
 
