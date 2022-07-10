@@ -152,15 +152,15 @@ mod tests {
     #[test]
     fn parse_trades_csv() {
         let result: Vec<Trade> = read_from_csv("./sample/trades.csv").unwrap();
-        assert_eq!(result.len(), 1);
+        assert_eq!(result.len(), 12);
 
         let result = &result[0];
-        assert_eq!(result.symbol, "IWDA.LON");
+        assert_eq!(result.symbol, "CSPX.LON");
         assert_eq!(result.trade_type, "buy");
-        assert_eq!(result.price_each, 76.34);
-        assert_eq!(result.quantity, 10.0);
+        assert_eq!(result.price_each, 446.12);
+        assert_eq!(result.quantity, 2.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-03-11 08:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2021-08-19 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.date_purchased, expected_date);
     }
@@ -168,14 +168,14 @@ mod tests {
     #[test]
     fn parse_assets_csv() {
         let result: Vec<Asset> = read_from_csv("./sample/assets.csv").unwrap();
-        assert_eq!(result.len(), 4);
+        assert_eq!(result.len(), 48);
 
         // Asserting the first row should be good enough
         let result = &result[0];
-        assert_eq!(result.type_, "CPF");
-        assert_eq!(result.amount, 1000.0);
+        assert_eq!(result.type_, "Bank");
+        assert_eq!(result.amount, 10000.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2020-03-31 08:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2021-08-01 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
     }
@@ -183,14 +183,14 @@ mod tests {
     #[test]
     fn parse_incomes_csv() {
         let result: Vec<Income> = read_from_csv("./sample/income.csv").unwrap();
-        assert_eq!(result.len(), 2);
+        assert_eq!(result.len(), 26);
 
         // Asserting the first row should be good enough
         let result = &result[0];
         assert_eq!(result.type_, "Base");
-        assert_eq!(result.amount, 500.0);
+        assert_eq!(result.amount, 5000.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-03-11 08:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2021-08-05 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
     }
@@ -198,14 +198,14 @@ mod tests {
     #[test]
     fn parse_expenses_csv() {
         let result: Vec<Expense> = read_from_csv("./sample/expenses.csv").unwrap();
-        assert_eq!(result.len(), 3);
+        assert_eq!(result.len(), 44);
 
         // Asserting the first row should be good enough
         let result = &result[0];
         assert_eq!(result.type_, "Credit Card");
-        assert_eq!(result.amount, 500.0);
+        assert_eq!(result.amount, 1000.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2020-03-31 08:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2021-08-31 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
     }

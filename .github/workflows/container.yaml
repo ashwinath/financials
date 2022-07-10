@@ -9,11 +9,20 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io/ashwinath
+      RUST_VERSION: 1.62.0
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
+    - name: Install Rust ${{ env.RUST_VERSION }}
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: ${{ env.RUST_VERSION }}
+        default: true
+    - name: Run cargo test
+      working-directory: financials
+      run: make test
     - name: Setup GitHub Container Registry
       run: echo ${{ secrets.GHCR_TOKEN }} | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
     - name: Build and push

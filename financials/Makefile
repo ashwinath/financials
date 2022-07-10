@@ -1,6 +1,9 @@
 commit=$(shell git rev-parse HEAD)
 all: build push
 
+test:
+	cargo test
+
 build:
 	docker build -t $(REGISTRY)/financials:$(commit) -t $(REGISTRY)/financials:latest .
 
