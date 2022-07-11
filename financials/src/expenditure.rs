@@ -29,7 +29,6 @@ pub fn calculate_average_expenditure(conn: &PgConnection) -> Result<(), Box<dyn 
 
     // Start from 1 year later.
     current_date = shift_months(current_date, WINDOW_PERIOD);
-    println!("{:?}", current_date);
     let tomorrow = chrono::offset::Utc::now() + Duration::days(1);
 
     let mut all_average_expenditures: Vec<AverageExpenditure> = Vec::new();
@@ -52,7 +51,6 @@ pub fn calculate_average_expenditure(conn: &PgConnection) -> Result<(), Box<dyn 
 
         current_date = get_last_day_of_month(shift_months(current_date, 1));
     }
-    println!("{:?}", all_average_expenditures);
     insert_into(average_expenditures)
         .values(all_average_expenditures)
         .execute(conn)?;

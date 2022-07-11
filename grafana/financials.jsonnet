@@ -380,11 +380,75 @@ ORDER BY expenditure.time;',
   stack=true,
 );
 
+local emergencyFunds = createPanel(
+  name='Emergency Funds',
+  unit='Months',
+  query="WITH avg_exp AS (
+    select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
+),
+bank AS (
+    select transaction_date, amount from assets where type = 'Bank'
+)
+select
+    a.expense_date as \"time\",
+    b.amount / a.amount as \"months\"
+from
+    avg_exp a inner join bank b on a.expense_date = b.transaction_date
+WHERE $__timeFilter(a.expense_date)
+ORDER BY a.expense_date;",
+  legend_show=false,
+  stack=true,
+);
+
+local runway = createPanel(
+  name='Runway Based on 70% Equity + Bank',
+  unit='Months',
+  query="WITH avg_exp AS (
+    select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
+),
+bank AS (
+    select transaction_date, amount from assets where type = 'Bank'
+),
+equity AS (
+    select transaction_date, amount from assets where type = 'Investments'
+)
+select
+    a.expense_date as \"time\",
+    (b.amount + (c.amount * 0.7)) / a.amount as \"months\"
+from
+    avg_exp a inner join bank b on a.expense_date = b.transaction_date
+    inner join equity c on a.expense_date = c.transaction_date
+WHERE $__timeFilter(a.expense_date)
+ORDER BY a.expense_date;",
+  legend_show=false,
+  stack=true,
+);
+
+local fiQuotient = createPanel(
+  name='Financial Independence Quotient (3% Withdrawal)',
+  unit='percentunit',
+  query="WITH avg_exp AS (
+    select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
+),
+equity AS (
+    select transaction_date, amount from assets where type = 'Investments'
+)
+select
+    a.expense_date as \"time\",
+    (0.03 * c.amount) / (a.amount * 12) as \"quotient\"
+from
+    avg_exp a inner join equity c on a.expense_date = c.transaction_date
+WHERE $__timeFilter(a.expense_date)
+ORDER BY a.expense_date;",
+  legend_show=false,
+  stack=true,
+);
+
 dashboard.new(
   'Financials',
   schemaVersion=16,
   tags=['financials'],
-  time_from='now-90d',
+  time_from='now-1y',
   editable=true,
   graphTooltip='shared_tooltip',
 )
@@ -422,32 +486,47 @@ dashboard.new(
   savingsRate,
   gridPos={ h: 8, w: 8, x: 16, y: 9 },
 )
-// CURRENT STATE
+
+# FI Ratios
+.addPanel(
+  emergencyFunds,
+  gridPos={ h: 8, w: 8, x: 0, y: 17 },
+)
+.addPanel(
+  runway,
+  gridPos={ h: 8, w: 8, x: 8, y: 17 },
+)
+.addPanel(
+  fiQuotient,
+  gridPos={ h: 8, w: 8, x: 16, y: 17 },
+)
+
+// Current State
 .addPanel(
   row.new(
     title="Current Investments"
   ),
-  gridPos={ h: 1, w: 12, x: 0, y: 17 },
+  gridPos={ h: 1, w: 12, x: 0, y: 25 },
 )
 .addPanel(
   currentStateTable,
-  gridPos={ h: 8, w: 10, x: 0, y: 18 },
+  gridPos={ h: 8, w: 10, x: 0, y: 26 },
 )
 .addPanel(
   portfolioPieChart,
-  gridPos={ h: 8, w: 6, x: 10, y: 18 },
+  gridPos={ h: 8, w: 6, x: 10, y: 26 },
 )
 .addPanel(
   currentNAV,
-  gridPos={ h: 4, w: 4, x: 16, y: 18 },
+  gridPos={ h: 4, w: 4, x: 16, y: 26 },
 )
 .addPanel(
   currentPrincipal,
-  gridPos={ h: 4, w: 4, x: 20, y: 18 },
+  gridPos={ h: 4, w: 4, x: 20, y: 26 },
 )
 .addPanel(
   currentSimpleReturns,
-  gridPos={ h: 4, w: 4, x: 16, y: 22 },
+  gridPos={ h: 4, w: 4, x: 16, y: 30 },
 )
 
 // PERFORMANCE
@@ -455,21 +534,21 @@ dashboard.new(
   row.new(
     title="Investment Historical Performance"
   ),
-  gridPos={ h: 1, w: 12, x: 0, y: 23 },
+  gridPos={ h: 1, w: 12, x: 0, y: 31 },
 )
 .addPanel(
   portfolioSimpleReturns,
-  gridPos={ h: 8, w: 12, x: 0, y: 24 },
-)
-.addPanel(
-  portfolioNAV,
-  gridPos={ h: 8, w: 12, x: 12, y: 24 },
-)
-.addPanel(
-  simpleReturns,
   gridPos={ h: 8, w: 12, x: 0, y: 32 },
 )
 .addPanel(
-  nav,
+  portfolioNAV,
   gridPos={ h: 8, w: 12, x: 12, y: 32 },
+)
+.addPanel(
+  simpleReturns,
+  gridPos={ h: 8, w: 12, x: 0, y: 40 },
+)
+.addPanel(
+  nav,
+  gridPos={ h: 8, w: 12, x: 12, y: 40 },
 )
