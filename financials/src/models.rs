@@ -2,7 +2,17 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use std::error::Error;
-use crate::schema::{assets, exchange_rates, expenses, incomes, stocks, symbols, trades, portfolios};
+use crate::schema::{
+    assets,
+    average_expenditures,
+    exchange_rates,
+    expenses,
+    incomes,
+    stocks,
+    symbols,
+    trades,
+    portfolios,
+};
 
 mod yymmdd_format {
     use chrono::{DateTime, Utc, TimeZone};
@@ -142,6 +152,14 @@ pub struct Portfolio {
     pub nav: f64,
     pub simple_returns: f64,
     pub quantity: f64,
+}
+
+#[derive(Debug, Insertable)]
+#[table_name = "average_expenditures"]
+pub struct AverageExpenditure {
+    pub id: Option<i32>,
+    pub expense_date: DateTime<Utc>,
+    pub amount: f64,
 }
 
 #[cfg(test)]

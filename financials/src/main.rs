@@ -6,6 +6,7 @@ use schema::incomes::dsl::incomes;
 use schema::expenses::dsl::expenses;
 use stock::calculate_stocks;
 use asset::populate_investments;
+use expenditure::calculate_average_expenditure;
 use std::error::Error;
 use std::process;
 
@@ -19,6 +20,7 @@ use diesel_migrations::run_pending_migrations;
 
 mod asset;
 mod config;
+mod expenditure;
 mod models;
 mod schema;
 mod stock;
@@ -41,6 +43,11 @@ fn main() {
 
     if let Err(e) = populate_investments(&conn) {
         eprintln!("failed to load populate investments into assets: {}", e);
+        process::exit(1);
+    }
+
+    if let Err(e) = calculate_average_expenditure(&conn) {
+        eprintln!("failed to load calculate average expenditure: {}", e);
         process::exit(1);
     }
 

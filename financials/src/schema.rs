@@ -9,6 +9,14 @@ table! {
 }
 
 table! {
+    average_expenditures (id) {
+        id -> Int4,
+        expense_date -> Timestamptz,
+        amount -> Float8,
+    }
+}
+
+table! {
     exchange_rates (id) {
         id -> Int4,
         trade_date -> Timestamptz,
@@ -81,6 +89,7 @@ table! {
 
 allow_tables_to_appear_in_same_query!(
     assets,
+    average_expenditures,
     exchange_rates,
     expenses,
     incomes,
