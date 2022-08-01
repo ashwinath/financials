@@ -7,6 +7,7 @@ use crate::models::AverageExpenditure;
 use diesel::dsl::sum;
 use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl};
 use diesel::pg::PgConnection;
+use diesel::pg::upsert::excluded;
 
 const WINDOW_PERIOD: i32 = 6;
 
@@ -53,6 +54,13 @@ pub fn calculate_average_expenditure(conn: &PgConnection) -> Result<(), Box<dyn 
     }
     insert_into(average_expenditures)
         .values(all_average_expenditures)
+        .on_conflict(crate::schema::average_expenditures::expense_date)
+        .do_update()
+        .set(
+            crate::schema::average_expenditures::amount.eq(
+                excluded(crate::schema::average_expenditures::amount)
+            )
+        )
         .execute(conn)?;
 
     Ok(())
