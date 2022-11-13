@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       REGISTRY: ghcr.io/ashwinath
-      RUST_VERSION: 1.62.0
+      RUST_VERSION: 1.65.0
     steps:
     - name: Checkout
       uses: actions/checkout@v2

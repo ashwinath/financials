@@ -82,7 +82,7 @@ pub struct AlphaVantageStockDailyResult {
 
 pub fn get_stock_history(symbol: &str, is_compact: bool, api_key: &str) -> Result<AlphaVantageStockResult, Box<dyn Error>> {
     let url = format!(
-        "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&outputsize={}&apikey={}",
+        "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={}&outputsize={}&apikey={}",
         symbol,
         if is_compact {"compact"} else {"full"},
         api_key,

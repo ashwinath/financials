@@ -1,4 +1,4 @@
-FROM rust:1.62.0-slim as builder
+FROM rust:1.65.0-slim as builder
 LABEL org.opencontainers.image.authors="ashwinath@hotmail.com"
 LABEL org.opencontainers.image.source https://github.com/ashwinath/financials
 
