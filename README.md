@@ -14,7 +14,7 @@ This list is not exhaustive but a wishlist that I would work on when I'm free. M
 - [x] Total Net assets
 - [x] Automatic detection of investment amount
 - [x] Financial Independence Quotient
-- [ ] Liabilities
+- [ ] Mortgage
 
 
 ## Installing
@@ -73,3 +73,49 @@ postgresql:
     storageClass: openebs-hostpath
     size: 10Gi
 ```
+
+## Classification of data
+
+### Assets
+
+There are three main graphs here; "Net Assets", "Net Liquid Assets" and "Net Illiquid Assets". There is integration with investment data here. The asset liquidity are as follows.
+
+CSV file: `income.csv`
+
+| Asset Class           | Liquidity | Autofilled | Remarks                                                |
+| --------------------- | --------- | ---------- | ------------------------------------------------------ |
+| Bank                  | Liquid    | false      | No easy API to retrieve information                    |
+| Investments           | Liquid    | true       | Determined from trade date                             |
+| SRS                   | Illiquid  | false      | No easy API to SRS investments                         |
+| Ordinary Account (OA) | Illiquid  | false      | Might have to check if there are APIs for CPF/Singpass |
+| Special Account (SA)  | Illiquid  | false      | Might have to check if there are APIs for CPF/Singpass |
+| Medisave              | Illiquid  | false      | Might have to check if there are APIs for CPF/Singpass |
+
+### Expenses
+
+These values will be used in the calculation of average expense which is used in "Emergency Funds", "Runway Based on 70% Equity + Bank" and "Financial Independence Quotient (3% Withdrawal)".
+
+CSV file: `expenses.csv`
+
+| Expense Type    | Displayed | Used in calculation | Remarks                                     |
+| ----------------| --------- | ------------------- | ------------------------------------------- |
+| Credit Card     | true      | true                | Note that this value is post reimbursement  |
+| Reimbursement   | false     | true                | This value is merged with credit card       |
+| (Anything else) | true      | true                | Will be displayed as an individual line     |
+
+### Income
+
+These values will be used in the calculation of "Savings Rate".
+
+CSV file: `income.csv`
+
+| Salary Type          | Included in calculation | Remarks                                                  |
+| -------------------- | ----------------------- | -------------------------------------------------------- |
+| Base                 | true                    | This is your base pay                                    |
+| Base Bonus           | true                    | This is your base pay's bonus                            |
+| CPF                  | false                   | This is your CPF contribution, considered to be illiquid |
+| CPF.\*               | false                   | This is your CPF contribution, considered to be illiquid |
+
+### Trades
+
+These values will be used in the calculation of investments as well as it's breakdown. For now I am only going to support London Stock Exchange. US stock exchanges should also work but I have not tried it.
