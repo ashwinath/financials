@@ -186,7 +186,7 @@ mod tests {
     #[test]
     fn parse_assets_csv() {
         let result: Vec<Asset> = read_from_csv("./sample/assets.csv").unwrap();
-        assert_eq!(result.len(), 48);
+        assert_eq!(result.len(), 68);
 
         // Asserting the first row should be good enough
         let result = &result[0];
@@ -201,7 +201,7 @@ mod tests {
     #[test]
     fn parse_incomes_csv() {
         let result: Vec<Income> = read_from_csv("./sample/income.csv").unwrap();
-        assert_eq!(result.len(), 26);
+        assert_eq!(result.len(), 34);
 
         // Asserting the first row should be good enough
         let result = &result[0];
@@ -216,7 +216,7 @@ mod tests {
     #[test]
     fn parse_expenses_csv() {
         let result: Vec<Expense> = read_from_csv("./sample/expenses.csv").unwrap();
-        assert_eq!(result.len(), 44);
+        assert_eq!(result.len(), 65);
 
         // Asserting the first row should be good enough
         let result = &result[0];

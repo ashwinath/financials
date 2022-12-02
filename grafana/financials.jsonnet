@@ -188,7 +188,7 @@ local currentSimpleReturns = createStat(
   order by trade_date",
 );
 
-local createPanel(name, unit, query, legend_show, stack=false) =
+local createPanel(name, unit, query, legend_show, stack=false, points=false) =
   graphPanel.new(
     name,
     datasource='PostgreSQL',
@@ -197,7 +197,9 @@ local createPanel(name, unit, query, legend_show, stack=false) =
     fillGradient=4,
     linewidth=2,
     stack=stack,
-    nullPointMode='null as zero'
+    nullPointMode='null as zero',
+    points=points,
+    pointradius=5
   )
   .addTarget(
     sql.target(
@@ -354,6 +356,7 @@ local expenses = createPanel(
   WHERE
       $__timeFilter(transaction_date)
       AND type not in (\'Credit Card\', \'Reimbursement\')
+      AND type not like \'Special:%\'
   UNION select transaction_date as "time", \'Credit Card\' as type, amount from cc
   group by transaction_date, type, amount
   order by time',
@@ -361,11 +364,29 @@ local expenses = createPanel(
   stack=true,
 );
 
+local special_expenses = createPanel(
+  name='Special Expenses',
+  unit='currencyUSD',
+  query='SELECT
+      transaction_date as "time",
+      type,
+      amount AS "Amount"
+  FROM expenses
+  WHERE
+      $__timeFilter(transaction_date)
+      AND type like \'Special:%\'
+  group by transaction_date, type, amount
+  order by time',
+  legend_show=true,
+  stack=true,
+  points=true,
+);
+
 local savingsRate = createPanel(
   name='Savings Rate',
   unit='percentunit',
   query='WITH expenditure AS (
-  select date_trunc(\'month\', transaction_date) as time, sum(amount) as Amount from expenses where $__timeFilter(transaction_date) group by time
+  select date_trunc(\'month\', transaction_date) as time, sum(amount) as Amount from expenses where $__timeFilter(transaction_date) and type not like \'Special:%\' group by time
 ),
 income as (
   select date_trunc(\'month\', transaction_date) as time, sum(amount) as Amount from incomes where $__timeFilter(transaction_date) and type in (\'Base\', \'Base Bonus\') group by time
@@ -475,30 +496,46 @@ dashboard.new(
 
 # Salary/Expenses Information
 .addPanel(
-  salary,
-  gridPos={ h: 8, w: 8, x: 0, y: 9 },
+  row.new(
+    title="Inflow/Outflow"
+  ),
+  gridPos={ h: 1, w: 12, x: 0, y: 9 },
 )
 .addPanel(
-  expenses,
-  gridPos={ h: 8, w: 8, x: 8, y: 9 },
+  salary,
+  gridPos={ h: 8, w: 8, x: 0, y: 10 },
 )
 .addPanel(
   savingsRate,
-  gridPos={ h: 8, w: 8, x: 16, y: 9 },
+  gridPos={ h: 8, w: 8, x: 16, y: 10 },
+)
+.addPanel(
+  expenses,
+  gridPos={ h: 8, w: 8, x: 8, y: 10 },
+)
+.addPanel(
+  special_expenses,
+  gridPos={ h: 8, w: 8, x: 0, y: 18 },
 )
 
 # FI Ratios
 .addPanel(
+  row.new(
+    title="Financial Health"
+  ),
+  gridPos={ h: 1, w: 12, x: 0, y: 19 },
+)
+.addPanel(
   emergencyFunds,
-  gridPos={ h: 8, w: 8, x: 0, y: 17 },
+  gridPos={ h: 8, w: 8, x: 0, y: 20 },
 )
 .addPanel(
   runway,
-  gridPos={ h: 8, w: 8, x: 8, y: 17 },
+  gridPos={ h: 8, w: 8, x: 8, y: 20 },
 )
 .addPanel(
   fiQuotient,
-  gridPos={ h: 8, w: 8, x: 16, y: 17 },
+  gridPos={ h: 8, w: 8, x: 16, y: 20 },
 )
 
 // Current State
@@ -506,23 +543,23 @@ dashboard.new(
   row.new(
     title="Current Investments"
   ),
-  gridPos={ h: 1, w: 12, x: 0, y: 25 },
+  gridPos={ h: 1, w: 12, x: 0, y: 28 },
 )
 .addPanel(
   currentStateTable,
-  gridPos={ h: 8, w: 10, x: 0, y: 26 },
+  gridPos={ h: 8, w: 10, x: 0, y: 29 },
 )
 .addPanel(
   portfolioPieChart,
-  gridPos={ h: 8, w: 6, x: 10, y: 26 },
+  gridPos={ h: 8, w: 6, x: 10, y: 29 },
 )
 .addPanel(
   currentNAV,
-  gridPos={ h: 4, w: 4, x: 16, y: 26 },
+  gridPos={ h: 4, w: 4, x: 16, y: 29 },
 )
 .addPanel(
   currentPrincipal,
-  gridPos={ h: 4, w: 4, x: 20, y: 26 },
+  gridPos={ h: 4, w: 4, x: 20, y: 29 },
 )
 .addPanel(
   currentSimpleReturns,

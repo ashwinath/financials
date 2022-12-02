@@ -5,7 +5,7 @@ use std::error::Error;
 use crate::schema::expenses::dsl::expenses;
 use crate::models::AverageExpenditure;
 use diesel::dsl::sum;
-use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl};
+use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl, TextExpressionMethods};
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::excluded;
 
@@ -39,6 +39,7 @@ pub fn calculate_average_expenditure(conn: &PgConnection) -> Result<(), Box<dyn 
             .filter(crate::schema::expenses::transaction_date.gt(shift_months(current_date, -WINDOW_PERIOD)))
             .filter(crate::schema::expenses::transaction_date.le(current_date))
             .filter(crate::schema::expenses::type_.ne(String::from("Tax")))
+            .filter(crate::schema::expenses::type_.not_like(String::from("Special:%")))
             .first::<Option<f64>>(conn)?;
 
         if let Some(i) = yearly_expenditure {

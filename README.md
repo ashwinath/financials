@@ -97,11 +97,12 @@ These values will be used in the calculation of average expense which is used in
 
 CSV file: `expenses.csv`
 
-| Expense Type    | Displayed | Used in calculation | Remarks                                     |
-| ----------------| --------- | ------------------- | ------------------------------------------- |
-| Credit Card     | true      | true                | Note that this value is post reimbursement  |
-| Reimbursement   | false     | true                | This value is merged with credit card       |
-| (Anything else) | true      | true                | Will be displayed as an individual line     |
+| Expense Type    | Displayed | Used in calculation | Remarks                                                                                           |
+| ----------------| --------- | ------------------- | ------------------------------------------------------------------------------------------------- |
+| Credit Card     | true      | true                | Note that this value is post reimbursement                                                        |
+| Reimbursement   | false     | true                | This value is merged with credit card                                                             |
+| Special:.\*     | true      | false               | These are special one off purchases for special events that will not be used for average spending |
+| (Anything else) | true      | true                | Will be displayed as an individual line                                                           |
 
 ### Income
 
