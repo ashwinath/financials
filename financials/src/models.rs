@@ -143,6 +143,20 @@ pub struct MortgageSchedule {
     pub total_interest_left: f64,
 }
 
+#[derive(Debug, PartialEq, Deserialize, Queryable, Insertable)]
+#[table_name = "mortgage"]
+pub struct MortgageScheduleWithId {
+    pub id: i32,
+    #[serde(with = "yymmdd_format")]
+    pub date: DateTime<Utc>,
+    pub interest_paid: f64,
+    pub principal_paid: f64,
+    pub total_principal_paid: f64,
+    pub total_interest_paid: f64,
+    pub total_principal_left: f64,
+    pub total_interest_left: f64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

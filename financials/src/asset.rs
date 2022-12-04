@@ -2,8 +2,9 @@ use chrono::{DateTime, Utc, Datelike, TimeZone, Duration};
 use chronoutil::delta::shift_months;
 use crate::schema::assets::dsl::assets;
 use crate::schema::portfolios::dsl::portfolios;
+use crate::schema::mortgage::dsl::mortgage;
 use std::error::Error;
-use crate::models::Asset;
+use crate::models::{Asset, MortgageScheduleWithId};
 use diesel::pg::PgConnection;
 use diesel::dsl::sum;
 use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl};
@@ -53,6 +54,30 @@ pub fn populate_investments(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
 
     insert_into(assets)
         .values(&all_investments)
+        .execute(conn)?;
+
+    Ok(())
+}
+
+// Populates the assets of the principal paid in the mortgage
+pub fn populate_housing_value(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
+    let mortgages = mortgage.load::<MortgageScheduleWithId>(conn)?;
+    let house_assets: Vec<Asset> = mortgages.iter().map(|m| {
+        let date = Utc.ymd(
+            m.date.year(),
+            m.date.month(),
+            1,
+        ).and_hms(8, 0, 0);
+        Asset {
+            id: None,
+            transaction_date: date,
+            type_: String::from("House"),
+            amount: m.total_principal_paid,
+        }
+    }).collect();
+
+    insert_into(assets)
+        .values(&house_assets)
         .execute(conn)?;
 
     Ok(())

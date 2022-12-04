@@ -14,7 +14,7 @@ This list is not exhaustive but a wishlist that I would work on when I'm free. M
 - [x] Total Net assets
 - [x] Automatic detection of investment amount
 - [x] Financial Independence Quotient
-- [ ] Mortgage
+- [x] Mortgage
 
 
 ## Installing
@@ -90,6 +90,7 @@ CSV file: `income.csv`
 | Ordinary Account (OA) | Illiquid  | false      | Might have to check if there are APIs for CPF/Singpass |
 | Special Account (SA)  | Illiquid  | false      | Might have to check if there are APIs for CPF/Singpass |
 | Medisave              | Illiquid  | false      | Might have to check if there are APIs for CPF/Singpass |
+| House                 | Illiquid  | true       | Determined from mortgage schedule                      |
 
 ### Expenses
 
@@ -120,3 +121,7 @@ CSV file: `income.csv`
 ### Trades
 
 These values will be used in the calculation of investments as well as it's breakdown. For now I am only going to support London Stock Exchange. US stock exchanges should also work but I have not tried it.
+
+### Mortgage
+
+These values will be used in the calculation of mortgage repayments.

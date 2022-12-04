@@ -24,8 +24,6 @@ struct Mortgage {
     #[serde(with = "yymmdd_format")]
     pub mortgage_first_payment: DateTime<Utc>,
     pub mortgage_duration_in_years: i32,
-    #[serde(with = "yymmdd_format")]
-    pub mortgage_end_date: DateTime<Utc>,
     pub downpayments: Vec<Downpayment>,
     pub interest_rate_percentage: f64,
 }
@@ -283,10 +281,6 @@ mod tests {
                         "%Y-%m-%d %H:%M:%S"
                     ).unwrap(),
                     mortgage_duration_in_years: 25,
-                    mortgage_end_date: Utc.datetime_from_str(
-                        "2047-10-10 08:00:00",
-                        "%Y-%m-%d %H:%M:%S"
-                    ).unwrap(),
                     interest_rate_percentage: 2.6,
                     downpayments: vec!(
                         Downpayment {
