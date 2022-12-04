@@ -45,6 +45,8 @@ spec:
             - /etc/income/income.csv
             - --expenses-csv
             - /etc/expenses/expenses.csv
+            - --mortgage-yaml
+            - /etc/mortgage/mortgage.yaml
             volumeMounts:
             - name: trades-csv
               mountPath: /etc/trades
@@ -54,6 +56,8 @@ spec:
               mountPath: /etc/assets
             - name: income-csv
               mountPath: /etc/income
+            - name: mortgage-yaml
+              mountPath: /etc/mortgage
           restartPolicy: OnFailure
           volumes:
           - name: trades-csv
@@ -68,3 +72,6 @@ spec:
           - name: income-csv
             configMap:
               name: {{ .Release.Name }}-income-csv
+          - name: mortgage-yaml
+            configMap:
+              name: {{ .Release.Name }}-mortgage-yaml

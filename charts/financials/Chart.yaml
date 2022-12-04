@@ -2,7 +2,7 @@ apiVersion: v2
 name: financials
 description: Helm chart for financials
 type: application
-version: 2.0.0
+version: 2.1.0
 
 dependencies:
 - name: postgresql
