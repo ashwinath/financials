@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-trades-csv
+  name: {{ .Release.Name }}-mortgage-yaml
 data:
   mortgage.yaml: |-
 {{ .Values.financials.mortgage | indent 4 }}
