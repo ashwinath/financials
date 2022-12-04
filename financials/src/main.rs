@@ -1,12 +1,14 @@
 use config::Config;
-use models::{read_from_csv, Trade, Expense, Asset, Income};
+use models::{Trade, Expense, Asset, Income};
 use schema::trades::dsl::trades;
 use schema::assets::dsl::assets;
 use schema::incomes::dsl::incomes;
 use schema::expenses::dsl::expenses;
 use stock::calculate_stocks;
-use asset::populate_investments;
+use asset::{populate_investments, populate_housing_value};
 use expenditure::calculate_average_expenditure;
+use mortgage::generate_mortgage_schedule;
+use utils::read_from_csv;
 use std::error::Error;
 use std::process;
 
@@ -25,6 +27,8 @@ mod models;
 mod schema;
 mod stock;
 mod alphavantage;
+mod mortgage;
+mod utils;
 
 fn main() {
     let start_time = Utc::now().time();
@@ -48,6 +52,16 @@ fn main() {
 
     if let Err(e) = calculate_average_expenditure(&conn) {
         eprintln!("failed to load calculate average expenditure: {}", e);
+        process::exit(1);
+    }
+
+    if let Err(e) = generate_mortgage_schedule(&conn, &c.mortgage_yaml) {
+        eprintln!("failed to generate mortgage schedule: {}", e);
+        process::exit(1);
+    }
+
+    if let Err(e) = populate_housing_value(&conn) {
+        eprintln!("failed to generate mortgage schedule: {}", e);
         process::exit(1);
     }
 

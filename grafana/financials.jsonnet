@@ -310,7 +310,7 @@ local nonLiquidAssets = createPanel(
   FROM assets
   WHERE
     $__timeFilter(transaction_date)
-    AND type IN (\'OA\', \'SA\', \'Medisave\', \'SRS\')
+    AND type IN (\'OA\', \'SA\', \'Medisave\', \'SRS\', \'House\')
   group by transaction_date, type, amount
   order by transaction_date',
   legend_show=true,
@@ -465,6 +465,54 @@ ORDER BY a.expense_date;",
   stack=true,
 );
 
+local mortgage_payment = createPanel(
+  name='Mortgage Payment',
+  unit='currencyUSD',
+  query='SELECT
+    date as "time",
+    interest_paid as "Interest Paid",
+    principal_paid AS "Principal Paid"
+FROM mortgage
+WHERE
+    $__timeFilter(date)
+group by date, interest_paid, principal_paid
+order by time',
+  legend_show=true,
+  stack=true,
+);
+
+local mortgage_serviced = createPanel(
+  name='Mortgage serviced',
+  unit='currencyUSD',
+  query='SELECT
+    date as "time",
+    total_interest_paid as "Interest Left",
+    total_principal_paid AS "Principal Left"
+FROM mortgage
+WHERE
+    $__timeFilter(date)
+group by date, total_interest_paid, total_principal_paid
+order by time',
+  legend_show=true,
+  stack=true,
+);
+
+local mortgage_summary = createPanel(
+  name='Mortgage Summary',
+  unit='currencyUSD',
+  query='SELECT
+    date as "time",
+    total_interest_left as "Interest Left",
+    total_principal_left AS "Principal Left"
+FROM mortgage
+WHERE
+    $__timeFilter(date)
+group by date, total_interest_left, total_principal_left
+order by time',
+  legend_show=true,
+  stack=true,
+);
+
 dashboard.new(
   'Financials',
   schemaVersion=16,
@@ -506,16 +554,36 @@ dashboard.new(
   gridPos={ h: 8, w: 8, x: 0, y: 10 },
 )
 .addPanel(
-  savingsRate,
-  gridPos={ h: 8, w: 8, x: 16, y: 10 },
-)
-.addPanel(
   expenses,
   gridPos={ h: 8, w: 8, x: 8, y: 10 },
 )
 .addPanel(
+  savingsRate,
+  gridPos={ h: 8, w: 8, x: 16, y: 10 },
+)
+.addPanel(
   special_expenses,
   gridPos={ h: 8, w: 8, x: 0, y: 18 },
+)
+
+// Mortgage
+.addPanel(
+  row.new(
+    title="Mortgage"
+  ),
+  gridPos={ h: 1, w: 12, x: 0, y: 19 },
+)
+.addPanel(
+  mortgage_summary,
+  gridPos={ h: 8, w: 8, x: 8, y: 20 },
+)
+.addPanel(
+  mortgage_serviced,
+  gridPos={ h: 8, w: 8, x: 16, y: 20 },
+)
+.addPanel(
+  mortgage_payment,
+  gridPos={ h: 8, w: 8, x: 0, y: 28 },
 )
 
 # FI Ratios
@@ -523,19 +591,19 @@ dashboard.new(
   row.new(
     title="Financial Health"
   ),
-  gridPos={ h: 1, w: 12, x: 0, y: 19 },
+  gridPos={ h: 1, w: 12, x: 0, y: 29 },
 )
 .addPanel(
   emergencyFunds,
-  gridPos={ h: 8, w: 8, x: 0, y: 20 },
+  gridPos={ h: 8, w: 8, x: 0, y: 30 },
 )
 .addPanel(
   runway,
-  gridPos={ h: 8, w: 8, x: 8, y: 20 },
+  gridPos={ h: 8, w: 8, x: 8, y: 30 },
 )
 .addPanel(
   fiQuotient,
-  gridPos={ h: 8, w: 8, x: 16, y: 20 },
+  gridPos={ h: 8, w: 8, x: 16, y: 30 },
 )
 
 // Current State
@@ -543,27 +611,27 @@ dashboard.new(
   row.new(
     title="Current Investments"
   ),
-  gridPos={ h: 1, w: 12, x: 0, y: 28 },
+  gridPos={ h: 1, w: 12, x: 0, y: 31 },
 )
 .addPanel(
   currentStateTable,
-  gridPos={ h: 8, w: 10, x: 0, y: 29 },
+  gridPos={ h: 8, w: 10, x: 0, y: 32 },
 )
 .addPanel(
   portfolioPieChart,
-  gridPos={ h: 8, w: 6, x: 10, y: 29 },
+  gridPos={ h: 8, w: 6, x: 10, y: 32 },
 )
 .addPanel(
   currentNAV,
-  gridPos={ h: 4, w: 4, x: 16, y: 29 },
+  gridPos={ h: 4, w: 4, x: 16, y: 32 },
 )
 .addPanel(
   currentPrincipal,
-  gridPos={ h: 4, w: 4, x: 20, y: 29 },
+  gridPos={ h: 4, w: 4, x: 20, y: 32 },
 )
 .addPanel(
   currentSimpleReturns,
-  gridPos={ h: 4, w: 4, x: 16, y: 30 },
+  gridPos={ h: 4, w: 4, x: 16, y: 40 },
 )
 
 // PERFORMANCE
@@ -571,21 +639,21 @@ dashboard.new(
   row.new(
     title="Investment Historical Performance"
   ),
-  gridPos={ h: 1, w: 12, x: 0, y: 31 },
+  gridPos={ h: 1, w: 12, x: 0, y: 41 },
 )
 .addPanel(
   portfolioSimpleReturns,
-  gridPos={ h: 8, w: 12, x: 0, y: 32 },
+  gridPos={ h: 8, w: 12, x: 0, y: 42 },
 )
 .addPanel(
   portfolioNAV,
-  gridPos={ h: 8, w: 12, x: 12, y: 32 },
+  gridPos={ h: 8, w: 12, x: 12, y: 42 },
 )
 .addPanel(
   simpleReturns,
-  gridPos={ h: 8, w: 12, x: 0, y: 40 },
+  gridPos={ h: 8, w: 12, x: 0, y: 50 },
 )
 .addPanel(
   nav,
-  gridPos={ h: 8, w: 12, x: 12, y: 40 },
+  gridPos={ h: 8, w: 12, x: 12, y: 50 },
 )
