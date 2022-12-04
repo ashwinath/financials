@@ -15,6 +15,8 @@ pub struct Config {
     pub income_csv: String,
     #[clap(long)]
     pub trades_csv: String,
+    #[clap(long)]
+    pub mortgage_yaml: String,
 }
 
 impl Config {

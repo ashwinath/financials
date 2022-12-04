@@ -1,4 +1,6 @@
-table! {
+// @generated automatically by Diesel CLI.
+
+diesel::table! {
     assets (id) {
         id -> Int4,
         transaction_date -> Timestamptz,
@@ -8,7 +10,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     average_expenditures (id) {
         id -> Int4,
         expense_date -> Timestamptz,
@@ -16,7 +18,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     exchange_rates (id) {
         id -> Int4,
         trade_date -> Timestamptz,
@@ -25,7 +27,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     expenses (id) {
         id -> Int4,
         transaction_date -> Timestamptz,
@@ -35,7 +37,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     incomes (id) {
         id -> Int4,
         transaction_date -> Timestamptz,
@@ -45,7 +47,20 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
+    mortgage (id) {
+        id -> Int4,
+        date -> Timestamptz,
+        interest_paid -> Float8,
+        principal_paid -> Float8,
+        total_principal_paid -> Float8,
+        total_interest_paid -> Float8,
+        total_principal_left -> Float8,
+        total_interest_left -> Float8,
+    }
+}
+
+diesel::table! {
     portfolios (id) {
         id -> Int4,
         trade_date -> Timestamptz,
@@ -57,7 +72,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     stocks (id) {
         id -> Int4,
         trade_date -> Timestamptz,
@@ -66,7 +81,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     symbols (id) {
         id -> Int4,
         symbol_type -> Text,
@@ -76,7 +91,7 @@ table! {
     }
 }
 
-table! {
+diesel::table! {
     trades (id) {
         id -> Int4,
         date_purchased -> Timestamptz,
@@ -87,12 +102,13 @@ table! {
     }
 }
 
-allow_tables_to_appear_in_same_query!(
+diesel::allow_tables_to_appear_in_same_query!(
     assets,
     average_expenditures,
     exchange_rates,
     expenses,
     incomes,
+    mortgage,
     portfolios,
     stocks,
     symbols,

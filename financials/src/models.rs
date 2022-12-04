@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
-use std::error::Error;
 use crate::schema::{
     assets,
     average_expenditures,
@@ -12,42 +11,11 @@ use crate::schema::{
     symbols,
     trades,
     portfolios,
+    mortgage,
 };
 
-mod yymmdd_format {
-    use chrono::{DateTime, Utc, TimeZone};
-    use serde::{self, Deserialize, Deserializer};
+use crate::utils::yymmdd_format;
 
-    const FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
-
-    pub fn deserialize<'de, D>(
-        deserializer: D,
-    ) -> Result<DateTime<Utc>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        let s = format!("{} 08:00:00", s);
-        Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
-    }
-}
-
-pub fn read_from_csv<T>(csv: &str) -> Result<Vec<T>, Box<dyn Error>>
-    where
-    T: for<'de> serde::Deserialize<'de>,
-{
-
-    let mut rdr = csv::Reader::from_path(csv)?;
-
-    let mut data = Vec::new();
-
-    for result in rdr.deserialize() {
-        let record: T = result?;
-        data.push(record);
-    }
-
-    Ok(data)
-}
 #[derive(Debug, Deserialize, Queryable, Insertable)]
 #[table_name = "trades"]
 pub struct TradeWithId {
@@ -162,10 +130,24 @@ pub struct AverageExpenditure {
     pub amount: f64,
 }
 
+#[derive(Debug, PartialEq, Deserialize, Insertable)]
+#[table_name = "mortgage"]
+pub struct MortgageSchedule {
+    #[serde(with = "yymmdd_format")]
+    pub date: DateTime<Utc>,
+    pub interest_paid: f64,
+    pub principal_paid: f64,
+    pub total_principal_paid: f64,
+    pub total_interest_paid: f64,
+    pub total_principal_left: f64,
+    pub total_interest_left: f64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use chrono::{Utc, TimeZone};
+    use crate::utils::read_from_csv;
 
     #[test]
     fn parse_trades_csv() {
