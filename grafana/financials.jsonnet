@@ -482,12 +482,12 @@ order by time',
 );
 
 local mortgage_serviced = createPanel(
-  name='Mortgage serviced',
+  name='Mortgage Serviced',
   unit='currencyUSD',
   query='SELECT
     date as "time",
-    total_interest_paid as "Interest Left",
-    total_principal_paid AS "Principal Left"
+    total_interest_paid as "Total Interest Paid",
+    total_principal_paid AS "Total Principal Paid"
 FROM mortgage
 WHERE
     $__timeFilter(date)
