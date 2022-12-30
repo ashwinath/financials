@@ -59,6 +59,8 @@ pub fn populate_investments(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+const HOUSE_SPLIT_RATIO: f64 = 2.0;
+
 // Populates the assets of the principal paid in the mortgage
 pub fn populate_housing_value(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
     let mortgages = mortgage.load::<MortgageScheduleWithId>(conn)?;
@@ -72,7 +74,7 @@ pub fn populate_housing_value(conn: &PgConnection) -> Result<(), Box<dyn Error>>
             id: None,
             transaction_date: date,
             type_: String::from("House"),
-            amount: m.total_principal_paid,
+            amount: m.total_principal_paid / HOUSE_SPLIT_RATIO,
         }
     }).collect();
 
