@@ -85,24 +85,24 @@ pub fn populate_housing_value(conn: &PgConnection) -> Result<(), Box<dyn Error>>
         return Ok(());
     }
 
-    let first = house_assets.first().cloned().unwrap().transaction_date;
-    let mut current_date = Utc.ymd(first.year(), first.month(), 1).and_hms(8, 0, 0);
-
     let mut all_house_assets: Vec<Asset> = Vec::new();
-    for house_asset in house_assets.iter() {
-        let current_asset_date = house_asset.transaction_date;
-        while current_date < shift_months(current_asset_date, -1) {
-            current_date = shift_months(current_date, 1);
+    for counter in 0..house_assets.len() - 1 {
+        let house_asset = &house_assets[counter];
+
+        let mut current_date = house_asset.transaction_date;
+
+        let next_house_asset = &house_assets[counter + 1];
+
+        while current_date < next_house_asset.transaction_date {
             let asset = Asset {
                 id: None,
                 transaction_date: current_date.clone(),
                 type_: String::from("House"),
                 amount: house_asset.clone().amount,
             };
+            current_date = shift_months(current_date, 1);
             all_house_assets.push(asset);
         }
-        current_date = current_asset_date.clone();
-        all_house_assets.push(house_asset.clone());
     }
 
     insert_into(assets)
