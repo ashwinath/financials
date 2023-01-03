@@ -38,7 +38,7 @@ pub struct Trade {
     pub trade_type: String,
 }
 
-#[derive(Debug, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Deserialize, Queryable, Insertable, Clone)]
 #[table_name = "assets"]
 pub struct Asset {
     pub id: Option<i32>,
@@ -130,7 +130,7 @@ pub struct AverageExpenditure {
     pub amount: f64,
 }
 
-#[derive(Debug, PartialEq, Deserialize, Insertable)]
+#[derive(Debug, PartialEq, Deserialize, Insertable, Clone)]
 #[table_name = "mortgage"]
 pub struct MortgageSchedule {
     #[serde(with = "yymmdd_format")]

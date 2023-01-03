@@ -63,7 +63,9 @@ const HOUSE_SPLIT_RATIO: f64 = 2.0;
 
 // Populates the assets of the principal paid in the mortgage
 pub fn populate_housing_value(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
-    let mortgages = mortgage.load::<MortgageScheduleWithId>(conn)?;
+    let mortgages = mortgage
+        .order_by(crate::schema::mortgage::dsl::date.asc())
+        .load::<MortgageScheduleWithId>(conn)?;
     let house_assets: Vec<Asset> = mortgages.iter().map(|m| {
         let date = Utc.ymd(
             m.date.year(),
@@ -78,8 +80,33 @@ pub fn populate_housing_value(conn: &PgConnection) -> Result<(), Box<dyn Error>>
         }
     }).collect();
 
+    // Find gaps in between dates that have no mortgage schedule
+    if house_assets.len() == 0 {
+        return Ok(());
+    }
+
+    let first = house_assets.first().cloned().unwrap().transaction_date;
+    let mut current_date = Utc.ymd(first.year(), first.month(), 1).and_hms(8, 0, 0);
+
+    let mut all_house_assets: Vec<Asset> = Vec::new();
+    for house_asset in house_assets.iter() {
+        let current_asset_date = house_asset.transaction_date;
+        while current_date < shift_months(current_asset_date, -1) {
+            current_date = shift_months(current_date, 1);
+            let asset = Asset {
+                id: None,
+                transaction_date: current_date.clone(),
+                type_: String::from("House"),
+                amount: house_asset.clone().amount,
+            };
+            all_house_assets.push(asset);
+        }
+        current_date = current_asset_date.clone();
+        all_house_assets.push(house_asset.clone());
+    }
+
     insert_into(assets)
-        .values(&house_assets)
+        .values(&all_house_assets)
         .execute(conn)?;
 
     Ok(())
