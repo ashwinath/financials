@@ -73,6 +73,16 @@ diesel::table! {
 }
 
 diesel::table! {
+    shared_expense (id) {
+        id -> Int4,
+        expense_date -> Timestamptz,
+        #[sql_name = "type"]
+        type_ -> Text,
+        amount -> Float8,
+    }
+}
+
+diesel::table! {
     stocks (id) {
         id -> Int4,
         trade_date -> Timestamptz,
@@ -110,6 +120,7 @@ diesel::allow_tables_to_appear_in_same_query!(
     incomes,
     mortgage,
     portfolios,
+    shared_expense,
     stocks,
     symbols,
     trades,

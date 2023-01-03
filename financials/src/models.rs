@@ -7,6 +7,7 @@ use crate::schema::{
     exchange_rates,
     expenses,
     incomes,
+    shared_expense,
     stocks,
     symbols,
     trades,
@@ -157,6 +158,18 @@ pub struct MortgageScheduleWithId {
     pub total_interest_left: f64,
 }
 
+#[derive(Debug, Deserialize, Queryable, Insertable)]
+#[table_name = "shared_expense"]
+pub struct SharedExpense {
+    pub id: Option<i32>,
+    #[serde(with = "yymmdd_format")]
+    #[serde(rename(deserialize = "date"))]
+    pub expense_date: DateTime<Utc>,
+    #[serde(rename(deserialize = "type"))]
+    pub type_: String,
+    pub amount: f64,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -222,5 +235,19 @@ mod tests {
             .datetime_from_str("2021-08-31 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
+    }
+
+    #[test]
+    fn parse_shared_expense_csv() {
+        let result: Vec<SharedExpense> = read_from_csv("./sample/shared_expenses.csv").unwrap();
+        assert_eq!(result.len(), 6);
+
+        let result = &result[0];
+        assert_eq!(result.type_, "Special:Renovations");
+        assert_eq!(result.amount, 5000.0);
+        let expected_date: DateTime<Utc> = Utc
+            .datetime_from_str("2023-01-01 08:00:00", "%Y-%m-%d %H:%M:%S")
+            .unwrap();
+        assert_eq!(result.expense_date, expected_date);
     }
 }

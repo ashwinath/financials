@@ -1,9 +1,10 @@
 use config::Config;
-use models::{Trade, Expense, Asset, Income};
+use models::{Trade, Expense, Asset, Income, SharedExpense};
 use schema::trades::dsl::trades;
 use schema::assets::dsl::assets;
 use schema::incomes::dsl::incomes;
 use schema::expenses::dsl::expenses;
+use schema::shared_expense::dsl::shared_expense;
 use stock::calculate_stocks;
 use asset::{populate_investments, populate_housing_value};
 use expenditure::calculate_average_expenditure;
@@ -92,6 +93,12 @@ fn load_data(conn: &PgConnection, c: &Config) -> Result<(), Box<dyn Error>> {
     delete(trades).execute(conn)?;
     let t: Vec<Trade> = read_from_csv(&c.trades_csv)?;
     insert_into(trades)
+        .values(&t)
+        .execute(conn)?;
+
+    delete(shared_expense).execute(conn)?;
+    let t: Vec<SharedExpense> = read_from_csv(&c.shared_expense_csv)?;
+    insert_into(shared_expense)
         .values(&t)
         .execute(conn)?;
 
