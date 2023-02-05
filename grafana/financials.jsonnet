@@ -293,7 +293,7 @@ local liquidAssets = createPanel(
   FROM assets
   WHERE
     $__timeFilter(transaction_date)
-    AND type IN (\'Bank\', \'Investments\')
+    AND type IN (\'Bank\', \'Investments\', \'Bonds\')
   group by transaction_date, type, amount
   order by transaction_date',
   legend_show=true,
@@ -408,7 +408,7 @@ local emergencyFunds = createPanel(
     select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
 ),
 bank AS (
-    select transaction_date, amount from assets where type = 'Bank'
+    select transaction_date, amount from assets where type in ('Bank', 'Bonds')
 )
 select
     a.expense_date as \"time\",
@@ -422,13 +422,13 @@ ORDER BY a.expense_date;",
 );
 
 local runway = createPanel(
-  name='Runway Based on 70% Equity + Bank',
+  name='Runway Based on 70% Equity + Bank + Bonds',
   unit='Months',
   query="WITH avg_exp AS (
     select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
 ),
 bank AS (
-    select transaction_date, amount from assets where type = 'Bank'
+    select transaction_date, amount from assets where type in ('Bank', 'Bonds')
 ),
 equity AS (
     select transaction_date, amount from assets where type = 'Investments'
