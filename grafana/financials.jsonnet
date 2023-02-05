@@ -408,7 +408,7 @@ local emergencyFunds = createPanel(
     select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
 ),
 bank AS (
-    select transaction_date, amount from assets where type in ('Bank', 'Bonds')
+    select transaction_date, sum(amount) as amount from assets where type in ('Bank', 'Bonds') group by transaction_date
 )
 select
     a.expense_date as \"time\",
@@ -428,7 +428,7 @@ local runway = createPanel(
     select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
 ),
 bank AS (
-    select transaction_date, amount from assets where type in ('Bank', 'Bonds')
+    select transaction_date, sum(amount) as amount from assets where type in ('Bank', 'Bonds') group by transaction_date
 ),
 equity AS (
     select transaction_date, amount from assets where type = 'Investments'
@@ -452,7 +452,7 @@ local fiQuotient = createPanel(
     select expense_date + INTERVAL '1 day' as \"expense_date\", amount from average_expenditures
 ),
 equity AS (
-    select transaction_date, amount from assets where type = 'Investments'
+    select transaction_date, sum(amount) as amount from assets where type in ('Investments', 'Bonds') group by transaction_date
 )
 select
     a.expense_date as \"time\",
