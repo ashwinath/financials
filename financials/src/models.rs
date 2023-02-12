@@ -7,6 +7,7 @@ use crate::schema::{
     exchange_rates,
     expenses,
     incomes,
+    shared_expense,
     stocks,
     symbols,
     trades,
@@ -17,7 +18,7 @@ use crate::schema::{
 use crate::utils::yymmdd_format;
 
 #[derive(Debug, Deserialize, Queryable, Insertable)]
-#[table_name = "trades"]
+#[diesel(table_name = trades)]
 pub struct TradeWithId {
     pub id: i32,
     pub date_purchased: DateTime<Utc>,
@@ -28,7 +29,7 @@ pub struct TradeWithId {
 }
 
 #[derive(Debug, Deserialize, Insertable)]
-#[table_name = "trades"]
+#[diesel(table_name = trades)]
 pub struct Trade {
     #[serde(with = "yymmdd_format")]
     pub date_purchased: DateTime<Utc>,
@@ -39,7 +40,7 @@ pub struct Trade {
 }
 
 #[derive(Debug, Deserialize, Queryable, Insertable, Clone)]
-#[table_name = "assets"]
+#[diesel(table_name = assets)]
 pub struct Asset {
     pub id: Option<i32>,
     #[serde(with = "yymmdd_format")]
@@ -51,7 +52,7 @@ pub struct Asset {
 }
 
 #[derive(Debug, Deserialize, Queryable, Insertable)]
-#[table_name = "incomes"]
+#[diesel(table_name = incomes)]
 pub struct Income {
     pub id: Option<i32>,
     #[serde(with = "yymmdd_format")]
@@ -63,7 +64,7 @@ pub struct Income {
 }
 
 #[derive(Debug, Deserialize, Queryable, Insertable)]
-#[table_name = "expenses"]
+#[diesel(table_name = expenses)]
 pub struct Expense {
     pub id: Option<i32>,
     #[serde(with = "yymmdd_format")]
@@ -77,7 +78,7 @@ pub struct Expense {
 // Need to create another struct for inserting without id
 // https://github.com/diesel-rs/diesel/issues/1440
 #[derive(Debug, Queryable, Insertable)]
-#[table_name = "symbols"]
+#[diesel(table_name = symbols)]
 pub struct SymbolWithId {
     pub id: i32,
     pub symbol_type: String,
@@ -87,7 +88,7 @@ pub struct SymbolWithId {
 }
 
 #[derive(Debug, Insertable)]
-#[table_name = "symbols"]
+#[diesel(table_name = symbols)]
 pub struct Symbol {
     pub symbol_type: String,
     pub symbol: String,
@@ -96,7 +97,7 @@ pub struct Symbol {
 }
 
 #[derive(Debug, Insertable, Queryable)]
-#[table_name = "exchange_rates"]
+#[diesel(table_name = exchange_rates)]
 pub struct ExchangeRate {
     pub trade_date: DateTime<Utc>,
     pub symbol: String,
@@ -104,7 +105,7 @@ pub struct ExchangeRate {
 }
 
 #[derive(Debug, Insertable)]
-#[table_name = "stocks"]
+#[diesel(table_name = stocks)]
 pub struct Stock {
     pub trade_date: DateTime<Utc>,
     pub symbol: String,
@@ -112,7 +113,7 @@ pub struct Stock {
 }
 
 #[derive(Debug, Insertable, Queryable)]
-#[table_name = "portfolios"]
+#[diesel(table_name = portfolios)]
 pub struct Portfolio {
     pub trade_date: DateTime<Utc>,
     pub symbol: String,
@@ -123,7 +124,7 @@ pub struct Portfolio {
 }
 
 #[derive(Debug, Insertable)]
-#[table_name = "average_expenditures"]
+#[diesel(table_name = average_expenditures)]
 pub struct AverageExpenditure {
     pub id: Option<i32>,
     pub expense_date: DateTime<Utc>,
@@ -131,7 +132,7 @@ pub struct AverageExpenditure {
 }
 
 #[derive(Debug, PartialEq, Deserialize, Insertable, Clone)]
-#[table_name = "mortgage"]
+#[diesel(table_name = mortgage)]
 pub struct MortgageSchedule {
     #[serde(with = "yymmdd_format")]
     pub date: DateTime<Utc>,
@@ -144,7 +145,7 @@ pub struct MortgageSchedule {
 }
 
 #[derive(Debug, PartialEq, Deserialize, Queryable, Insertable)]
-#[table_name = "mortgage"]
+#[diesel(table_name = mortgage)]
 pub struct MortgageScheduleWithId {
     pub id: i32,
     #[serde(with = "yymmdd_format")]
@@ -155,6 +156,17 @@ pub struct MortgageScheduleWithId {
     pub total_interest_paid: f64,
     pub total_principal_left: f64,
     pub total_interest_left: f64,
+}
+
+#[derive(Debug, Deserialize, Insertable)]
+#[diesel(table_name = shared_expense)]
+pub struct SharedExpense {
+    #[serde(with = "yymmdd_format")]
+    #[serde(rename(deserialize = "date"))]
+    pub expense_date: DateTime<Utc>,
+    #[serde(rename(deserialize = "type"))]
+    pub type_: String,
+    pub amount: f64,
 }
 
 #[cfg(test)]
@@ -222,5 +234,19 @@ mod tests {
             .datetime_from_str("2021-08-31 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.transaction_date, expected_date);
+    }
+
+    #[test]
+    fn parse_shared_expense_csv() {
+        let result: Vec<SharedExpense> = read_from_csv("./sample/shared_expenses.csv").unwrap();
+        assert_eq!(result.len(), 6);
+
+        let result = &result[0];
+        assert_eq!(result.type_, "Special:Renovations");
+        assert_eq!(result.amount, 5000.0);
+        let expected_date: DateTime<Utc> = Utc
+            .datetime_from_str("2023-01-01 08:00:00", "%Y-%m-%d %H:%M:%S")
+            .unwrap();
+        assert_eq!(result.expense_date, expected_date);
     }
 }

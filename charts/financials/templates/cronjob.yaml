@@ -47,6 +47,8 @@ spec:
             - /etc/expenses/expenses.csv
             - --mortgage-yaml
             - /etc/mortgage/mortgage.yaml
+            - --shared-expense-csv
+            - /etc/shared-expenses/shared_expenses.csv
             volumeMounts:
             - name: trades-csv
               mountPath: /etc/trades
@@ -58,6 +60,8 @@ spec:
               mountPath: /etc/income
             - name: mortgage-yaml
               mountPath: /etc/mortgage
+            - name: shared-expenses-csv
+              mountPath: /etc/shared-expenses
           restartPolicy: OnFailure
           volumes:
           - name: trades-csv
@@ -75,3 +79,6 @@ spec:
           - name: mortgage-yaml
             configMap:
               name: {{ .Release.Name }}-mortgage-yaml
+          - name: shared-expenses-csv
+            configMap:
+              name: {{ .Release.Name }}-shared-expenses-yaml

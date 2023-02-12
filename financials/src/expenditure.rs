@@ -1,4 +1,4 @@
-use chrono::{DateTime, Utc, Datelike, TimeZone, Duration};
+use chrono::{DateTime, Utc, Duration};
 use chronoutil::delta::shift_months;
 use crate::schema::average_expenditures::dsl::average_expenditures;
 use std::error::Error;
@@ -9,11 +9,13 @@ use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl, TextExpressi
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::excluded;
 
+use crate::utils::{get_last_day_of_month, is_last_day_of_month};
+
 const WINDOW_PERIOD: i32 = 6;
 
 // Calculates monthly expenditure rates based on half yearly rolling window.
 // Expenditure should not include taxes as if we retire there is no tax.
-pub fn calculate_average_expenditure(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
+pub fn calculate_average_expenditure(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
     let first_date = expenses
         .select(crate::schema::expenses::transaction_date)
         .order(crate::schema::expenses::transaction_date.asc())
@@ -65,18 +67,4 @@ pub fn calculate_average_expenditure(conn: &PgConnection) -> Result<(), Box<dyn 
         .execute(conn)?;
 
     Ok(())
-}
-
-fn get_last_day_of_month(dt: DateTime<Utc>) -> DateTime<Utc> {
-    let dt = shift_months(dt, 1);
-    Utc.ymd(
-        dt.year(),
-        dt.month(),
-        1,
-    ).and_hms(8, 0, 0) - Duration::days(1)
-}
-
-fn is_last_day_of_month(dt: DateTime<Utc>) -> bool {
-    let next_day = dt + Duration::days(1);
-    next_day.day() == 1
 }

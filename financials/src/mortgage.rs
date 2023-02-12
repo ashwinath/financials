@@ -35,7 +35,7 @@ struct Downpayment {
     pub sum: f64,
 }
 
-pub fn generate_mortgage_schedule(conn: &PgConnection, config_location: &str) -> Result<(), Box<dyn Error>> {
+pub fn generate_mortgage_schedule(conn: &mut PgConnection, config_location: &str) -> Result<(), Box<dyn Error>> {
     let config = parse_mortgage(config_location)?;
     delete(mortgage).execute(conn)?;
     for m in config.mortgages.iter() {

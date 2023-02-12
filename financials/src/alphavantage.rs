@@ -118,7 +118,7 @@ mod tests {
     #[test]
     fn search_symbol() {
         let result = search_alphavantage_symbol("tesco", "demo").unwrap();
-        assert_eq!(result.best_matches.len(), 3);
+        assert_eq!(result.best_matches.len(), 5);
         let result = &result.best_matches[0];
         assert_eq!(result.symbol, "TSCO.LON");
         assert_eq!(result.currency, "GBX");

@@ -125,3 +125,14 @@ These values will be used in the calculation of investments as well as it's brea
 ### Mortgage
 
 These values will be used in the calculation of mortgage repayments.
+
+### Split Expenses
+
+These values will be used to calculate the finances incurred by multiple people. Currently it will only be split among 2 people and added to personal expenses. However, special expenses will be excluded.
+
+CSV file: `shared_expenses.csv`
+
+| Expense Type    | Displayed | Used in calculation | Remarks                                                                                           |
+| ----------------| --------- | ------------------- | ------------------------------------------------------------------------------------------------- |
+| Special:.\*     | true      | false               | These are special one off purchases for special events that will not be used for average spending |
+| (Anything else) | true      | true                | Will be displayed as an individual line                                                           |

@@ -11,5 +11,4 @@ FROM debian:bullseye-slim
 WORKDIR /app
 RUN apt update && apt install -y libssl-dev libpq-dev ca-certificates
 COPY --from=builder /usr/local/cargo/bin/financials /app/financials
-COPY ./migrations ./migrations
 CMD ["./financials"]

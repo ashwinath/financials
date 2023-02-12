@@ -75,6 +75,17 @@ financials:
       - date: 2021-12-12
         sum: 20000.0
 
+  # -- CSV values for shared expenses
+  shared_expenses: |-
+    date,type,amount
+    2023-01-01,Special:Renovations,5000.00
+    2023-01-01,Electricity,100.00
+    2023-01-01,Water,50.00
+    2023-01-01,Gas,30.00
+    2023-01-01,Grocery,300.00
+    2023-01-01,Eating Out,500.00
+
+
 postgresql:
   # -- Resources requests and limits for the database
   resources: {}
