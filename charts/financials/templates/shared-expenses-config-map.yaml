@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-shared-expenses-csv
 data:
-  shared-expenses.csv: |-
+  shared_expenses.csv: |-
 {{ .Values.financials.shared_expenses | indent 4 }}
