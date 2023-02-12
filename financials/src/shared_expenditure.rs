@@ -16,7 +16,7 @@ use crate::schema::expenses::dsl::expenses;
 const NON_SPECIAL_SHARED_EXPENSE_TYPE: &str = "Shared Expense";
 const NON_SPECIAL_EXPENSES_SQL: &str = "SELECT expense_date, sum(amount) AS total FROM shared_expense WHERE type NOT LIKE 'Special:%' GROUP BY expense_date";
 
-const SPECIAL_SHARED_EXPENSE_TYPE: &str = "Special: Shared Expense";
+const SPECIAL_SHARED_EXPENSE_TYPE: &str = "Special:Shared Expense";
 const SPECIAL_EXPENSES_SQL: &str = "SELECT expense_date, sum(amount) AS total FROM shared_expense WHERE type LIKE 'Special:%' GROUP BY expense_date";
 
 #[derive(Debug, QueryableByName)]
