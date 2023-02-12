@@ -33,7 +33,7 @@ mod mortgage;
 mod utils;
 mod shared_expenditure;
 
-pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
+const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
 
 fn main() {
     let start_time = Utc::now().time();

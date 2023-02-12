@@ -169,18 +169,6 @@ pub struct SharedExpense {
     pub amount: f64,
 }
 
-#[derive(Debug, Deserialize, Queryable, Insertable)]
-#[diesel(table_name = shared_expense)]
-pub struct SharedExpenseWithId {
-    pub id: i32,
-    #[serde(with = "yymmdd_format")]
-    #[serde(rename(deserialize = "date"))]
-    pub expense_date: DateTime<Utc>,
-    #[serde(rename(deserialize = "type"))]
-    pub type_: String,
-    pub amount: f64,
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
