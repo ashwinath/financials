@@ -81,4 +81,4 @@ spec:
               name: {{ .Release.Name }}-mortgage-yaml
           - name: shared-expenses-csv
             configMap:
-              name: {{ .Release.Name }}-shared-expenses-yaml
+              name: {{ .Release.Name }}-shared-expenses-csv
