@@ -2,7 +2,7 @@
 
 Financials is a way to track your financial independence track in Singapore's context. This is still very much a work in progress, see the 'Feature Roadmap' for more details. We use Grafana as the frontend and it is assumed that Grafana is installed at the moment.
 
-![](./img/sample-screenshot.png)
+![](./img/screenshot.png)
 
 ## Feature roadmap
 
@@ -66,6 +66,28 @@ financials:
     2021-03-11,CPF,500
     2021-03-11,Bonus,200
     2021-03-11,CPF Bonus,200
+
+  mortgage: |-
+    mortgages:
+    - total: 50000.0
+      mortgage_first_payment: 2022-10-10
+      mortgage_duration_in_years: 25
+      mortgage_end_date: 2047-10-10
+      interest_rate_percentage: 2.6
+      downpayments:
+      - date: 2021-10-10
+        sum: 1000.0
+      - date: 2021-12-12
+        sum: 20000.0
+
+  shared_expenses: |-
+    date,type,amount
+    2023-01-01,Special:Renovations,5000.00
+    2023-01-01,Electricity,100.00
+    2023-01-01,Water,50.00
+    2023-01-01,Gas,30.00
+    2023-01-01,Grocery,300.00
+    2023-01-01,Eating Out,500.00
 
 postgresql:
   postgresqlPassword: somePasswordHere

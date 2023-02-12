@@ -19,6 +19,8 @@ const NON_SPECIAL_EXPENSES_SQL: &str = "SELECT expense_date, sum(amount) AS tota
 const SPECIAL_SHARED_EXPENSE_TYPE: &str = "Special:Shared Expense";
 const SPECIAL_EXPENSES_SQL: &str = "SELECT expense_date, sum(amount) AS total FROM shared_expense WHERE type LIKE 'Special:%' GROUP BY expense_date";
 
+const NUMBER_OF_PEOPLE_SHARING: f64 = 2.0;
+
 #[derive(Debug, QueryableByName)]
 struct DateAmountPair {
     #[diesel(sql_type = Timestamptz)]
@@ -43,7 +45,7 @@ fn insert_expense(conn: &mut PgConnection, sql: &str, expense_type: &str) -> Res
         id: None,
         transaction_date: x.expense_date,
         type_: String::from(expense_type),
-        amount: x.total,
+        amount: x.total / NUMBER_OF_PEOPLE_SHARING,
     }).collect();
 
     insert_into(expenses)

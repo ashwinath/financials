@@ -379,7 +379,43 @@ local special_expenses = createPanel(
   order by time',
   legend_show=true,
   stack=true,
-  points=true,
+  points=false,
+);
+
+local shared_expenses = createPanel(
+  name='Shared Expenses (2 people)',
+  unit='currencyUSD',
+  query='SELECT
+      expense_date as "time",
+      type,
+      amount AS "Amount"
+  FROM shared_expense
+  WHERE
+      $__timeFilter(expense_date)
+      AND type not like \'Special:%\'
+  group by expense_date, type, amount
+  order by time',
+  legend_show=true,
+  stack=true,
+  points=false,
+);
+
+local special_shared_expenses = createPanel(
+  name='Special Shared Expenses (2 people)',
+  unit='currencyUSD',
+  query='SELECT
+      expense_date as "time",
+      type,
+      amount AS "Amount"
+  FROM shared_expense
+  WHERE
+      $__timeFilter(expense_date)
+      AND type like \'Special:%\'
+  group by expense_date, type, amount
+  order by time',
+  legend_show=true,
+  stack=true,
+  points=false,
 );
 
 local savingsRate = createPanel(
@@ -564,6 +600,14 @@ dashboard.new(
 .addPanel(
   special_expenses,
   gridPos={ h: 8, w: 8, x: 0, y: 18 },
+)
+.addPanel(
+  shared_expenses,
+  gridPos={ h: 8, w: 8, x: 8, y: 18 },
+)
+.addPanel(
+  special_shared_expenses,
+  gridPos={ h: 8, w: 8, x: 16, y: 18 },
 )
 
 // Mortgage

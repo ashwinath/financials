@@ -194,7 +194,7 @@ mod tests {
     #[test]
     fn parse_assets_csv() {
         let result: Vec<Asset> = read_from_csv("./sample/assets.csv").unwrap();
-        assert_eq!(result.len(), 68);
+        assert_eq!(result.len(), 76);
 
         // Asserting the first row should be good enough
         let result = &result[0];
@@ -209,7 +209,7 @@ mod tests {
     #[test]
     fn parse_incomes_csv() {
         let result: Vec<Income> = read_from_csv("./sample/income.csv").unwrap();
-        assert_eq!(result.len(), 34);
+        assert_eq!(result.len(), 40);
 
         // Asserting the first row should be good enough
         let result = &result[0];
@@ -224,7 +224,7 @@ mod tests {
     #[test]
     fn parse_expenses_csv() {
         let result: Vec<Expense> = read_from_csv("./sample/expenses.csv").unwrap();
-        assert_eq!(result.len(), 65);
+        assert_eq!(result.len(), 77);
 
         // Asserting the first row should be good enough
         let result = &result[0];
@@ -239,13 +239,13 @@ mod tests {
     #[test]
     fn parse_shared_expense_csv() {
         let result: Vec<SharedExpense> = read_from_csv("./sample/shared_expenses.csv").unwrap();
-        assert_eq!(result.len(), 6);
+        assert_eq!(result.len(), 40);
 
         let result = &result[0];
-        assert_eq!(result.type_, "Special:Renovations");
-        assert_eq!(result.amount, 5000.0);
+        assert_eq!(result.type_, "Electricity");
+        assert_eq!(result.amount, 35.0);
         let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2023-01-01 08:00:00", "%Y-%m-%d %H:%M:%S")
+            .datetime_from_str("2022-08-31 08:00:00", "%Y-%m-%d %H:%M:%S")
             .unwrap();
         assert_eq!(result.expense_date, expected_date);
     }
