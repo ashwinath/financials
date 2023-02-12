@@ -158,10 +158,21 @@ pub struct MortgageScheduleWithId {
     pub total_interest_left: f64,
 }
 
-#[derive(Debug, Deserialize, Queryable, Insertable)]
+#[derive(Debug, Deserialize, Insertable)]
 #[table_name = "shared_expense"]
 pub struct SharedExpense {
-    pub id: Option<i32>,
+    #[serde(with = "yymmdd_format")]
+    #[serde(rename(deserialize = "date"))]
+    pub expense_date: DateTime<Utc>,
+    #[serde(rename(deserialize = "type"))]
+    pub type_: String,
+    pub amount: f64,
+}
+
+#[derive(Debug, Deserialize, Queryable, Insertable)]
+#[table_name = "shared_expense"]
+pub struct SharedExpenseWithId {
+    pub id: i32,
     #[serde(with = "yymmdd_format")]
     #[serde(rename(deserialize = "date"))]
     pub expense_date: DateTime<Utc>,

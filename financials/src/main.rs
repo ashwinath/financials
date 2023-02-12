@@ -10,6 +10,7 @@ use asset::{populate_investments, populate_housing_value};
 use expenditure::calculate_average_expenditure;
 use mortgage::generate_mortgage_schedule;
 use utils::read_from_csv;
+use shared_expenditure::populate_shared_expenditure;
 use std::error::Error;
 use std::process;
 
@@ -30,6 +31,7 @@ mod stock;
 mod alphavantage;
 mod mortgage;
 mod utils;
+mod shared_expenditure;
 
 fn main() {
     let start_time = Utc::now().time();
@@ -43,27 +45,32 @@ fn main() {
 
     if let Err(e) = calculate_stocks(&conn, &c.alphavantage_key) {
         eprintln!("failed to load process stocks: {}", e);
-        process::exit(1);
+        process::exit(2);
     }
 
     if let Err(e) = populate_investments(&conn) {
         eprintln!("failed to load populate investments into assets: {}", e);
-        process::exit(1);
+        process::exit(3);
+    }
+
+    if let Err(e) = populate_shared_expenditure(&conn) {
+        eprintln!("failed to load populate shared expenditure: {}", e);
+        process::exit(4);
     }
 
     if let Err(e) = calculate_average_expenditure(&conn) {
         eprintln!("failed to load calculate average expenditure: {}", e);
-        process::exit(1);
+        process::exit(5);
     }
 
     if let Err(e) = generate_mortgage_schedule(&conn, &c.mortgage_yaml) {
         eprintln!("failed to generate mortgage schedule: {}", e);
-        process::exit(1);
+        process::exit(6);
     }
 
     if let Err(e) = populate_housing_value(&conn) {
         eprintln!("failed to generate mortgage schedule: {}", e);
-        process::exit(1);
+        process::exit(7);
     }
 
     let end_time = Utc::now().time();
