@@ -39,11 +39,12 @@ pub mod yymmdd_format {
 
 pub fn get_last_day_of_month(dt: DateTime<Utc>) -> DateTime<Utc> {
     let dt = shift_months(dt, 1);
-    Utc.ymd(
+    Utc.with_ymd_and_hms(
         dt.year(),
         dt.month(),
         1,
-    ).and_hms(8, 0, 0) - Duration::days(1)
+        8, 0, 0
+    ).unwrap() - Duration::days(1)
 }
 
 pub fn is_last_day_of_month(dt: DateTime<Utc>) -> bool {

@@ -20,7 +20,7 @@ extern crate diesel;
 use chrono::Utc;
 use diesel::{Connection, insert_into, delete, RunQueryDsl};
 use diesel::pg::PgConnection;
-use diesel_migrations::run_pending_migrations;
+use diesel_migrations::{embed_migrations, MigrationHarness, EmbeddedMigrations};
 
 mod asset;
 mod config;
@@ -33,42 +33,47 @@ mod mortgage;
 mod utils;
 mod shared_expenditure;
 
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!();
+
 fn main() {
     let start_time = Utc::now().time();
     let c = Config::new();
 
-    let conn = init_db(&c.database_url);
-    if let Err(e) = load_data(&conn, &c) {
+    let mut conn = PgConnection::establish(&c.database_url)
+        .expect(&format!("Error connecting to {}", &c.database_url));
+    conn.run_pending_migrations(MIGRATIONS).unwrap();
+
+    if let Err(e) = load_data(&mut conn, &c) {
         eprintln!("failed to load csv data: {}", e);
         process::exit(1);
     }
 
-    if let Err(e) = calculate_stocks(&conn, &c.alphavantage_key) {
+    if let Err(e) = calculate_stocks(&mut conn, &c.alphavantage_key) {
         eprintln!("failed to load process stocks: {}", e);
         process::exit(2);
     }
 
-    if let Err(e) = populate_investments(&conn) {
+    if let Err(e) = populate_investments(&mut conn) {
         eprintln!("failed to load populate investments into assets: {}", e);
         process::exit(3);
     }
 
-    if let Err(e) = populate_shared_expenditure(&conn) {
+    if let Err(e) = populate_shared_expenditure(&mut conn) {
         eprintln!("failed to load populate shared expenditure: {}", e);
         process::exit(4);
     }
 
-    if let Err(e) = calculate_average_expenditure(&conn) {
+    if let Err(e) = calculate_average_expenditure(&mut conn) {
         eprintln!("failed to load calculate average expenditure: {}", e);
         process::exit(5);
     }
 
-    if let Err(e) = generate_mortgage_schedule(&conn, &c.mortgage_yaml) {
+    if let Err(e) = generate_mortgage_schedule(&mut conn, &c.mortgage_yaml) {
         eprintln!("failed to generate mortgage schedule: {}", e);
         process::exit(6);
     }
 
-    if let Err(e) = populate_housing_value(&conn) {
+    if let Err(e) = populate_housing_value(&mut conn) {
         eprintln!("failed to generate mortgage schedule: {}", e);
         process::exit(7);
     }
@@ -78,7 +83,7 @@ fn main() {
     println!("Total time taken to run is {} ms.", diff.num_milliseconds());
 }
 
-fn load_data(conn: &PgConnection, c: &Config) -> Result<(), Box<dyn Error>> {
+fn load_data(conn: &mut PgConnection, c: &Config) -> Result<(), Box<dyn Error>> {
     delete(assets).execute(conn)?;
     let t: Vec<Asset> = read_from_csv(&c.assets_csv)?;
     insert_into(assets)
@@ -110,13 +115,4 @@ fn load_data(conn: &PgConnection, c: &Config) -> Result<(), Box<dyn Error>> {
         .execute(conn)?;
 
     Ok(())
-}
-
-fn init_db(database_url: &str) -> PgConnection {
-    let conn = PgConnection::establish(database_url)
-        .expect(&format!("Error connecting to {}", database_url));
-
-    run_pending_migrations(&conn).expect("Error migration database");
-
-    conn
 }

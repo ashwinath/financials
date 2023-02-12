@@ -6,7 +6,6 @@ use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl, TextExpressi
 use crate::schema::expenses::dsl::expenses;
 use crate::schema::shared_expense::dsl::shared_expense;
 use crate::models::SharedExpenseWithId;
-use crate::diesel::GroupByDsl;
 // Needs to go inside expenses as a row called shared_expenses
 // Needs to go inside special expenses as a row called special something 
 // Average expense needs to be recalculated.
@@ -16,7 +15,7 @@ struct DateAmountPair {
     pub amount: f64,
 }
 
-pub fn populate_shared_expenditure(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
+pub fn populate_shared_expenditure(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
     // Handle non special expense
     //let non_special_expenses = shared_expense
         //.select((

@@ -12,7 +12,7 @@ use diesel::{insert_into, ExpressionMethods, QueryDsl, RunQueryDsl};
 // Populates the investments on a monthly basis, every first of the month,
 // check the value of the investments and populate into the assets table.
 // Removing the need to manually key in the assets CSV.
-pub fn populate_investments(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
+pub fn populate_investments(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
     // Get earliest start date
     let first_date = portfolios
         .select(crate::schema::portfolios::trade_date)
@@ -25,11 +25,12 @@ pub fn populate_investments(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
         shift_months(first_date, 1)
     };
 
-    current_date = Utc.ymd(
+    current_date = Utc.with_ymd_and_hms(
         current_date.year(),
         current_date.month(),
         1,
-    ).and_hms(8, 0, 0);
+        8, 0, 0
+    ).unwrap();
 
     let mut all_investments: Vec<Asset> = Vec::new();
     let tomorrow = chrono::offset::Utc::now() + Duration::days(1);
@@ -62,16 +63,17 @@ pub fn populate_investments(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
 const HOUSE_SPLIT_RATIO: f64 = 2.0;
 
 // Populates the assets of the principal paid in the mortgage
-pub fn populate_housing_value(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
+pub fn populate_housing_value(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
     let mortgages = mortgage
         .order_by(crate::schema::mortgage::dsl::date.asc())
         .load::<MortgageScheduleWithId>(conn)?;
     let house_assets: Vec<Asset> = mortgages.iter().map(|m| {
-        let date = Utc.ymd(
+        let date = Utc.with_ymd_and_hms(
             m.date.year(),
             m.date.month(),
             1,
-        ).and_hms(8, 0, 0);
+            8, 0, 0
+        ).unwrap();
         Asset {
             id: None,
             transaction_date: date,

@@ -17,7 +17,7 @@ const FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 const STOCK_SYMBOL: &str = "stock";
 const CURRENCY_SYMBOL: &str = "currency";
 
-pub fn calculate_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>>  {
+pub fn calculate_stocks(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>>  {
     sync_symbol_table(conn, alphavantage_key)?;
     // TODO: Stocks and currencies can be concurrent
     process_currencies(conn, alphavantage_key)?;
@@ -27,7 +27,7 @@ pub fn calculate_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(
     Ok(())
 }
 
-fn calculate_portfolio(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
+fn calculate_portfolio(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
     let stock_symbols = symbols
         .filter(crate::schema::symbols::dsl::symbol_type.eq(STOCK_SYMBOL))
         .load::<SymbolWithId>(conn)?;
@@ -86,7 +86,13 @@ fn calculate_portfolio(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
 
         let mut all_portfolios: Vec<Portfolio> = Vec::new();
         let today = chrono::offset::Utc::now();
-        let tomorrow = Utc.ymd(today.year(), today.month(), today.day()).and_hms(8, 0, 0);
+        let tomorrow = Utc.with_ymd_and_hms(
+            today.year(),
+            today.month(),
+            today.day(),
+            8, 0, 0
+        ).unwrap();
+
         while current_date < tomorrow {
             let exchange_rate = get_currency_rate(conn, current_date, &currency_symbol);
             let price = get_stock_price(conn, current_date, &symbol);
@@ -125,7 +131,7 @@ fn calculate_portfolio(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-fn get_stock_price(conn: &PgConnection, trade_date: DateTime<Utc>, symbol: &str) -> f64 {
+fn get_stock_price(conn: &mut PgConnection, trade_date: DateTime<Utc>, symbol: &str) -> f64 {
     let mut trade_date = trade_date;
     loop {
         let price = stocks
@@ -142,7 +148,7 @@ fn get_stock_price(conn: &PgConnection, trade_date: DateTime<Utc>, symbol: &str)
     }
 }
 
-fn get_currency_rate(conn: &PgConnection, trade_date: DateTime<Utc>, symbol: &str) -> f64 {
+fn get_currency_rate(conn: &mut PgConnection, trade_date: DateTime<Utc>, symbol: &str) -> f64 {
     let mut trade_date = trade_date;
     loop {
         let exchange_rate = exchange_rates
@@ -158,7 +164,7 @@ fn get_currency_rate(conn: &PgConnection, trade_date: DateTime<Utc>, symbol: &st
     }
 }
 
-fn process_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
+fn process_stocks(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
     let stock_symbols = symbols
         .filter(crate::schema::symbols::dsl::symbol_type.eq(STOCK_SYMBOL))
         .load::<SymbolWithId>(conn)?;
@@ -205,7 +211,7 @@ fn process_stocks(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box
     Ok(())
 }
 
-fn process_currencies(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
+fn process_currencies(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
     let currencies = symbols
         .filter(crate::schema::symbols::dsl::symbol_type.eq(CURRENCY_SYMBOL))
         .load::<SymbolWithId>(conn)?;
@@ -252,7 +258,7 @@ fn process_currencies(conn: &PgConnection, alphavantage_key: &str) -> Result<(),
     Ok(())
 }
 
-fn sync_symbol_table(conn: &PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
+fn sync_symbol_table(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
     let s = trades
         .select(crate::schema::trades::dsl::symbol)
         .distinct()

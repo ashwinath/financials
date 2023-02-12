@@ -15,7 +15,7 @@ const WINDOW_PERIOD: i32 = 6;
 
 // Calculates monthly expenditure rates based on half yearly rolling window.
 // Expenditure should not include taxes as if we retire there is no tax.
-pub fn calculate_average_expenditure(conn: &PgConnection) -> Result<(), Box<dyn Error>> {
+pub fn calculate_average_expenditure(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
     let first_date = expenses
         .select(crate::schema::expenses::transaction_date)
         .order(crate::schema::expenses::transaction_date.asc())
