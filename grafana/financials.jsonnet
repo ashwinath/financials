@@ -554,7 +554,7 @@ dashboard.new(
   schemaVersion=16,
   tags=['financials'],
   time_from='now-1y',
-  editable=true,
+  editable=false,
   graphTooltip='shared_tooltip',
 )
 // Summary Of Financials
