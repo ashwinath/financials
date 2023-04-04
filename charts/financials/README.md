@@ -32,7 +32,7 @@ Helm chart for financials
 | financials.shared_expenses | string | `"date,type,amount\n2023-01-01,Special:Renovations,5000.00\n2023-01-01,Electricity,100.00\n2023-01-01,Water,50.00\n2023-01-01,Gas,30.00\n2023-01-01,Grocery,300.00\n2023-01-01,Eating Out,500.00"` | CSV values for shared expenses |
 | financials.trades | string | `"date_purchased,symbol,trade_type,price_each,quantity\n2021-03-11,IWDA.LON,buy,76.34,10"` | CSV values for the trades |
 | postgresql.persistence.enabled | bool | `true` | Persist Postgresql data in a Persistent Volume Claim  |
-| postgresql.postgresqlDatabase | string | `"postgres"` | Database name for Turing Postgresql database |
+| postgresql.postgresqlDatabase | string | `"postgres"` | Database name for Postgresql database |
 | postgresql.postgresqlPassword | string | `"password"` | Password for postgresql database, highly recommended to change this value |
 | postgresql.postgresqlUsername | string | `"postgres"` | Username for postgresql database |
 | postgresql.resources | object | `{}` | Resources requests and limits for the database |

@@ -102,7 +102,7 @@ postgresql:
   persistence:
     # -- Persist Postgresql data in a Persistent Volume Claim 
     enabled: true
-  # -- Database name for Turing Postgresql database
+  # -- Database name for Postgresql database
   postgresqlDatabase: postgres
   # -- Username for postgresql database
   postgresqlUsername: postgres
