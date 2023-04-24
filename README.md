@@ -15,11 +15,13 @@ This list is not exhaustive but a wishlist that I would work on when I'm free. M
 - [x] Automatic detection of investment amount
 - [x] Financial Independence Quotient
 - [x] Mortgage
-
+- [x] Telegram bot to record expenses ([separate binary](https://github.com/ashwinath/money-tracker-telegram)) + scrape endpoint
 
 ## Installing
 
 Helm is the preferred way to install this. First, get an API key here: https://www.alphavantage.co/support/#api-key
+
+We are also using the telegram bot to record all our expenses, see more [here](https://github.com/ashwinath/money-tracker-telegram).
 
 Then deploy using this command, see `charts/financials/values.yaml` for the defaults.
 
@@ -38,6 +40,7 @@ A sample `values.yaml` may look something like this, with all the trade informat
 ```yaml
 financials:
   alphavantageAPIKey: yourAlphaVantageAPIKeyHere
+  telegramBotUrl: http://<url to the telegram bot>
 
   financialsGrafana:
     apiKey: yourAPIKeyHere
