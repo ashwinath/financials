@@ -30,10 +30,10 @@ Helm chart for financials
 | financials.mortgage | string | `"mortgages:\n- total: 50000.0\n  mortgage_first_payment: 2022-10-10\n  mortgage_duration_in_years: 25\n  mortgage_end_date: 2047-10-10\n  interest_rate_percentage: 2.6\n  downpayments:\n  - date: 2021-10-10\n    sum: 1000.0\n  - date: 2021-12-12\n    sum: 20000.0"` | YAML values for mortgage |
 | financials.resources | object | `{}` | Resources requests and limits for the financial app |
 | financials.shared_expenses | string | `"date,type,amount\n2023-01-01,Special:Renovations,5000.00\n2023-01-01,Electricity,100.00\n2023-01-01,Water,50.00\n2023-01-01,Gas,30.00\n2023-01-01,Grocery,300.00\n2023-01-01,Eating Out,500.00"` | CSV values for shared expenses |
+| financials.telegramBotUrl | string | `"http://<url here>"` | telegram bot dump endpoint, include scheme as well. |
 | financials.trades | string | `"date_purchased,symbol,trade_type,price_each,quantity\n2021-03-11,IWDA.LON,buy,76.34,10"` | CSV values for the trades |
 | postgresql.persistence.enabled | bool | `true` | Persist Postgresql data in a Persistent Volume Claim  |
 | postgresql.postgresqlDatabase | string | `"postgres"` | Database name for Postgresql database |
 | postgresql.postgresqlPassword | string | `"password"` | Password for postgresql database, highly recommended to change this value |
 | postgresql.postgresqlUsername | string | `"postgres"` | Username for postgresql database |
 | postgresql.resources | object | `{}` | Resources requests and limits for the database |
-
