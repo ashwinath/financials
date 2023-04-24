@@ -49,6 +49,8 @@ spec:
             - /etc/mortgage/mortgage.yaml
             - --shared-expense-csv
             - /etc/shared-expenses/shared_expenses.csv
+            - --telegram-bot-endpoint
+            - "{{ .Values.financials.telegramBotUrl }}"
             volumeMounts:
             - name: trades-csv
               mountPath: /etc/trades

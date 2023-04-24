@@ -19,6 +19,8 @@ pub struct Config {
     pub mortgage_yaml: String,
     #[clap(long)]
     pub shared_expense_csv: String,
+    #[clap(long)]
+    pub telegram_bot_endpoint: String,
 }
 
 impl Config {

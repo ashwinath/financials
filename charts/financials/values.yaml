@@ -9,6 +9,8 @@ financials:
     pullPolicy: Always
     # -- Override this value for the desired image tag
     tag: latest
+  # -- telegram bot dump endpoint, include scheme as well.
+  telegramBotUrl: http://<url here>
 
   # -- Resources requests and limits for the financial app
   resources: {}
