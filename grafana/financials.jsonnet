@@ -429,7 +429,10 @@ income as (
 )
 SELECT
   expenditure.time + interval \'1 month\' - interval \'1 day\' AS "time",
-  (1 - (expenditure.amount / income.amount)) as \"Savings Rate\"
+  CASE 
+    WHEN income.amount != 0 then (1 - (expenditure.amount / income.amount)) 
+    ELSE 0
+  END as \"Savings Rate\"
 FROM expenditure inner join income on income.time = expenditure.time
 WHERE $__timeFilter(expenditure.time)
 ORDER BY expenditure.time;',

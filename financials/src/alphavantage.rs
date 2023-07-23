@@ -1,9 +1,9 @@
-use std::fmt;
-use std::error::Error;
-use std::collections::HashMap;
+use reqwest;
 use serde::{Deserialize, Deserializer};
 use serde_json::Value;
-use reqwest;
+use std::collections::HashMap;
+use std::error::Error;
+use std::fmt;
 
 #[derive(Debug, Clone)]
 pub struct AlphaVantageError {
@@ -32,11 +32,13 @@ pub struct AlphaVantageSymbolSearchResult {
     pub currency: String,
 }
 
-pub fn search_alphavantage_symbol(symbol: &str, api_key: &str) -> Result<AlphaVantageBestMatches, Box<dyn Error>> {
+pub fn search_alphavantage_symbol(
+    symbol: &str,
+    api_key: &str,
+) -> Result<AlphaVantageBestMatches, Box<dyn Error>> {
     let url = format!(
         "https://www.alphavantage.co/query?function=SYMBOL_SEARCH&keywords={}&apikey={}",
-        symbol,
-        api_key,
+        symbol, api_key,
     );
 
     call_alphavantage(&url)
@@ -55,7 +57,12 @@ pub struct AlphaVantageCurrencyDailyResult {
     pub close: f64,
 }
 
-pub fn get_currency_history(from_symbol: &str, to_symbol: &str, is_compact: bool, api_key: &str) -> Result<AlphaVantageCurrencyResult, Box<dyn Error>> {
+pub fn get_currency_history(
+    from_symbol: &str,
+    to_symbol: &str,
+    is_compact: bool,
+    api_key: &str,
+) -> Result<AlphaVantageCurrencyResult, Box<dyn Error>> {
     let url = format!(
         "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol={}&to_symbol={}&outputsize={}&apikey={}",
         from_symbol,
@@ -80,9 +87,13 @@ pub struct AlphaVantageStockDailyResult {
     pub close: f64,
 }
 
-pub fn get_stock_history(symbol: &str, is_compact: bool, api_key: &str) -> Result<AlphaVantageStockResult, Box<dyn Error>> {
+pub fn get_stock_history(
+    symbol: &str,
+    is_compact: bool,
+    api_key: &str,
+) -> Result<AlphaVantageStockResult, Box<dyn Error>> {
     let url = format!(
-        "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY_ADJUSTED&symbol={}&outputsize={}&apikey={}",
+        "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&outputsize={}&apikey={}",
         symbol,
         if is_compact {"compact"} else {"full"},
         api_key,
@@ -91,23 +102,34 @@ pub fn get_stock_history(symbol: &str, is_compact: bool, api_key: &str) -> Resul
     call_alphavantage(&url)
 }
 
-fn call_alphavantage<T>(url: &str) -> Result<T, Box<dyn Error>> 
-    where
-    T: for<'de> serde::Deserialize<'de>
+fn call_alphavantage<T>(url: &str) -> Result<T, Box<dyn Error>>
+where
+    T: for<'de> serde::Deserialize<'de>,
 {
     let response = reqwest::blocking::get(url)?;
 
     match response.status() {
         reqwest::StatusCode::OK => return Ok(response.json::<T>()?),
-        e => return Err(AlphaVantageError {message: format!("status code: {} {}", e.as_str(), e.canonical_reason().unwrap())}.into()),
+        e => {
+            return Err(AlphaVantageError {
+                message: format!(
+                    "status code: {} {}",
+                    e.as_str(),
+                    e.canonical_reason().unwrap()
+                ),
+            }
+            .into())
+        }
     }
 }
 
 fn de_float<'de, D: Deserializer<'de>>(deserializer: D) -> Result<f64, D::Error> {
     Ok(match Value::deserialize(deserializer)? {
         Value::String(s) => s.parse().map_err(serde::de::Error::custom)?,
-        Value::Number(num) => num.as_f64().ok_or(serde::de::Error::custom("Invalid number"))?,
-        _ => return Err(serde::de::Error::custom("wrong type"))
+        Value::Number(num) => num
+            .as_f64()
+            .ok_or(serde::de::Error::custom("Invalid number"))?,
+        _ => return Err(serde::de::Error::custom("wrong type")),
     })
 }
 
