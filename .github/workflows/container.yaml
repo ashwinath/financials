@@ -10,6 +10,7 @@ jobs:
     env:
       REGISTRY: ghcr.io/ashwinath
       RUST_VERSION: 1.73.0
+      DEBIAN_VERSION: '12.2-slim'
     steps:
     - name: Checkout
       uses: actions/checkout@v2

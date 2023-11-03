@@ -5,7 +5,11 @@ test:
 	cargo test
 
 build:
-	docker build -t $(REGISTRY)/financials:$(commit) -t $(REGISTRY)/financials:latest .
+	docker build \
+		--build-arg="RUST_VERSION=${RUST_VERSION}" \
+		--build-arg="DEBIAN_VERSION=${DEBIAN_VERSION}" \
+		-t $(REGISTRY)/financials:$(commit) \
+		-t $(REGISTRY)/financials:latest .
 
 push:
 	docker push $(REGISTRY)/financials:$(commit)
