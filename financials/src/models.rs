@@ -2,17 +2,8 @@ use chrono::{DateTime, Utc};
 use serde::Deserialize;
 
 use crate::schema::{
-    assets,
-    average_expenditures,
-    exchange_rates,
-    expenses,
-    incomes,
-    shared_expense,
-    stocks,
-    symbols,
-    trades,
-    portfolios,
-    mortgage,
+    assets, average_expenditures, exchange_rates, expenses, incomes, mortgage, portfolios,
+    shared_expense, stocks, symbols, trades,
 };
 
 use crate::utils::yymmdd_format;
@@ -172,8 +163,8 @@ pub struct SharedExpense {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{Utc, TimeZone};
     use crate::utils::read_from_csv;
+    use chrono::{NaiveDateTime, Utc};
 
     #[test]
     fn parse_trades_csv() {
@@ -185,9 +176,10 @@ mod tests {
         assert_eq!(result.trade_type, "buy");
         assert_eq!(result.price_each, 446.12);
         assert_eq!(result.quantity, 2.0);
-        let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-08-19 08:00:00", "%Y-%m-%d %H:%M:%S")
-            .unwrap();
+        let expected_date: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
+            NaiveDateTime::parse_from_str("2021-08-19 08:00:00", "%Y-%m-%d %H:%M:%S").unwrap(),
+            Utc,
+        );
         assert_eq!(result.date_purchased, expected_date);
     }
 
@@ -200,9 +192,10 @@ mod tests {
         let result = &result[0];
         assert_eq!(result.type_, "Bank");
         assert_eq!(result.amount, 10000.0);
-        let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-08-01 08:00:00", "%Y-%m-%d %H:%M:%S")
-            .unwrap();
+        let expected_date: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
+            NaiveDateTime::parse_from_str("2021-08-01 08:00:00", "%Y-%m-%d %H:%M:%S").unwrap(),
+            Utc,
+        );
         assert_eq!(result.transaction_date, expected_date);
     }
 
@@ -215,9 +208,10 @@ mod tests {
         let result = &result[0];
         assert_eq!(result.type_, "Base");
         assert_eq!(result.amount, 5000.0);
-        let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-08-05 08:00:00", "%Y-%m-%d %H:%M:%S")
-            .unwrap();
+        let expected_date: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
+            NaiveDateTime::parse_from_str("2021-08-05 08:00:00", "%Y-%m-%d %H:%M:%S").unwrap(),
+            Utc,
+        );
         assert_eq!(result.transaction_date, expected_date);
     }
 
@@ -230,9 +224,10 @@ mod tests {
         let result = &result[0];
         assert_eq!(result.type_, "Credit Card");
         assert_eq!(result.amount, 1000.0);
-        let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2021-08-31 08:00:00", "%Y-%m-%d %H:%M:%S")
-            .unwrap();
+        let expected_date: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
+            NaiveDateTime::parse_from_str("2021-08-31 08:00:00", "%Y-%m-%d %H:%M:%S").unwrap(),
+            Utc,
+        );
         assert_eq!(result.transaction_date, expected_date);
     }
 
@@ -244,9 +239,10 @@ mod tests {
         let result = &result[0];
         assert_eq!(result.type_, "Electricity");
         assert_eq!(result.amount, 35.0);
-        let expected_date: DateTime<Utc> = Utc
-            .datetime_from_str("2022-08-31 08:00:00", "%Y-%m-%d %H:%M:%S")
-            .unwrap();
+        let expected_date: DateTime<Utc> = DateTime::<Utc>::from_naive_utc_and_offset(
+            NaiveDateTime::parse_from_str("2022-08-31 08:00:00", "%Y-%m-%d %H:%M:%S").unwrap(),
+            Utc,
+        );
         assert_eq!(result.expense_date, expected_date);
     }
 }

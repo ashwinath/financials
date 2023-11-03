@@ -1,23 +1,26 @@
-use std::error::Error;
-use crate::alphavantage::{search_alphavantage_symbol, get_currency_history, get_stock_history};
-use crate::models::{TradeWithId, Symbol, SymbolWithId, ExchangeRate, Stock, Portfolio};
-use crate::schema::trades::dsl::trades;
-use crate::schema::symbols::dsl::symbols;
+use crate::alphavantage::{get_currency_history, get_stock_history, search_alphavantage_symbol};
+use crate::models::{ExchangeRate, Portfolio, Stock, Symbol, SymbolWithId, TradeWithId};
 use crate::schema::exchange_rates::dsl::exchange_rates;
 use crate::schema::portfolios::dsl::portfolios;
 use crate::schema::stocks::dsl::stocks;
+use crate::schema::symbols::dsl::symbols;
+use crate::schema::trades::dsl::trades;
 use std::collections::HashMap;
+use std::error::Error;
 
-use chrono::{DateTime, Duration, Datelike, Utc, TimeZone};
-use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
-use diesel::{insert_into, update};
+use chrono::{DateTime, Datelike, Duration, NaiveDateTime, TimeZone, Utc};
 use diesel::pg::PgConnection;
+use diesel::{insert_into, update};
+use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl};
 
 const FORMAT: &str = "%Y-%m-%d %H:%M:%S";
 const STOCK_SYMBOL: &str = "stock";
 const CURRENCY_SYMBOL: &str = "currency";
 
-pub fn calculate_stocks(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>>  {
+pub fn calculate_stocks(
+    conn: &mut PgConnection,
+    alphavantage_key: &str,
+) -> Result<(), Box<dyn Error>> {
     sync_symbol_table(conn, alphavantage_key)?;
     // TODO: Stocks and currencies can be concurrent
     process_currencies(conn, alphavantage_key)?;
@@ -39,7 +42,6 @@ fn calculate_portfolio(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
             .filter(crate::schema::trades::symbol.eq(&symbol))
             .load::<TradeWithId>(conn)?;
 
-
         let mut partial_portfolios: Vec<Portfolio> = Vec::new();
         let currency_symbol = stock_symbol.base_currency.unwrap();
 
@@ -53,18 +55,19 @@ fn calculate_portfolio(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
                     trade_date: t.date_purchased,
                     symbol: symbol.clone(),
                     principal,
-                    nav: 0.0, // Calculate later
+                    nav: 0.0,            // Calculate later
                     simple_returns: 0.0, // Calculate later
                     quantity: t.quantity,
                 }
             } else {
                 let last_portfolio = &partial_portfolios[partial_portfolios.len() - 1];
-                let principal = last_portfolio.principal + (t.price_each * t.quantity * exchange_rate * trade_multiplier);
+                let principal = last_portfolio.principal
+                    + (t.price_each * t.quantity * exchange_rate * trade_multiplier);
                 Portfolio {
                     trade_date: t.date_purchased,
                     symbol: symbol.clone(),
                     principal,
-                    nav: 0.0, // Calculate later
+                    nav: 0.0,            // Calculate later
                     simple_returns: 0.0, // Calculate later
                     quantity: last_portfolio.quantity + (t.quantity * trade_multiplier),
                 }
@@ -86,23 +89,21 @@ fn calculate_portfolio(conn: &mut PgConnection) -> Result<(), Box<dyn Error>> {
 
         let mut all_portfolios: Vec<Portfolio> = Vec::new();
         let today = chrono::offset::Utc::now();
-        let tomorrow = Utc.with_ymd_and_hms(
-            today.year(),
-            today.month(),
-            today.day(),
-            8, 0, 0
-        ).unwrap();
+        let tomorrow = Utc
+            .with_ymd_and_hms(today.year(), today.month(), today.day(), 8, 0, 0)
+            .unwrap();
 
         while current_date < tomorrow {
             let exchange_rate = get_currency_rate(conn, current_date, &currency_symbol);
             let price = get_stock_price(conn, current_date, &symbol);
 
-            let previous_portfolio = if let Some(previous_portfolio) = portfolio_map.get(&current_date) {
-                previous_portfolio
-            } else {
-                // Guaranteed to have an element.
-                all_portfolios.last().unwrap()
-            };
+            let previous_portfolio =
+                if let Some(previous_portfolio) = portfolio_map.get(&current_date) {
+                    previous_portfolio
+                } else {
+                    // Guaranteed to have an element.
+                    all_portfolios.last().unwrap()
+                };
 
             let principal = previous_portfolio.principal;
             let quantity = previous_portfolio.quantity;
@@ -172,15 +173,18 @@ fn process_stocks(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(),
     // TODO: Can be concurrent
     for stock_symbol in stock_symbols {
         let is_compact = stock_symbol.last_processed_date.is_some();
-        let stock_history = get_stock_history(&stock_symbol.symbol, is_compact, alphavantage_key)?
-            .results;
+        let stock_history =
+            get_stock_history(&stock_symbol.symbol, is_compact, alphavantage_key)?.results;
 
         let mut last_processed_date: Option<DateTime<Utc>> = None;
         let mut stock_histories = Vec::new();
 
         for (date, value) in stock_history {
             let date = format!("{} 08:00:00", date);
-            let date = Utc.datetime_from_str(&date, FORMAT)?;
+            let date = DateTime::<Utc>::from_naive_utc_and_offset(
+                NaiveDateTime::parse_from_str(&date, FORMAT)?,
+                Utc,
+            );
             last_processed_date = if last_processed_date.is_none() {
                 Some(date)
             } else if last_processed_date.unwrap().lt(&date) {
@@ -211,7 +215,10 @@ fn process_stocks(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(),
     Ok(())
 }
 
-fn process_currencies(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
+fn process_currencies(
+    conn: &mut PgConnection,
+    alphavantage_key: &str,
+) -> Result<(), Box<dyn Error>> {
     let currencies = symbols
         .filter(crate::schema::symbols::dsl::symbol_type.eq(CURRENCY_SYMBOL))
         .load::<SymbolWithId>(conn)?;
@@ -219,15 +226,18 @@ fn process_currencies(conn: &mut PgConnection, alphavantage_key: &str) -> Result
     // TODO: Can be concurrent
     for currency in currencies {
         let is_compact = currency.last_processed_date.is_some();
-        let history = get_currency_history(&currency.symbol, "SGD", is_compact, alphavantage_key)?
-            .results;
+        let history =
+            get_currency_history(&currency.symbol, "SGD", is_compact, alphavantage_key)?.results;
 
         let mut last_processed_date: Option<DateTime<Utc>> = None;
         let mut currency_history = Vec::new();
 
         for (date, value) in history {
             let date = format!("{} 08:00:00", date);
-            let date = Utc.datetime_from_str(&date, FORMAT)?;
+            let date = DateTime::<Utc>::from_naive_utc_and_offset(
+                NaiveDateTime::parse_from_str(&date, FORMAT)?,
+                Utc,
+            );
             last_processed_date = if last_processed_date.is_none() {
                 Some(date)
             } else if last_processed_date.unwrap().lt(&date) {
@@ -258,7 +268,10 @@ fn process_currencies(conn: &mut PgConnection, alphavantage_key: &str) -> Result
     Ok(())
 }
 
-fn sync_symbol_table(conn: &mut PgConnection, alphavantage_key: &str) -> Result<(), Box<dyn Error>> {
+fn sync_symbol_table(
+    conn: &mut PgConnection,
+    alphavantage_key: &str,
+) -> Result<(), Box<dyn Error>> {
     let s = trades
         .select(crate::schema::trades::dsl::symbol)
         .distinct()
@@ -274,9 +287,7 @@ fn sync_symbol_table(conn: &mut PgConnection, alphavantage_key: &str) -> Result<
 
         if count == 0 {
             let symbol_info = search_alphavantage_symbol(&symbol, alphavantage_key)?;
-            let base_currency = &symbol_info
-                .best_matches[0]
-                .currency;
+            let base_currency = &symbol_info.best_matches[0].currency;
 
             let symbol_object = Symbol {
                 symbol_type: STOCK_SYMBOL.to_string(),
@@ -285,9 +296,7 @@ fn sync_symbol_table(conn: &mut PgConnection, alphavantage_key: &str) -> Result<
                 last_processed_date: None,
             };
 
-            insert_into(symbols)
-                .values(&symbol_object)
-                .execute(conn)?;
+            insert_into(symbols).values(&symbol_object).execute(conn)?;
         }
     }
 
@@ -315,9 +324,7 @@ fn sync_symbol_table(conn: &mut PgConnection, alphavantage_key: &str) -> Result<
                 base_currency: None,
                 last_processed_date: None,
             };
-            insert_into(symbols)
-                .values(&symbol_object)
-                .execute(conn)?;
+            insert_into(symbols).values(&symbol_object).execute(conn)?;
         }
     }
 

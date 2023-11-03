@@ -1,12 +1,12 @@
 use chrono::{DateTime, Utc};
 use chronoutil::delta::shift_months;
-use diesel::{insert_into, delete, RunQueryDsl};
 use diesel::pg::PgConnection;
+use diesel::{delete, insert_into, RunQueryDsl};
 use serde::Deserialize;
 
-use crate::utils::yymmdd_format;
 use crate::models::MortgageSchedule;
 use crate::schema::mortgage::dsl::mortgage;
+use crate::utils::yymmdd_format;
 
 use std::error::Error;
 use std::fs;
@@ -35,7 +35,10 @@ struct Downpayment {
     pub sum: f64,
 }
 
-pub fn generate_mortgage_schedule(conn: &mut PgConnection, config_location: &str) -> Result<(), Box<dyn Error>> {
+pub fn generate_mortgage_schedule(
+    conn: &mut PgConnection,
+    config_location: &str,
+) -> Result<(), Box<dyn Error>> {
     let config = parse_mortgage(config_location)?;
     delete(mortgage).execute(conn)?;
     for m in config.mortgages.iter() {
@@ -57,14 +60,11 @@ fn parse_one_mortgage_schedule(m: &Mortgage) -> Vec<MortgageSchedule> {
     let monthly_payment = calculate_mortgage(
         principal,
         m.interest_rate_percentage,
-        m.mortgage_duration_in_years
+        m.mortgage_duration_in_years,
     );
 
-    let interest_paid_schedule = calculate_interest_paid_schedule(
-        principal,
-        monthly_payment,
-        m.interest_rate_percentage,
-    );
+    let interest_paid_schedule =
+        calculate_interest_paid_schedule(principal, monthly_payment, m.interest_rate_percentage);
 
     let total_interest_to_be_paid = interest_paid_schedule.iter().sum();
 
@@ -158,7 +158,11 @@ fn parse_mortgage(config_location: &str) -> Result<MortgageConfig, Box<dyn Error
     Ok(config)
 }
 
-fn calculate_interest_paid_schedule(principal: f64, monthly_payment: f64, interest_rate: f64) -> Vec<f64> {
+fn calculate_interest_paid_schedule(
+    principal: f64,
+    monthly_payment: f64,
+    interest_rate: f64,
+) -> Vec<f64> {
     let ir = interest_rate / 100.0 / NUMBER_OF_MONTHS_IN_YEAR as f64;
     let mut sum_left = principal;
 
@@ -177,53 +181,89 @@ fn calculate_interest_paid_schedule(principal: f64, monthly_payment: f64, intere
 fn calculate_mortgage(principal: f64, interest_rate: f64, mortgage_duration_in_years: i32) -> f64 {
     let number_of_months = mortgage_duration_in_years * NUMBER_OF_MONTHS_IN_YEAR;
     let ir = interest_rate / 100.0 / NUMBER_OF_MONTHS_IN_YEAR as f64;
-    // M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1]. 
-    let monthly_payment = principal * (
-        (ir * f64::powi(1.0 + ir, number_of_months)) /
-        (f64::powi(1.0 + ir, number_of_months) - 1.0)
-    );
+    // M = P [ i(1 + i)^n ] / [ (1 + i)^n – 1].
+    let monthly_payment = principal
+        * ((ir * f64::powi(1.0 + ir, number_of_months))
+            / (f64::powi(1.0 + ir, number_of_months) - 1.0));
     monthly_payment
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use chrono::{Utc, TimeZone};
+    use chrono::{NaiveDateTime, Utc};
 
     #[test]
     fn test_mortgage_schedule() {
         let mortgage_config = parse_mortgage("./sample/mortgage.yaml").unwrap();
-        let mortgage_schedule = parse_one_mortgage_schedule(mortgage_config.mortgages.get(0).unwrap());
+        let mortgage_schedule =
+            parse_one_mortgage_schedule(mortgage_config.mortgages.get(0).unwrap());
 
         let first_downpayment_schedule = mortgage_schedule.get(0).unwrap();
         assert_eq!(
             first_downpayment_schedule.date,
-            Utc.datetime_from_str(
-                "2021-10-10 08:00:00",
-                "%Y-%m-%d %H:%M:%S"
-            ).unwrap()
+            DateTime::<Utc>::from_naive_utc_and_offset(
+                NaiveDateTime::parse_from_str("2021-10-10 08:00:00", "%Y-%m-%d %H:%M:%S").unwrap(),
+                Utc,
+            ),
         );
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.interest_paid), "0.00");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_interest_paid), "0.00");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.principal_paid), "1000.00");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_principal_paid), "1000.00");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_principal_left), "49000.00");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_interest_left), "10469.25");
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.interest_paid),
+            "0.00"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_interest_paid),
+            "0.00"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.principal_paid),
+            "1000.00"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_principal_paid),
+            "1000.00"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_principal_left),
+            "49000.00"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_interest_left),
+            "10469.25"
+        );
 
         let first_downpayment_schedule = mortgage_schedule.get(2).unwrap();
         assert_eq!(
             first_downpayment_schedule.date,
-            Utc.datetime_from_str(
-                "2022-10-10 08:00:00",
-                "%Y-%m-%d %H:%M:%S"
-            ).unwrap()
+            DateTime::<Utc>::from_naive_utc_and_offset(
+                NaiveDateTime::parse_from_str("2022-10-10 08:00:00", "%Y-%m-%d %H:%M:%S").unwrap(),
+                Utc,
+            ),
         );
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.interest_paid), "62.83");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_interest_paid), "62.83");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.principal_paid), "68.73");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_principal_paid), "21068.73");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_principal_left), "28931.27");
-        assert_eq!(format!("{:.2}", first_downpayment_schedule.total_interest_left), "10406.41");
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.interest_paid),
+            "62.83"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_interest_paid),
+            "62.83"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.principal_paid),
+            "68.73"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_principal_paid),
+            "21068.73"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_principal_left),
+            "28931.27"
+        );
+        assert_eq!(
+            format!("{:.2}", first_downpayment_schedule.total_interest_left),
+            "10406.41"
+        );
     }
 
     #[test]
@@ -236,7 +276,7 @@ mod tests {
             pub interest_paid_expected: &'a str,
         }
 
-        let test_cases = vec!(
+        let test_cases = vec![
             TestCase {
                 principal: 29_000.0,
                 ir: 2.6,
@@ -258,14 +298,22 @@ mod tests {
                 expected: "118724.61",
                 interest_paid_expected: "3172582.59",
             },
-        );
+        ];
 
         for test_case in test_cases.iter() {
-            let monthly_payment = calculate_mortgage(test_case.principal, test_case.ir, test_case.years);
+            let monthly_payment =
+                calculate_mortgage(test_case.principal, test_case.ir, test_case.years);
             assert_eq!(format!("{:.2}", monthly_payment), test_case.expected);
-            let interest_paid_schedule = calculate_interest_paid_schedule(test_case.principal, monthly_payment, test_case.ir);
+            let interest_paid_schedule = calculate_interest_paid_schedule(
+                test_case.principal,
+                monthly_payment,
+                test_case.ir,
+            );
             let interest_paid: f64 = interest_paid_schedule.iter().sum();
-            assert_eq!(format!("{:.2}", interest_paid), test_case.interest_paid_expected);
+            assert_eq!(
+                format!("{:.2}", interest_paid),
+                test_case.interest_paid_expected
+            );
         }
     }
 
@@ -273,33 +321,40 @@ mod tests {
     fn test_parse_mortgage() {
         let mortgage_config = parse_mortgage("./sample/mortgage.yaml").unwrap();
         let expected = MortgageConfig {
-            mortgages: vec!(
-                Mortgage {
-                    total: 50_000.0,
-                    mortgage_first_payment: Utc.datetime_from_str(
-                        "2022-10-10 08:00:00",
-                        "%Y-%m-%d %H:%M:%S"
-                    ).unwrap(),
-                    mortgage_duration_in_years: 25,
-                    interest_rate_percentage: 2.6,
-                    downpayments: vec!(
-                        Downpayment {
-                            date: Utc.datetime_from_str(
+            mortgages: vec![Mortgage {
+                total: 50_000.0,
+                mortgage_first_payment: DateTime::<Utc>::from_naive_utc_and_offset(
+                    NaiveDateTime::parse_from_str("2022-10-10 08:00:00", "%Y-%m-%d %H:%M:%S")
+                        .unwrap(),
+                    Utc,
+                ),
+                mortgage_duration_in_years: 25,
+                interest_rate_percentage: 2.6,
+                downpayments: vec![
+                    Downpayment {
+                        date: DateTime::<Utc>::from_naive_utc_and_offset(
+                            NaiveDateTime::parse_from_str(
                                 "2021-10-10 08:00:00",
-                                "%Y-%m-%d %H:%M:%S"
-                            ).unwrap(),
-                            sum: 1000.0,
-                        },
-                        Downpayment {
-                            date: Utc.datetime_from_str(
+                                "%Y-%m-%d %H:%M:%S",
+                            )
+                            .unwrap(),
+                            Utc,
+                        ),
+                        sum: 1000.0,
+                    },
+                    Downpayment {
+                        date: DateTime::<Utc>::from_naive_utc_and_offset(
+                            NaiveDateTime::parse_from_str(
                                 "2021-12-12 08:00:00",
-                                "%Y-%m-%d %H:%M:%S"
-                            ).unwrap(),
-                            sum: 20000.0,
-                        },
-                    ),
-                },
-            ),
+                                "%Y-%m-%d %H:%M:%S",
+                            )
+                            .unwrap(),
+                            Utc,
+                        ),
+                        sum: 20000.0,
+                    },
+                ],
+            }],
         };
         assert_eq!(mortgage_config, expected);
     }

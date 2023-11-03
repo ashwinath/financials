@@ -1,12 +1,11 @@
-use chrono::{DateTime, Utc, Datelike, TimeZone, Duration};
+use chrono::{DateTime, Datelike, Duration, TimeZone, Utc};
 use chronoutil::delta::shift_months;
 use std::error::Error;
 
 pub fn read_from_csv<T>(csv: &str) -> Result<Vec<T>, Box<dyn Error>>
-    where
+where
     T: for<'de> serde::Deserialize<'de>,
 {
-
     let mut rdr = csv::Reader::from_path(csv)?;
 
     let mut data = Vec::new();
@@ -20,31 +19,27 @@ pub fn read_from_csv<T>(csv: &str) -> Result<Vec<T>, Box<dyn Error>>
 }
 
 pub mod yymmdd_format {
-    use chrono::{DateTime, Utc, TimeZone};
+    use chrono::{DateTime, NaiveDateTime, Utc};
     use serde::{self, Deserialize, Deserializer};
 
     const FORMAT: &'static str = "%Y-%m-%d %H:%M:%S";
 
-    pub fn deserialize<'de, D>(
-        deserializer: D,
-    ) -> Result<DateTime<Utc>, D::Error>
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<DateTime<Utc>, D::Error>
     where
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
         let s = format!("{} 08:00:00", s);
-        Utc.datetime_from_str(&s, FORMAT).map_err(serde::de::Error::custom)
+        let dt = NaiveDateTime::parse_from_str(&s, FORMAT).map_err(serde::de::Error::custom)?;
+        Ok(DateTime::<Utc>::from_naive_utc_and_offset(dt, Utc))
     }
 }
 
 pub fn get_last_day_of_month(dt: DateTime<Utc>) -> DateTime<Utc> {
     let dt = shift_months(dt, 1);
-    Utc.with_ymd_and_hms(
-        dt.year(),
-        dt.month(),
-        1,
-        8, 0, 0
-    ).unwrap() - Duration::days(1)
+    Utc.with_ymd_and_hms(dt.year(), dt.month(), 1, 8, 0, 0)
+        .unwrap()
+        - Duration::days(1)
 }
 
 pub fn is_last_day_of_month(dt: DateTime<Utc>) -> bool {
