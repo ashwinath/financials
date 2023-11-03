@@ -387,13 +387,12 @@ local shared_expenses = createPanel(
   unit='currencyUSD',
   query='SELECT
       expense_date as "time",
-      type,
-      amount AS "Amount"
+      sum(amount) AS "Amount"
   FROM shared_expense
   WHERE
       $__timeFilter(expense_date)
       AND type not like \'Special:%\'
-  group by expense_date, type, amount
+  group by expense_date
   order by time',
   legend_show=true,
   stack=true,
@@ -405,13 +404,12 @@ local special_shared_expenses = createPanel(
   unit='currencyUSD',
   query='SELECT
       expense_date as "time",
-      type,
-      amount AS "Amount"
+      sum(amount) AS "Amount"
   FROM shared_expense
   WHERE
       $__timeFilter(expense_date)
       AND type like \'Special:%\'
-  group by expense_date, type, amount
+  group by expense_date
   order by time',
   legend_show=true,
   stack=true,
@@ -558,7 +556,7 @@ dashboard.new(
   tags=['financials'],
   time_from='now-1y',
   editable=false,
-  graphTooltip='shared_tooltip',
+  graphTooltip='1',
 )
 // Summary Of Financials
 .addPanel(
