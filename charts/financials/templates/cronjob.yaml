@@ -34,7 +34,7 @@ spec:
             args:
             - ./financials
             - --database-url
-            - postgres://{{ .Values.postgresql.postgresqlUsername }}:{{ .Values.postgresql.postgresqlPassword }}@{{ .Release.Name }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local/{{ .Values.postgresql.postgresqlDatabase }}
+            - postgres://postgres:{{ .Values.postgresql.auth.postgresPassword }}@{{ .Release.Name }}-postgresql.{{ .Release.Namespace }}.svc.cluster.local/postgres
             - --alphavantage-key
             - {{ .Values.financials.alphavantageApiKey }}
             - --trades-csv

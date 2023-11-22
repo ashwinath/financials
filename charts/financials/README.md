@@ -1,6 +1,6 @@
 # financials
 
-![Version: 2.2.2](https://img.shields.io/badge/Version-2.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 2.3.0](https://img.shields.io/badge/Version-2.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Helm chart for financials
 
@@ -8,7 +8,7 @@ Helm chart for financials
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://raw.githubusercontent.com/bitnami/charts/pre-2022/bitnami | postgresql | 10.12.4 |
+| https://charts.bitnami.com/bitnami | postgresql | 13.2.15 |
 
 ## Values
 
@@ -32,8 +32,6 @@ Helm chart for financials
 | financials.shared_expenses | string | `"date,type,amount\n2023-01-01,Special:Renovations,5000.00\n2023-01-01,Electricity,100.00\n2023-01-01,Water,50.00\n2023-01-01,Gas,30.00\n2023-01-01,Grocery,300.00\n2023-01-01,Eating Out,500.00"` | CSV values for shared expenses |
 | financials.telegramBotUrl | string | `"http://<url here>"` | telegram bot dump endpoint, include scheme as well. |
 | financials.trades | string | `"date_purchased,symbol,trade_type,price_each,quantity\n2021-03-11,IWDA.LON,buy,76.34,10"` | CSV values for the trades |
-| postgresql.persistence.enabled | bool | `true` | Persist Postgresql data in a Persistent Volume Claim  |
-| postgresql.postgresqlDatabase | string | `"postgres"` | Database name for Postgresql database |
-| postgresql.postgresqlPassword | string | `"password"` | Password for postgresql database, highly recommended to change this value |
-| postgresql.postgresqlUsername | string | `"postgres"` | Username for postgresql database |
+| postgresql.auth.postgresqlPassword | string | `"password"` | Password for postgresql database, highly recommended to change this value |
+| postgresql.primary.persistence.enabled | bool | `true` | Persist Postgresql data in a Persistent Volume Claim  |
 | postgresql.resources | object | `{}` | Resources requests and limits for the database |

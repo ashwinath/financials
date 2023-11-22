@@ -101,12 +101,10 @@ postgresql:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
-  persistence:
-    # -- Persist Postgresql data in a Persistent Volume Claim 
-    enabled: true
-  # -- Database name for Postgresql database
-  postgresqlDatabase: postgres
-  # -- Username for postgresql database
-  postgresqlUsername: postgres
-  # -- Password for postgresql database, highly recommended to change this value
-  postgresqlPassword: password
+  primary:
+    persistence:
+      # -- Persist Postgresql data in a Persistent Volume Claim 
+      enabled: true
+  auth:
+    # -- Password for postgresql database, highly recommended to change this value
+    postgresqlPassword: password
