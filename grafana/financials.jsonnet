@@ -293,7 +293,7 @@ local liquidAssets = createPanel(
   FROM assets
   WHERE
     $__timeFilter(transaction_date)
-    AND type IN (\'Bank\', \'MMF\' \'Investments\', \'Bonds\')
+    AND type IN (\'Bank\', \'MMF\', \'Investments\', \'Bonds\')
   group by transaction_date, type, amount
   order by transaction_date',
   legend_show=true,
