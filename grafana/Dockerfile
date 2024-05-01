@@ -1,4 +1,4 @@
-FROM docker.io/bitnami/minideb:buster
+FROM docker.io/bitnami/minideb:bookworm
 LABEL org.opencontainers.image.authors="ashwinath@hotmail.com"
 LABEL org.opencontainers.image.source https://github.com/ashwinath/financials
 
