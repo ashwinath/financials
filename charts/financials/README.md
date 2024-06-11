@@ -18,11 +18,6 @@ Helm chart for financials
 | financials.assets | string | `"date,type,amount\n2020-03-31,CPF,1000\n2020-03-31,Bank,20000\n2020-03-31,Mortgage,-40000\n2020-03-31,Investments,20000"` | CSV values for the assets |
 | financials.cronSchedule | string | `"0 */4 * * *"` | cron schedule |
 | financials.expenses | string | `"date,type,amount\n2020-03-31,Credit Card,500\n2020-03-31,Reimbursement,-200\n2020-03-31,Tithe,800"` | CSV values for the expenses |
-| financials.financialsGrafana.apiKey | string | `"secret"` |  |
-| financials.financialsGrafana.endpoint | string | `"www.example.com:3000"` | URL and port of the grafana site |
-| financials.financialsGrafana.image.pullPolicy | string | `"Always"` | Image pull policy in Kubernetes |
-| financials.financialsGrafana.image.repository | string | `"ghcr.io/ashwinath/financials-grafana"` | Respository of the image. |
-| financials.financialsGrafana.image.tag | string | `"latest"` | Override this value for the desired image tag |
 | financials.image.pullPolicy | string | `"Always"` | Image pull policy in Kubernetes |
 | financials.image.repository | string | `"ghcr.io/ashwinath/financials"` | Respository of the image. |
 | financials.image.tag | string | `"latest"` | Override this value for the desired image tag |

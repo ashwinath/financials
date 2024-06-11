@@ -25,18 +25,6 @@ financials:
     #   cpu: 100m
     #   memory: 128Mi
 
-  financialsGrafana:
-    image:
-      # -- Respository of the image.
-      repository: ghcr.io/ashwinath/financials-grafana
-      # -- Image pull policy in Kubernetes
-      pullPolicy: Always
-      # -- Override this value for the desired image tag
-      tag: latest
-    apiKey: secret
-    # -- URL and port of the grafana site
-    endpoint: www.example.com:3000
-
   # -- CSV values for the trades
   trades: |-
     date_purchased,symbol,trade_type,price_each,quantity

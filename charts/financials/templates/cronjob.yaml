@@ -11,17 +11,6 @@ spec:
     spec:
       template:
         spec:
-          initContainers:
-          - name: grafana-init
-            image: "{{ .Values.financials.financialsGrafana.image.repository }}:{{ .Values.financials.financialsGrafana.image.tag }}"
-            command: ["/bin/sh", "-c"]
-            args:
-            - /app/load.sh
-            env:
-            - name: GRAFANA_API_KEY
-              value: {{ .Values.financials.financialsGrafana.apiKey }}
-            - name: GRAFANA_ENDPOINT
-              value: {{ .Values.financials.financialsGrafana.endpoint }}
           containers:
           - name: financials
             image: "{{ .Values.financials.image.repository }}:{{ .Values.financials.image.tag }}"
