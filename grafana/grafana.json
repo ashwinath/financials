@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": "1",
-  "id": 19,
+  "id": 1,
   "links": [],
   "panels": [
     {
@@ -125,11 +125,11 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -219,11 +219,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -313,11 +313,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -436,11 +436,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -530,11 +530,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -624,11 +624,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -718,11 +718,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -812,11 +812,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -906,11 +906,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1001,7 +1001,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1028,11 +1029,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1094,7 +1095,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1121,11 +1123,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1187,7 +1189,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1214,11 +1217,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1309,7 +1312,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1336,11 +1340,11 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1402,7 +1406,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1429,11 +1434,11 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1495,7 +1500,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1522,11 +1528,11 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -1577,9 +1583,6 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
           "custom": {
             "align": "auto",
             "cellOptions": {
@@ -1592,7 +1595,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1608,6 +1612,10 @@
               "options": "time"
             },
             "properties": [
+              {
+                "id": "custom.hidden",
+                "value": true
+              },
               {
                 "id": "custom.align"
               }
@@ -1762,13 +1770,13 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 13,
+        "w": 16,
         "x": 0,
         "y": 45
       },
       "id": 22,
       "options": {
-        "cellHeight": "md",
+        "cellHeight": "sm",
         "footer": {
           "countRows": false,
           "fields": "",
@@ -1779,7 +1787,7 @@
         },
         "showHeader": true
       },
-      "pluginVersion": "10.4.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
@@ -1792,15 +1800,231 @@
         }
       ],
       "title": "Current Portfolio",
-      "transformations": [
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 2,
+        "x": 16,
+        "y": 45
+      },
+      "id": 25,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
         {
-          "id": "merge",
-          "options": {
-            "reducers": []
-          }
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
+          },
+          "format": "time_series",
+          "rawSql": "SELECT\n    trade_date as \"time\",\n    sum(principal) as \"principal\"\n  FROM portfolios\n  WHERE\n    trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'\n  group by trade_date\n  order by trade_date",
+          "refId": "A"
         }
       ],
-      "type": "table"
+      "title": "Principal",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUSD"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 2,
+        "x": 18,
+        "y": 45
+      },
+      "id": 24,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
+          },
+          "format": "time_series",
+          "rawSql": "SELECT\n    trade_date as \"time\",\n    sum(nav) as \"nav\"\n  FROM portfolios\n  WHERE\n    trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'\n  group by trade_date\n  order by trade_date",
+          "refId": "A"
+        }
+      ],
+      "title": "NAV",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "match": "null",
+                "result": {
+                  "text": "N/A"
+                }
+              },
+              "type": "special"
+            }
+          ],
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 2,
+        "x": 20,
+        "y": 45
+      },
+      "id": 26,
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "none",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
+          },
+          "format": "time_series",
+          "rawSql": "SELECT\n    trade_date as \"time\",\n    (sum(nav) - sum(principal)) / sum(principal) as \"returns\"\n  FROM portfolios\n  WHERE\n    trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'\n  group by trade_date\n  order by trade_date",
+          "refId": "A"
+        }
+      ],
+      "title": "Simple Returns",
+      "type": "stat"
     },
     {
       "aliasColors": {},
@@ -1827,10 +2051,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 5,
-        "x": 13,
-        "y": 45
+        "h": 11,
+        "w": 8,
+        "x": 16,
+        "y": 50
       },
       "id": 23,
       "legend": {
@@ -1857,6 +2081,7 @@
           "values": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "single",
           "sort": "none"
         }
@@ -1887,223 +2112,167 @@
           "color": {
             "mode": "thresholds"
           },
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
-              },
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "date"
+            },
+            "properties": [
               {
-                "color": "red",
-                "value": 80
+                "id": "displayName",
+                "value": "Date"
               }
             ]
           },
-          "unit": "currencyUSD"
-        },
-        "overrides": []
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "type"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Type"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "symbol"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Symbol"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "price"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Price"
+              },
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "quantity"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Quantity"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "cost"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Cost"
+              },
+              {
+                "id": "unit",
+                "value": "currencyUSD"
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
-        "h": 4,
-        "w": 2,
-        "x": 18,
-        "y": 45
+        "h": 8,
+        "w": 16,
+        "x": 0,
+        "y": 53
       },
-      "id": 24,
-      "maxDataPoints": 100,
+      "id": 32,
       "options": {
-        "colorMode": "none",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
           "fields": "",
-          "values": false
+          "reducer": [
+            "sum"
+          ],
+          "show": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "showHeader": true
       },
-      "pluginVersion": "10.4.2",
+      "pluginVersion": "11.0.0",
       "targets": [
         {
           "datasource": {
             "type": "grafana-postgresql-datasource",
             "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
           },
-          "format": "time_series",
-          "rawSql": "SELECT\n    trade_date as \"time\",\n    sum(nav) as \"nav\"\n  FROM portfolios\n  WHERE\n    trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'\n  group by trade_date\n  order by trade_date",
-          "refId": "A"
-        }
-      ],
-      "title": "NAV",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "select TO_CHAR(date_purchased, 'YYYY/MM/DD') as Date, trade_type as Type, symbol as Symbol, price_each As Price, quantity as Quantity, price_each * quantity as Cost from trades order by date_purchased desc;",
+          "refId": "A",
+          "sql": {
+            "columns": [
               {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
+                "parameters": [],
+                "type": "function"
               }
-            ]
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 2,
-        "x": 20,
-        "y": 45
-      },
-      "id": 26,
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "none",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "10.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
-          },
-          "format": "time_series",
-          "rawSql": "SELECT\n    trade_date as \"time\",\n    (sum(nav) - sum(principal)) / sum(principal) as \"returns\"\n  FROM portfolios\n  WHERE\n    trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'\n  group by trade_date\n  order by trade_date",
-          "refId": "A"
-        }
-      ],
-      "title": "Simple Returns",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "type": "grafana-postgresql-datasource",
-        "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
+            ],
+            "groupBy": [
               {
-                "color": "green"
-              },
-              {
-                "color": "red",
-                "value": 80
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
               }
-            ]
-          },
-          "unit": "currencyUSD"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 2,
-        "x": 22,
-        "y": 45
-      },
-      "id": 25,
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "none",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": [
-            "mean"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "10.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "grafana-postgresql-datasource",
-            "uid": "ba553d1e-96ca-4409-8496-109e1b6e17a4"
-          },
-          "format": "time_series",
-          "rawSql": "SELECT\n    trade_date as \"time\",\n    sum(principal) as \"principal\"\n  FROM portfolios\n  WHERE\n    trade_date=DATE_TRUNC('day', CURRENT_TIMESTAMP - INTERVAL '1 day') + INTERVAL '8 hours'\n  group by trade_date\n  order by trade_date",
-          "refId": "A"
+            ],
+            "limit": 50
+          }
         }
       ],
-      "title": "Principal",
-      "type": "stat"
+      "title": "Trades",
+      "type": "table"
     },
     {
       "collapse": false,
@@ -2116,7 +2285,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 53
+        "y": 61
       },
       "id": 27,
       "panels": [],
@@ -2181,7 +2350,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2197,7 +2367,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 54
+        "y": 62
       },
       "id": 28,
       "options": {
@@ -2208,11 +2378,11 @@
           "showLegend": false
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -2274,7 +2444,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2290,7 +2461,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 54
+        "y": 62
       },
       "id": 29,
       "options": {
@@ -2301,11 +2472,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -2367,7 +2538,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2383,7 +2555,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 62
+        "y": 70
       },
       "id": 30,
       "options": {
@@ -2394,11 +2566,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -2460,7 +2632,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -2476,7 +2649,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 62
+        "y": 70
       },
       "id": 31,
       "options": {
@@ -2487,11 +2660,11 @@
           "showLegend": true
         },
         "tooltip": {
+          "maxHeight": 600,
           "mode": "multi",
           "sort": "none"
         }
       },
-      "pluginVersion": "10.4.2",
       "targets": [
         {
           "datasource": {
@@ -2509,7 +2682,9 @@
   ],
   "refresh": "",
   "schemaVersion": 39,
-  "tags": [],
+  "tags": [
+    "financials"
+  ],
   "templating": {
     "list": []
   },
@@ -2517,6 +2692,7 @@
     "from": "now-1y",
     "to": "now"
   },
+  "timeRangeUpdatedDuringEditOrView": false,
   "timepicker": {
     "refresh_intervals": [
       "5s",
@@ -2544,7 +2720,7 @@
   },
   "timezone": "browser",
   "title": "Financials",
-  "uid": "fdogp9yrpaby8e",
-  "version": 1,
+  "uid": "ba062ec8-be7d-467f-b295-7b66d5494574",
+  "version": 3338,
   "weekStart": ""
 }
