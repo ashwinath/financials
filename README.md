@@ -1,3 +1,7 @@
+# ⚠️⚠️⚠️⚠️⚠️⚠️⚠️ Deprecated ⚠️⚠️⚠️⚠️⚠️⚠️⚠️
+
+Financials and money-tracker-telegram has been consolidated into one project called [Moneybags](https://github.com/ashwinath/moneybags). Future development work will be based on that repository.
+
 # Financials
 
 Financials is a way to track your financial independence track in Singapore's context. This is still very much a work in progress, see the 'Feature Roadmap' for more details. We use Grafana as the frontend and it is assumed that Grafana is installed at the moment.
